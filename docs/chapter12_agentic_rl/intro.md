@@ -11,13 +11,14 @@
 
 - [GRPO 与 RLVR](../chapter08_grpo_rlvr/intro)——"可验证奖励"是 Agentic RL 的天然选择
 - [PPO 与奖励模型](../chapter06_ppo/intro)——策略优化的基础框架
-:::
+  :::
 
-| 小节                                                        | 核心问题                                        |
-| ----------------------------------------------------------- | ----------------------------------------------- |
-| [多轮交互 RL 与信用分配](./multi-turn-rl)                   | 7 轮交互失败了，该怪谁？ORM vs PRM              |
-| [轨迹合成与数据工程](./trajectory-synthesis)                | 训练数据从哪来？拒绝采样、图谱合成、闭环迭代    |
-| [工具调用 RL：Web Agent 与 Code Agent](./tool-use-agents)   | SFT 教格式，RL 教策略——工具调用的 RL 训练       |
-| [Agentic RL 工程实战与总结](./agentic-engineering)          | 沙箱、基础设施、框架选择——把 Agentic RL 跑起来  |
+| 小节                                                         | 核心问题                                        |
+| ------------------------------------------------------------ | ----------------------------------------------- |
+| [多轮交互 RL 与信用分配](./multi-turn-rl)                    | 7 轮交互失败了，该怪谁？ORM vs PRM              |
+| [轨迹合成与数据工程](./trajectory-synthesis)                 | 训练数据从哪来？拒绝采样、图谱合成、闭环迭代    |
+| [工具调用 RL：Web Agent 与 Code Agent](./tool-use-agents)    | SFT 教格式，RL 教策略——工具调用的 RL 训练       |
+| [Agentic RL 工程实战与总结](./agentic-engineering)           | 沙箱、基础设施、框架选择——把 Agentic RL 跑起来  |
+| [深度研究智能体：Deep Research Agent](./deep-research-agent) | 从工具调用到自主研究——Agentic RL 的前沿综合应用 |
 
 准备好了吗？让我们从 Agentic RL 最核心的挑战开始——[多轮交互 RL 与信用分配](./multi-turn-rl)。

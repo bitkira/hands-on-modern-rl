@@ -33,7 +33,7 @@ flowchart LR
 
 这就引出了轨迹合成的核心动机：**用算法自动生成大量高质量的交互轨迹，替代昂贵的人工标注**。
 
-## 四种主流合成方法
+## 六种主流合成方法
 
 ### 方法一：拒绝采样——最朴素的方案
 
@@ -84,9 +84,9 @@ flowchart TD
 
 **同一大纲可以生成多条不同的轨迹**。改变演员模型（或改变采样温度），同一个"先查航班再查酒店"的大纲可以生成不同风格的轨迹。这增加了训练数据的多样性。
 
-代表性工作包括 IBSEN、CoDi 等框架。这种模式特别擅长模拟复杂的多步骤交互场景。
+代表性工作包括 IBSEN[^ibsen]、CoDi 等框架。这种模式特别擅长模拟复杂的多步骤交互场景。
 
-### 方法三：基于图谱合成——Magnet
+### 方法三：基于图谱合成——Magnet[^magnet]
 
 Magnet 的思路更加结构化。它把工具之间的调用关系建模为一个**函数签名图**（Function Signature Graph），然后通过图操作来生成逻辑严密的轨迹。
 
@@ -113,7 +113,7 @@ Magnet 定义了两种核心图操作：
 
 Magnet 的核心优势是**在源头保证工具调用的逻辑正确性**。基于图生成的路径一定是合法的（参数类型匹配、调用顺序合理），这比让 LLM 自由生成要可靠得多。基于该方法训练的 Magnet-14B 模型，在 BFCL-v3 和 ToolQuery 基准上超越了其教师模型。
 
-### 方法四：闭环迭代——LoopTool
+### 方法四：闭环迭代——LoopTool[^looptool]
 
 LoopTool 是目前社区最活跃的轨迹合成框架。它解决的是前三种方法的一个共同缺陷：**生成的数据是"静态"的——不会根据模型的弱点来调整**。
 
@@ -147,7 +147,7 @@ flowchart TD
 
 LoopTool 的实验结果令人印象深刻：用 32B 的 Qwen3 作为数据生成器，训练出来的 8B 模型在 BFCL-v3 上**超越了 32B 的生成器本身**。这说明闭环迭代的数据质量可以远超静态合成。
 
-### 方法五：难度自适应——HardGen
+### 方法五：难度自适应——HardGen[^hardgen]
 
 HardGen 专门解决合成数据"过于简单"的问题。它的核心洞察是：**模型能力的提升主要来自于困难样本**。简单的轨迹（比如只调一次工具就完成的任务）对模型训练的贡献很小。
 
@@ -155,15 +155,28 @@ HardGen 的流程是：先让模型尝试一批任务，收集失败案例。然
 
 实验表明，用 HardGen 数据训练的 4B 模型，性能超越了多个主流闭源大模型——这再次印证了"困难样本的价值远超简单样本"。
 
-## 四种方法对比
+### 方法六：后见之明重写——ECHO[^echo]
 
-| 方法         | 核心思路                       | 多样性 | 质量   | 成本 | 代表工作       |
-| ------------ | ------------------------------ | ------ | ------ | ---- | -------------- |
-| 拒绝采样     | 生成 → 过滤 → 只留成功的      | 低     | 中     | 低   | GRPO、TinyZero |
-| 导演-演员    | 规划与执行分离                 | 中     | 高     | 中   | IBSEN、CoDi    |
-| 图谱合成     | 基于工具关系图生成合法路径     | 高     | 极高   | 高   | Magnet         |
-| 闭环迭代     | 训练 → 诊断弱点 → 针对性补强   | 自适应 | 最高   | 中   | LoopTool       |
-| 难度自适应   | 从失败案例中定向生成困难样本   | 自适应 | 高     | 中   | HardGen        |
+ECHO 的思路和第 9 章的 HER（事后经验回放）异曲同工：**失败轨迹不用扔掉——换个目标，它就是成功轨迹**。
+
+在第 9.3 节中我们见过 HER：机器人的目标是"把球放到位置 A"，但实际放到了位置 B。从目标 A 的角度看这是失败的，但从目标 B 的角度看这是完美的成功。ECHO 把这个思路搬到了 LLM 轨迹上——先用 LLM 分析失败轨迹"实际上完成了什么"，然后把目标标签改为实际完成的目标，失败轨迹就被重写为针对新目标的成功案例。
+
+这个方法极大提升了样本效率。在拒绝采样中，失败轨迹被直接丢弃。但如果模型当前成功率只有 10%，90% 的生成都被浪费了。ECHO 让这些"浪费"的轨迹重新变得有价值。结合第 9.3 节的讨论，我们可以把 ECHO 理解为"HER 在语言空间中的应用"——HER 改变的是机器人目标的位置标签，ECHO 改变的是语言任务的目标语义标签。
+
+### 端到端合成：ASTRA[^astra]
+
+前面六种方法聚焦的都是"怎么生成高质量轨迹"。ASTRA 更进一步：它不仅合成多轮交互轨迹，还能把轨迹**自动打包成独立的、可验证的 RL 训练环境**。这意味着从"数据生成"到"环境搭建"全流程自动化——你只需要给定任务规格，ASTRA 就能输出一组可直接用于 GRPO/PPO 训练的（轨迹，环境）配对。这种端到端的思路特别适合需要快速构建新场景训练数据的工程场景。框架将 SFT 数据（合成轨迹）和 RL 环境（可验证竞技场）统一在同一管线中，官方已开源代码和环境。
+
+## 六种方法对比
+
+| 方法         | 核心思路                     | 多样性 | 质量  | 成本 | 代表工作       |
+| ------------ | ---------------------------- | ------ | ----- | ---- | -------------- |
+| 拒绝采样     | 生成 → 过滤 → 只留成功的     | 低     | 中    | 低   | GRPO、TinyZero |
+| 导演-演员    | 规划与执行分离               | 中     | 高    | 中   | IBSEN、CoDi    |
+| 图谱合成     | 基于工具关系图生成合法路径   | 高     | 极高  | 高   | Magnet         |
+| 闭环迭代     | 训练 → 诊断弱点 → 针对性补强 | 自适应 | 最高  | 中   | LoopTool       |
+| 难度自适应   | 从失败案例中定向生成困难样本 | 自适应 | 高    | 中   | HardGen        |
+| 后见之明重写 | 失败轨迹换个目标变成成功轨迹 | 高     | 中-高 | 低   | ECHO           |
 
 在实践中，**LoopTool 的闭环迭代思路是最推荐的**。它不需要你预先知道模型会犯什么错——系统会自动发现并补强。如果你资源有限，拒绝采样是最容易上手的起点。
 
@@ -178,6 +191,8 @@ HardGen 的流程是：先让模型尝试一批任务，收集失败案例。然
 **多样性**：轨迹是否覆盖了不同的策略？如果 100 条轨迹都是"先搜索再总结"的同一种模式，模型就学不到"先分析再搜索"的替代策略。通常用**轨迹嵌入的聚类**来衡量——如果轨迹在嵌入空间中形成了多个聚类，说明覆盖了多种策略。
 
 **难度分布**：数据集中简单/中等/困难样本的比例是否合理？太多简单样本会让模型"安逸"在已知策略上，太多困难样本又可能导致训练不稳定。一个好的分布通常是 30% 简单 + 50% 中等 + 20% 困难。
+
+**步骤级校准**：除了过滤和排序，还有一种更精细的做法——**直接修正轨迹中不理想的步骤**。STeCa（Step-level Trajectory Calibration）[^steca] 的核心洞察是：一条大部分正确但个别步骤有瑕疵的轨迹，与其直接丢弃，不如找到那些不理想的步骤并修正它们。具体做法是通过步骤级奖励对比，识别轨迹中哪些步骤拉低了整体质量，然后用更强模型或规则来校准这些步骤。这比简单的"成功/失败"二分法精细得多——一条轨迹可能在 7 个步骤中有 6 个做得很好，只有第 4 步的搜索策略不够优。STeCa 会保留前 6 步，只校准第 4 步，最终得到一条比原始轨迹更优的校准轨迹。
 
 ```python
 def filter_trajectories(trajectories, quality_threshold=0.7):
@@ -215,6 +230,8 @@ def filter_trajectories(trajectories, quality_threshold=0.7):
 
 这也解释了为什么 Agentic RL 被认为比 RLHF 更适合轨迹合成：RLHF 需要人工标注偏好，成本高且不可扩展；而 Agentic RL 的 reward 可以通过环境交互自动获取——代码是否通过测试、搜索结果是否包含目标信息——这些都可以自动化验证。
 
+值得一提的是，轨迹合成不仅能从"已有数据"中提炼，还可以借助"搜索"来生成更高质量的轨迹。TSR（Trajectory-Search Rollouts）[^tsr] 的思路是把第 13 章将讨论的测试时搜索技巧——如束搜索（beam search）和 best-of-N——搬到训练阶段的 rollout 中。在生成轨迹时不是随机采样，而是用搜索策略探索多条路径，选出最高质量的轨迹作为训练数据。实验表明，将 TSR 与 PPO 或 GRPO 结合，能带来最高 15% 的性能提升。本质上，TSR 让训练时的数据生成也拥有了"思考"的能力——而不仅仅是随机探索。
+
 <details>
 <summary>思考题：拒绝采样生成的"成功轨迹"一定是好的训练数据吗？</summary>
 
@@ -223,6 +240,7 @@ def filter_trajectories(trajectories, quality_threshold=0.7):
 考虑这样一个场景：模型需要搜索一个事实性问题。模型用了一个非常低效的策略——先搜索了 5 次不相关的关键词，最后碰巧在第 6 次找到了答案。这条轨迹"成功了"，但它的前 5 次搜索完全是无用的。如果用它来训练模型，模型可能会学到"多搜索几次总能找到"的低效策略。
 
 这就是为什么轨迹质量控制中的"效率评估"很重要——不只是看"最终是否成功"，还要看"成功的路径是否高效"。第 12.3 节的 reward 设计中会引入效率惩罚项，本质上就是在解决这个问题。
+
 </details>
 
 <details>
@@ -233,6 +251,7 @@ def filter_trajectories(trajectories, quality_threshold=0.7):
 32B 模型生成初始数据时，数据质量受限于模型自身的能力。但 LoopTool 不是一个"生成完就结束"的过程——它会诊断 8B 模型的弱点，针对性地补充数据。经过多轮迭代后，最终的数据集是"32B 模型的初始数据 + 针对 8B 弱点的多轮补强数据"的累积。这个累积数据集的质量可以远超 32B 模型单次生成的数据。
 
 更深层的原因是：**生成数据和理解数据是两种不同的能力**。8B 模型虽然生成能力不如 32B，但它的学习能力和泛化能力可能不逊色——给它更好的训练数据，它就能发挥更大的潜力。这也是为什么"数据质量 > 模型规模"正在成为社区共识。
+
 </details>
 
 ## 实战代码：一个简易的轨迹合成管线
@@ -314,7 +333,18 @@ def compute_quality(traj):
 
 ## 参考资料
 
-- Han S, Chen L, Lin L-M, et al. "[IBSEN: Director-Actor Agent Collaboration for Controllable and Interactive Drama Script Generation](https://arxiv.org/abs/2407.01093)." ACL 2024. —— 导演-演员模式的代表工作，将轨迹生成拆分为规划与执行两个层级。
-- Yin F, Wang Z, Hsu I-H, et al. "[Magnet: Multi-turn Tool-use Data Synthesis and Distillation via Graph Translation](https://arxiv.org/abs/2503.07826)." ACL 2025. —— 基于函数签名图的轨迹合成，通过 MAGNIFY/CONNECT 图操作生成合法调用路径。
-- LoopTool Team. "[LoopTool: Closing the Data-Training Loop for Robust LLM Tool Calls](https://arxiv.org/abs/2511.09148)." arXiv:2511.09148, 2024. —— 闭环迭代框架，用 GCP+JGLV+EDDE 三模块实现"模型驱动数据进化"。[GitHub](https://github.com/Rednote-DeepExperience/LoopTool)
-- HardGen Team. "[From Failure to Mastery: Generating Hard Samples for Tool-use Agents](https://arxiv.org/abs/2601.01498)." arXiv:2601.01498, 2026. —— 从模型失败案例中定向生成高难度训练数据。[数据集](https://huggingface.co/datasets/Bingguang/HardGen)
+[^ibsen]: Han S, Chen L, Lin L-M, et al. "[IBSEN: Director-Actor Agent Collaboration for Controllable and Interactive Drama Script Generation](https://arxiv.org/abs/2407.01093)." ACL 2024. —— 导演-演员模式的代表工作，将轨迹生成拆分为规划与执行两个层级。
+
+[^magnet]: Yin F, Wang Z, Hsu I-H, et al. "[Magnet: Multi-turn Tool-use Data Synthesis and Distillation via Graph Translation](https://arxiv.org/abs/2503.07826)." ACL 2025. —— 基于函数签名图的轨迹合成，通过 MAGNIFY/CONNECT 图操作生成合法调用路径。
+
+[^looptool]: LoopTool Team. "[LoopTool: Closing the Data-Training Loop for Robust LLM Tool Calls](https://arxiv.org/abs/2511.09148)." arXiv:2511.09148, 2024. —— 闭环迭代框架，用 GCP+JGLV+EDDE 三模块实现"模型驱动数据进化"。[GitHub](https://github.com/Rednote-DeepExperience/LoopTool)
+
+[^hardgen]: HardGen Team. "[From Failure to Mastery: Generating Hard Samples for Tool-use Agents](https://arxiv.org/abs/2601.01498)." arXiv:2601.01498, 2026. —— 从模型失败案例中定向生成高难度训练数据。[数据集](https://huggingface.co/datasets/Bingguang/HardGen)
+
+[^echo]: Shinn A, et al. "[Sample-Efficient Online Learning in LM Agents via Hindsight Trajectory Rewriting](https://arxiv.org/abs/2510.10304)." arXiv:2510.10304, 2025. —— ECHO：借鉴 HER 的后见之明经验回放，将失败轨迹重写为针对其他目标的成功案例，极大提升样本效率。
+
+[^astra]: ASTRA Team. "[ASTRA: Automated Synthesis of agentic Trajectories and Reinforcement Arenas](https://arxiv.org/abs/2601.21558)." arXiv:2601.21558, 2026. —— 端到端框架：自动合成多轮交互轨迹并打包为可验证 RL 环境。[GitHub](https://github.com/LianjiaTech/astra)
+
+[^tsr]: Djuhera A, Kadhe S, et al. "[TSR: Trajectory-Search Rollouts for Multi-Turn RL of LLM Agents](https://arxiv.org/abs/2602.11767)." arXiv:2602.11767, 2026. —— 将测试时搜索（束搜索、best-of-N）搬到训练阶段 rollout，最高 15% 性能提升。
+
+[^steca]: Wang H, Wang J, et al. "[STeCa: Step-level Trajectory Calibration for LLM Agent Learning](https://arxiv.org/abs/2502.14276)." ACL 2025 Findings. —— 通过步骤级奖励对比识别并修正轨迹中的不理想动作，而非简单过滤。[GitHub](https://github.com/WangHanLinHenry/STeCa)
