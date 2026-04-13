@@ -134,12 +134,12 @@ $$\rho_{XY} = \frac{\text{Cov}(X, Y)}{\sigma_X \sigma_Y}$$
 
 ## 公式速查
 
-| 概念 | 公式 | RL 中的角色 |
-| --- | --- | --- |
-| 条件概率 | $P(A \mid B) = P(A \cap B) / P(B)$ | MDP 状态转移、策略分布 |
-| 贝叶斯定理 | $P(A \mid B) = P(B \mid A) P(A) / P(B)$ | 贝叶斯 RL、偏好学习 |
-| 期望 | $\mathbb{E}[X] = \sum x \cdot P(x)$ | 价值函数、策略梯度 |
-| 方差 | $\text{Var}(X) = \mathbb{E}[X^2] - (\mathbb{E}[X])^2$ | baseline 的动机、GAE |
-| 分类分布 | $P(X=k) = p_k$ | 离散动作策略 |
-| 高斯分布 | $\mathcal{N}(\mu, \sigma^2)$ | 连续动作策略 |
-| 重要性采样 | $\mathbb{E}_P[f] = \mathbb{E}_Q[f \cdot P/Q]$ | PPO/GRPO 的 off-policy 修正 |
+| 概念       | 公式                                                  | RL 中的角色                 |
+| ---------- | ----------------------------------------------------- | --------------------------- |
+| 条件概率   | $P(A \mid B) = P(A \cap B) / P(B)$                    | MDP 状态转移、策略分布      |
+| 贝叶斯定理 | $P(A \mid B) = P(B \mid A) P(A) / P(B)$               | 贝叶斯 RL、偏好学习         |
+| 期望       | $\mathbb{E}[X] = \sum x \cdot P(x)$                   | 价值函数、策略梯度          |
+| 方差       | $\text{Var}(X) = \mathbb{E}[X^2] - (\mathbb{E}[X])^2$ | baseline 的动机、GAE        |
+| 分类分布   | $P(X=k) = p_k$                                        | 离散动作策略                |
+| 高斯分布   | $\mathcal{N}(\mu, \sigma^2)$                          | 连续动作策略                |
+| 重要性采样 | $\mathbb{E}_P[f] = \mathbb{E}_Q[f \cdot P/Q]$         | PPO/GRPO 的 off-policy 修正 |

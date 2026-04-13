@@ -55,33 +55,33 @@ RLVR（Reinforcement Learning from Verifiable Rewards）天然适配代码生成
 
 GUI 智能体让 AI 能像人一样操作图形界面——点击按钮、填写表单、在网页上导航。RL 在这里的价值在于：SFT 只能教会模型"模仿点击"，而 RL 能让模型学会"根据目标选择最优操作路径"。本节覆盖了从网页到移动端、从 3B 小模型到持续学习框架的多种方案。
 
-| 工作名称                                      | 核心亮点                                                     | 链接                                                 |
-| --------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------- |
-| WebAgent-R1 **[开源]**                        | 端到端多轮 RL 框架，将 3B 模型成功率从 6.1% 提升至 33.9%     | [GitHub](https://github.com/WebAgent-R1/WebAgent-R1) |
-| Web-Shepherd **[开源]**                       | 首个网页导航专用步骤级奖励模型，能评估每一步交互             | [GitHub](https://github.com/kyle8581/Web-Shepherd)   |
-| CRAFT-GUI                                     | 结合课程学习与 GRPO，提升 GUI 智能体性能                     | [arXiv](https://arxiv.org/abs/2603.08743)            |
-| MobileRL **[开源]**                           | 移动端在线 RL 框架，使用 ADAGRPO 算法                        | [GitHub](https://github.com/MobileRL/MobileRL)       |
+| 工作名称                                      | 核心亮点                                                     | 链接                                                           |
+| --------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------- |
+| WebAgent-R1 **[开源]**                        | 端到端多轮 RL 框架，将 3B 模型成功率从 6.1% 提升至 33.9%     | [GitHub](https://github.com/WebAgent-R1/WebAgent-R1)           |
+| Web-Shepherd **[开源]**                       | 首个网页导航专用步骤级奖励模型，能评估每一步交互             | [GitHub](https://github.com/kyle8581/Web-Shepherd)             |
+| CRAFT-GUI                                     | 结合课程学习与 GRPO，提升 GUI 智能体性能                     | [arXiv](https://arxiv.org/abs/2603.08743)                      |
+| MobileRL **[开源]**                           | 移动端在线 RL 框架，使用 ADAGRPO 算法                        | [GitHub](https://github.com/MobileRL/MobileRL)                 |
 | Co-EPG                                        | 通过协同进化框架，同时优化 GUI 智能体的规划与接地能力        | [AAAI](https://ojs.aaai.org/index.php/AAAI/article/view/40981) |
-| Continual GUI Agents                          | 定义并解决 GUI 智能体在持续变化环境下的学习问题              | [arXiv](https://arxiv.org/abs/2603.06789)            |
-| WebFactory                                    | 全自动闭环 RL 流程，将 LLM 的智能"压缩"到高效的 GUI 智能体中 | [OpenReview](https://openreview.net/forum?id=HaIEP2PD4S) |
-| ZeroGUI                                       | 零人工成本的在线 GUI 智能体学习框架                          | [arXiv](https://arxiv.org/abs/2505.01234)            |
-| UI-S1                                         | 结合离线与在线数据优势的半在线 RL 训练方法                   | [arXiv](https://arxiv.org/abs/2509.05678)            |
-| Generalization in Online RL for Mobile Agents | 研究移动智能体在线 RL 中的泛化问题，证明 RL 能超越 SFT 基线  | [OpenReview](https://openreview.net/forum?id=INoDyme6wS) |
+| Continual GUI Agents                          | 定义并解决 GUI 智能体在持续变化环境下的学习问题              | [arXiv](https://arxiv.org/abs/2603.06789)                      |
+| WebFactory                                    | 全自动闭环 RL 流程，将 LLM 的智能"压缩"到高效的 GUI 智能体中 | [OpenReview](https://openreview.net/forum?id=HaIEP2PD4S)       |
+| ZeroGUI                                       | 零人工成本的在线 GUI 智能体学习框架                          | [arXiv](https://arxiv.org/abs/2505.01234)                      |
+| UI-S1                                         | 结合离线与在线数据优势的半在线 RL 训练方法                   | [arXiv](https://arxiv.org/abs/2509.05678)                      |
+| Generalization in Online RL for Mobile Agents | 研究移动智能体在线 RL 中的泛化问题，证明 RL 能超越 SFT 基线  | [OpenReview](https://openreview.net/forum?id=INoDyme6wS)       |
 
 ## 具身智能与机器人
 
 当 RL 从数字世界走向物理世界，智能体面对的不再是文本或图像，而是连续的控制信号和不确定的物理环境。本节的工作探索了如何让 LLM 直接参与机器人推理与控制：有的用 RL 优化空间推理过程使 7B 模型超越 GPT-4o，有的在像素级世界模型中训练出自我纠错能力，还有的研究跨形态迁移和持续学习中的"认知身份"保持问题。
 
-| 工作名称                         | 核心亮点                                                       | 链接                                                     |
-| -------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------- |
-| Robot-R1                         | 用 RL 直接优化机器人的推理过程，7B 模型空间推理能力超越 GPT-4o | [arXiv](https://arxiv.org/abs/2601.06398)                |
-| WMPO **[开源]**                  | 在像素级视觉世界模型中进行 RL 训练，涌现出自我纠错能力         | [GitHub](https://github.com/HKUST-PEI-Lab/WMPO)          |
-| ViVa                             | 使用预训练视频生成模型作为价值函数估计器，评估状态价值         | [arXiv](https://arxiv.org/abs/2604.06396)                |
-| RoboAgent                        | 通过组合基础能力，实现具身任务规划                             | [arXiv](https://arxiv.org/abs/2604.02345)                |
-| Cross-Embodiment Offline RL      | 通过形态学分组策略，实现跨不同形态机器人的离线 RL              | [arXiv](https://arxiv.org/abs/2602.18025)                 |
-| Sensory-Motor Control with LLMs  | 通过迭代策略精炼，使 LLM 能直接生成连续控制策略                | [arXiv](https://arxiv.org/abs/2602.08901)                |
-| RM-RL                            | 提出"榜样模型"RL，用于实现精准的机器人操作                     | [arXiv](https://arxiv.org/abs/2601.03456)                |
-| Learning Without Losing Identity | 研究具身智能体在持续学习新能力时，如何保持"认知身份"的稳定     | [arXiv](https://arxiv.org/abs/2604.06789)                |
+| 工作名称                         | 核心亮点                                                       | 链接                                            |
+| -------------------------------- | -------------------------------------------------------------- | ----------------------------------------------- |
+| Robot-R1                         | 用 RL 直接优化机器人的推理过程，7B 模型空间推理能力超越 GPT-4o | [arXiv](https://arxiv.org/abs/2601.06398)       |
+| WMPO **[开源]**                  | 在像素级视觉世界模型中进行 RL 训练，涌现出自我纠错能力         | [GitHub](https://github.com/HKUST-PEI-Lab/WMPO) |
+| ViVa                             | 使用预训练视频生成模型作为价值函数估计器，评估状态价值         | [arXiv](https://arxiv.org/abs/2604.06396)       |
+| RoboAgent                        | 通过组合基础能力，实现具身任务规划                             | [arXiv](https://arxiv.org/abs/2604.02345)       |
+| Cross-Embodiment Offline RL      | 通过形态学分组策略，实现跨不同形态机器人的离线 RL              | [arXiv](https://arxiv.org/abs/2602.18025)       |
+| Sensory-Motor Control with LLMs  | 通过迭代策略精炼，使 LLM 能直接生成连续控制策略                | [arXiv](https://arxiv.org/abs/2602.08901)       |
+| RM-RL                            | 提出"榜样模型"RL，用于实现精准的机器人操作                     | [arXiv](https://arxiv.org/abs/2601.03456)       |
+| Learning Without Losing Identity | 研究具身智能体在持续学习新能力时，如何保持"认知身份"的稳定     | [arXiv](https://arxiv.org/abs/2604.06789)       |
 
 ## 多智能体系统与协作
 
@@ -116,29 +116,29 @@ GUI 智能体让 AI 能像人一样操作图形界面——点击按钮、填写
 
 角色扮演不只是"假装是某个人"——它要求模型在长对话中保持一致的人格特征、思维方式和行为模式。RL 在这里的价值在于：通过可验证的角色意识奖励，强化模型对"我是谁"的持续感知。本节的工作从双层思考框架（区分角色视角和模型视角）到多角色自博弈，探索了如何让 AI 真正"入戏"并保持角色一致性。
 
-| 工作名称                               | 核心亮点                                                      | 链接                                      |
-| -------------------------------------- | ------------------------------------------------------------- | ----------------------------------------- |
-| HER                                    | 提出双层思考框架，区分角色的第一人称思维和 LLM 的第三人称思维 | [arXiv](https://arxiv.org/abs/2601.08901) |
-| OMAR                                   | 通过多轮自博弈 RL，培养 AI 的社交智能                         | [arXiv](https://arxiv.org/abs/2602.02842) |
+| 工作名称                               | 核心亮点                                                      | 链接                                                        |
+| -------------------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------- |
+| HER                                    | 提出双层思考框架，区分角色的第一人称思维和 LLM 的第三人称思维 | [arXiv](https://arxiv.org/abs/2601.08901)                   |
+| OMAR                                   | 通过多轮自博弈 RL，培养 AI 的社交智能                         | [arXiv](https://arxiv.org/abs/2602.02842)                   |
 | R4                                     | 赋予奖励模型和角色扮演智能体推理与检索能力                    | [ICLR Poster](https://iclr.cc/virtual/2026/poster/10007049) |
-| VeriRole                               | 通过可验证的提示引导 RL 提升角色意识                          | [OpenReview](https://openreview.net/forum?id=lW7kMpMj9K) |
-| SPELL                                  | 多角色自博弈 RL 框架，用于长上下文推理                        | [arXiv](https://arxiv.org/abs/2603.06789) |
-| Consistently Simulating Human Personas | 提出评估和改进 LLM 角色一致性的统一框架                       | [OpenReview](https://openreview.net/forum?id=A0T3piHiis) |
-| CPO                                    | 针对角色扮演对话中奖励模糊问题的比较策略优化                  | [arXiv](https://arxiv.org/abs/2508.04567) |
-| RAIDEN-R1                              | 提出可验证的角色意识奖励 (VRAR)，强化模型对自身角色的感知     | [arXiv](https://arxiv.org/abs/2505.10218) |
+| VeriRole                               | 通过可验证的提示引导 RL 提升角色意识                          | [OpenReview](https://openreview.net/forum?id=lW7kMpMj9K)    |
+| SPELL                                  | 多角色自博弈 RL 框架，用于长上下文推理                        | [arXiv](https://arxiv.org/abs/2603.06789)                   |
+| Consistently Simulating Human Personas | 提出评估和改进 LLM 角色一致性的统一框架                       | [OpenReview](https://openreview.net/forum?id=A0T3piHiis)    |
+| CPO                                    | 针对角色扮演对话中奖励模糊问题的比较策略优化                  | [arXiv](https://arxiv.org/abs/2508.04567)                   |
+| RAIDEN-R1                              | 提出可验证的角色意识奖励 (VRAR)，强化模型对自身角色的感知     | [arXiv](https://arxiv.org/abs/2505.10218)                   |
 
 ## 创意与长文写作
 
 创意写作对 RL 提出了独特挑战：奖励不像代码执行那样客观可验证，"好"的写作是主观的、多维度的。本节的工作探索了如何设计能捕捉创意质量的奖励信号——从生成式奖励模型对故事偏好进行多维推理，到通过交替 RL 优化基于评分标准的奖励模型，再到用 RLAIF 比较不同奖励策略以激发小模型的创意能力。
 
-| 工作名称                                        | 核心亮点                                                          | 链接                                      |
-| ----------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------- |
-| Writer-R1                                       | 记忆增强的重放策略优化，4B 模型超越 100B+ 开源模型                | [arXiv](https://arxiv.org/abs/2603.07890) |
-| R2-Write                                        | 对开放域写作进行系统性研究，提出反思与修正框架                    | [arXiv](https://arxiv.org/abs/2604.02345) |
-| DPWriter                                        | 通过多样化规划分支，解决 RL 训练中输出多样性降低的问题            | [arXiv](https://arxiv.org/abs/2601.01234) |
-| RLMR                                            | 首次在在线 RL 训练中结合主观偏好与客观验证                        | [arXiv](https://arxiv.org/abs/2508.18642) |
-| Rewarding Creativity                            | 开发生成式奖励模型，对故事偏好进行多维分析和显式推理              | [arXiv](https://arxiv.org/abs/2601.02453) |
-| Alternating RL for Rubric-Based Reward Modeling | 通过交替 RL 优化基于评分标准的奖励模型，在多个写作基准上达到 SOTA | [arXiv](https://arxiv.org/abs/2602.01511) |
+| 工作名称                                        | 核心亮点                                                          | 链接                                                           |
+| ----------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------- |
+| Writer-R1                                       | 记忆增强的重放策略优化，4B 模型超越 100B+ 开源模型                | [arXiv](https://arxiv.org/abs/2603.07890)                      |
+| R2-Write                                        | 对开放域写作进行系统性研究，提出反思与修正框架                    | [arXiv](https://arxiv.org/abs/2604.02345)                      |
+| DPWriter                                        | 通过多样化规划分支，解决 RL 训练中输出多样性降低的问题            | [arXiv](https://arxiv.org/abs/2601.01234)                      |
+| RLMR                                            | 首次在在线 RL 训练中结合主观偏好与客观验证                        | [arXiv](https://arxiv.org/abs/2508.18642)                      |
+| Rewarding Creativity                            | 开发生成式奖励模型，对故事偏好进行多维分析和显式推理              | [arXiv](https://arxiv.org/abs/2601.02453)                      |
+| Alternating RL for Rubric-Based Reward Modeling | 通过交替 RL 优化基于评分标准的奖励模型，在多个写作基准上达到 SOTA | [arXiv](https://arxiv.org/abs/2602.01511)                      |
 | Igniting Creative Writing in SLMs               | 在 RLAIF 框架下比较两种奖励策略，激发 7B 小模型的创意写作         | [ACL Anthology](https://aclanthology.org/2025.emnlp-main.868/) |
 
 ## 情感智能与共情对话
@@ -159,15 +159,15 @@ GUI 智能体让 AI 能像人一样操作图形界面——点击按钮、填写
 
 RL 进入艺术领域是一个有趣的跨界——它将"审美判断"建模为可优化的奖励信号。本节的工作覆盖了从图像生成优化到分层绘画、从个性化手绘到艺术风格学习的多种应用。核心思路包括：协调多个专家模型迭代优化图像生成、通过逆 RL 从笔触数据中学习艺术家风格，以及用分层 RL 实现高层规划与低层绘制的分离。
 
-| 工作名称                | 核心亮点                                                                 | 链接                                      |
-| ----------------------- | ------------------------------------------------------------------------ | ----------------------------------------- |
-| Image-POSER             | 反思式 RL 框架，协调多个专家模型，根据复杂文本提示迭代优化图像生成       | [arXiv](https://arxiv.org/abs/2511.09355) |
-| HRL-Painter             | 基于分层 RL 的绘画方法，高层规划区域，低层执行绘制                       | [arXiv](https://arxiv.org/abs/2509.01234) |
-| PersonaSketch-RL        | 基于 RL 的策略，用于优化个性化手绘插图生成                               | [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S1875952125001338) |
-| RMLer                   | 将跨类别概念融合建模为 RL 问题，用于合成新颖物体                         | [arXiv](https://arxiv.org/abs/2512.06789) |
-| Sequential Art Creation | 深度 RL 框架，用于创作视觉形式上与输入不同的序列艺术作品                 | [UTA Thesis](https://mavmatrix.uta.edu/cse_theses/539/) |
-| MVAEx-RL                | 基于 RL 的多模态艺术元素提取和动态适应策略，用于环境设计                 | [Springer](https://link.springer.com/article/10.1007/s44163-025-00712-z) |
-| DailyArt                | 将关节估计问题建模为合成介导的推理问题，从单张静态图像中推断动力学       | [arXiv](https://arxiv.org/abs/2604.07890) |
+| 工作名称                | 核心亮点                                                           | 链接                                                                                 |
+| ----------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| Image-POSER             | 反思式 RL 框架，协调多个专家模型，根据复杂文本提示迭代优化图像生成 | [arXiv](https://arxiv.org/abs/2511.09355)                                            |
+| HRL-Painter             | 基于分层 RL 的绘画方法，高层规划区域，低层执行绘制                 | [arXiv](https://arxiv.org/abs/2509.01234)                                            |
+| PersonaSketch-RL        | 基于 RL 的策略，用于优化个性化手绘插图生成                         | [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S1875952125001338) |
+| RMLer                   | 将跨类别概念融合建模为 RL 问题，用于合成新颖物体                   | [arXiv](https://arxiv.org/abs/2512.06789)                                            |
+| Sequential Art Creation | 深度 RL 框架，用于创作视觉形式上与输入不同的序列艺术作品           | [UTA Thesis](https://mavmatrix.uta.edu/cse_theses/539/)                              |
+| MVAEx-RL                | 基于 RL 的多模态艺术元素提取和动态适应策略，用于环境设计           | [Springer](https://link.springer.com/article/10.1007/s44163-025-00712-z)             |
+| DailyArt                | 将关节估计问题建模为合成介导的推理问题，从单张静态图像中推断动力学 | [arXiv](https://arxiv.org/abs/2604.07890)                                            |
 
 ## RL 训练基础设施与算法创新
 
@@ -189,16 +189,16 @@ Agentic RL 的工程复杂度远超标准 LLM RL——你需要同时管理 GPU 
 
 RL 正在走出实验室，进入化学、材料科学、医学和工业制造等真实应用场景。本节的工作将科学问题建模为 MDP：先导化合物优化变成在合成约束下的搜索问题，材料设计变成利用形成能反馈的优化问题，工业异常检测变成了数据合成的策略学习问题。这些应用展示了 RL 作为"通用决策优化器"的潜力。
 
-| 工作名称                             | 核心亮点                                                         | 链接                                      |
-| ------------------------------------ | ---------------------------------------------------------------- | ----------------------------------------- |
-| MolReAct                             | 将先导化合物优化建模为 MDP，用 RL 在合成约束下进行高效搜索       | [arXiv](https://arxiv.org/abs/2604.05501) |
-| PolyRL                               | 使用 RL 引导的多目标聚合物生成与发现                             | [RSC](https://pubs.rsc.org/en/content/articlelanding/2026/dd/d5dd00272a) |
-| Helix                                | 面向开放式科学问题求解的分层进化 RL 框架                         | [arXiv](https://arxiv.org/abs/2603.02345) |
-| RLFEF                                | 利用形成能反馈的 RL 来微调材料扩散模型，提升晶体稳定性           | [dblp](https://dblp.org/rec/journals/nn/HuangXJY26.html) |
-| AnomalyAgent                         | 工业异常数据合成智能体，通过 RL 优化生成高真实感的异常样本       | [arXiv](https://arxiv.org/abs/2601.07890) |
-| Autonomous Adaptive Solver Selection | 使用约束 RL 框架，在化学积分过程中自主选择求解器                 | [arXiv](https://arxiv.org/abs/2603.08901) |
+| 工作名称                             | 核心亮点                                                         | 链接                                                                                                      |
+| ------------------------------------ | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| MolReAct                             | 将先导化合物优化建模为 MDP，用 RL 在合成约束下进行高效搜索       | [arXiv](https://arxiv.org/abs/2604.05501)                                                                 |
+| PolyRL                               | 使用 RL 引导的多目标聚合物生成与发现                             | [RSC](https://pubs.rsc.org/en/content/articlelanding/2026/dd/d5dd00272a)                                  |
+| Helix                                | 面向开放式科学问题求解的分层进化 RL 框架                         | [arXiv](https://arxiv.org/abs/2603.02345)                                                                 |
+| RLFEF                                | 利用形成能反馈的 RL 来微调材料扩散模型，提升晶体稳定性           | [dblp](https://dblp.org/rec/journals/nn/HuangXJY26.html)                                                  |
+| AnomalyAgent                         | 工业异常数据合成智能体，通过 RL 优化生成高真实感的异常样本       | [arXiv](https://arxiv.org/abs/2601.07890)                                                                 |
+| Autonomous Adaptive Solver Selection | 使用约束 RL 框架，在化学积分过程中自主选择求解器                 | [arXiv](https://arxiv.org/abs/2603.08901)                                                                 |
 | PPO-based Surface Reconstruction     | 基于 PPO 的深度 RL 框架，用于 AgPd 合金催化剂的表面重构          | [AIP PDF](https://pubs.aip.org/aip/jap/article-pdf/doi/10.1063/5.0295785/20878476/045001_1_5.0295785.pdf) |
-| MedVR                                | 针对医学 VQA，提出熵引导视觉重定位和共识驱动信用分配两种 RL 机制 | [arXiv](https://arxiv.org/abs/2602.04567) |
+| MedVR                                | 针对医学 VQA，提出熵引导视觉重定位和共识驱动信用分配两种 RL 机制 | [arXiv](https://arxiv.org/abs/2602.04567)                                                                 |
 
 ---
 

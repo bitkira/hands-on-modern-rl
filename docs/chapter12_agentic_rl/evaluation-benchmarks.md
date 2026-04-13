@@ -152,13 +152,13 @@ Agent 评测需要同时考察两个层面。
 
 以三种常见 Agent 任务为例：
 
-| 质量维度 | Code Agent | Web Agent | Research Agent |
-| -------- | ---------- | --------- | -------------- |
-| 正确性   | 补丁通过测试 | 操作结果符合预期 | 核心结论与事实吻合 |
-| 完整性   | 覆盖所有相关文件 | 完成所有子步骤 | 报告覆盖关键信息点 |
-| 效率     | 总交互轮数 | 操作步骤数 | 搜索次数 / 总轮数 |
-| 鲁棒性   | 处理边界情况 | 从页面错误恢复 | 冲突信息的交叉验证 |
-| 引用     | — | — | 每个论断有可追溯来源 |
+| 质量维度 | Code Agent       | Web Agent        | Research Agent       |
+| -------- | ---------------- | ---------------- | -------------------- |
+| 正确性   | 补丁通过测试     | 操作结果符合预期 | 核心结论与事实吻合   |
+| 完整性   | 覆盖所有相关文件 | 完成所有子步骤   | 报告覆盖关键信息点   |
+| 效率     | 总交互轮数       | 操作步骤数       | 搜索次数 / 总轮数    |
+| 鲁棒性   | 处理边界情况     | 从页面错误恢复   | 冲突信息的交叉验证   |
+| 引用     | —                | —                | 每个论断有可追溯来源 |
 
 拆完维度之后，每个维度需要一个评分方法。正确性通常可以自动验证（跑测试、对比答案），效率可以直接计算（统计轮数），但完整性和鲁棒性往往需要人工或 LLM-as-Judge 判断。
 
@@ -297,13 +297,13 @@ Anthropic 的实践建议对于开放式任务采用**混合评分策略** [^ant
 
 前端页面的质量可以从以下几个维度衡量：
 
-| 维度     | 含义                               | 量化方式                     |
-| -------- | ---------------------------------- | ---------------------------- |
-| 功能正确 | 页面的交互逻辑是否正确             | Puppeteer/Playwright 自动化测试 |
-| 视觉还原 | 页面是否符合需求描述的布局和风格   | LLM-as-Judge 截图对比        |
-| 代码质量 | HTML/CSS/JS 是否规范、可维护       | ESLint + LLM 评分            |
-| 响应式   | 页面在不同屏幕尺寸下是否正常显示   | 多分辨率截图对比             |
-| 效率     | Agent 用了多少轮交互完成任务       | 统计轨迹轮数                 |
+| 维度     | 含义                             | 量化方式                        |
+| -------- | -------------------------------- | ------------------------------- |
+| 功能正确 | 页面的交互逻辑是否正确           | Puppeteer/Playwright 自动化测试 |
+| 视觉还原 | 页面是否符合需求描述的布局和风格 | LLM-as-Judge 截图对比           |
+| 代码质量 | HTML/CSS/JS 是否规范、可维护     | ESLint + LLM 评分               |
+| 响应式   | 页面在不同屏幕尺寸下是否正常显示 | 多分辨率截图对比                |
+| 效率     | Agent 用了多少轮交互完成任务     | 统计轨迹轮数                    |
 
 **第二步：构造任务集。**
 
@@ -397,13 +397,13 @@ class FrontendEvalPipeline:
 
 **做法一：用 Design2Code 的多指标体系替代单一打分。** Design2Code [^design2code]（NAACL 2025）不依赖单一分数，而是从五个维度独立评估视觉还原质量：
 
-| 指标               | 评估什么                           | 计算方式                      |
-| ------------------ | ---------------------------------- | ----------------------------- |
-| Block-Match        | 页面区块的布局是否对齐             | 对应区块的匹配比例            |
-| Text Accuracy      | 文字内容是否正确                   | Sorensen-Dice 字符级相似度    |
-| Position Alignment | 元素位置是否准确                   | 区块中心的归一化空间偏移      |
-| Color Consistency  | 配色是否一致                       | CIEDE2000 色差（感知加权）    |
-| CLIP Similarity    | 整体视觉语义是否接近               | CLIP-ViT 嵌入的余弦相似度    |
+| 指标               | 评估什么               | 计算方式                   |
+| ------------------ | ---------------------- | -------------------------- |
+| Block-Match        | 页面区块的布局是否对齐 | 对应区块的匹配比例         |
+| Text Accuracy      | 文字内容是否正确       | Sorensen-Dice 字符级相似度 |
+| Position Alignment | 元素位置是否准确       | 区块中心的归一化空间偏移   |
+| Color Consistency  | 配色是否一致           | CIEDE2000 色差（感知加权） |
+| CLIP Similarity    | 整体视觉语义是否接近   | CLIP-ViT 嵌入的余弦相似度  |
 
 每个指标独立计算、独立报告。如果 Block-Match 低但 CLIP 高，说明整体布局对但配色/文字有偏差。如果 Block-Match 高但 Text Accuracy 低，说明布局对了但内容有误。多指标体系比单一分数提供更丰富的诊断信息。
 
@@ -827,19 +827,35 @@ $$
 - Ji H, et al. "[The Tool Decathlon](https://arxiv.org/abs/2510.25726)." arXiv:2510.25726, 2024. —— Toolathlon，多工具长时间工作流评测。
 
 [^benchmark-exploit]: Berkeley RDI. "[Trustworthy Benchmarks for Contamination](https://rdi.berkeley.edu/blog/trustworthy-benchmarks-cont)." 2025. —— 几乎所有主流 agentic benchmark 都可以被钻空子拿到接近满分，SWE-bench、WebArena、GAIA 均不例外。
+
 [^abc]: Zhu J, et al. "[Establishing Best Practices for Building Rigorous Agentic Benchmarks](https://arxiv.org/abs/2507.02825)." NeurIPS 2025. —— 调查了 78 个 agentic benchmark，提出 ABC 清单用于审查评测集质量。
+
 [^agent-judge]: Zhuge M, et al. "[Agent-as-a-Judge: Evaluate Agents with Agents](https://arxiv.org/abs/2410.10934)." ICML 2025. —— 用完整的 Agent 作为评审者，可以调用工具验证被评测 Agent 的行为。
+
 [^tau-bench]: Sierra Team. "[τ-bench: A Benchmark for Tool-Agent-User Interaction](https://arxiv.org/abs/2406.12045)." 2024. —— 三阶段构建方法：手动 schema → LLM 数据生成 → 人工场景编写。
+
 [^taskcraft]: TaskCraft Team. "[TaskCraft: Automated Generation of Agentic Tasks](https://arxiv.org/abs/2506.10055)." ICLR 2026. —— 原子任务 + 深度/宽度扩展，自动生成 41K 多工具任务。
+
 [^apigen]: APIGen-MT Team. "[Agentic Pipeline for Multi-Turn Data Generation](https://openreview.net/forum?id=qk6ORqQ4Cu)." NeurIPS 2025. —— 模拟 Agent-人类交互生成多轮对话任务。
+
 [^jade]: JADE Team. "[JADE: Expert-Grounded Dynamic Evaluation](https://arxiv.org/html/2602.06486v1)." 2025. —— 两层框架评估开放式任务：技能激活 + 声明验证。
+
 [^rler]: Allen AI. "[DR Tulu: Reinforcement Learning with Evolving Rubrics](https://arxiv.org/abs/2511.19399)." 2025. —— Rubric 随训练动态演化，保持评测的区分度。
+
 [^anthropic-eval]: Anthropic Engineering. "[Demystifying Evals for AI Agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents)." 2025. —— 工业界 Agent 评测实践：混合评分策略、两套评测集、从真实失败中提取任务。
+
 [^design2code]: Si Y, et al. "[Design2Code: How Far Are We from Automating Front-End Engineering?](https://salt-nlp.github.io/Design2Code/)." NAACL 2025. —— 前端代码生成的视觉评测基准，提出 Block-Match、Text Accuracy、Position Alignment、CIEDE2000、CLIP Similarity 五个细粒度指标。
+
 [^omni-i2c]: Omni-I2C Team. "[Omni-I2C: A Holistic Benchmark for Image-to-Code](https://arxiv.org/abs/2603.17508)." 2025. —— 发现 LMM Judge 与人类判断相关性达 Tau=0.83，远高于 SSIM（0.12）和 CLIP Score（0.44）。
+
 [^fullfront]: FullFront Team. "[FullFront: A Benchmark for Full-Stack Front-End Development](https://openreview.net/pdf/636edc8feafa72561dc2cff193472b1f68327a52.pdf)." 2025. —— CLIP + DINOv2 + Gemini 三层视觉评估，与人类相关性达 Spearman rho=0.94。
+
 [^visrefiner]: VisRefiner Team. "[VisRefiner: Learning from Visual Differences](https://arxiv.org/abs/2602.05998)." 2025. —— 用渲染截图与参考图的视觉差异作为 RL 训练奖励信号。
+
 [^agent-prm]: Chen et al. "[AgentPRM: Process Reward Models for LLM Agents via Step-Wise Promise and Progress](https://arxiv.org/abs/2511.08325)." 2025. —— 用 Promise（Q-value）和 Progress（Advantage）双信号评估 Agent 每步质量。
+
 [^ada-rubric]: AdaRubric Team. "[AdaRubric: Task-Adaptive Rubrics for LLM Agent Evaluation](https://arxiv.org/abs/2603.21362)." 2025. —— 评测维度按任务动态生成，在 VisualWebArena 上与人类相关性达 r=0.76。
+
 [^irc]: IRC Team. "[Iterative Reward Calibration for Multi-Turn Agent RL](https://arxiv.org/abs/2604.02869)." 2025. —— 发现设计不当的密集奖励比稀疏奖励更差。
+
 [^metr]: METR. "[MALT: Monitoring Agents for Reward Hacking](https://metr.org/)." 2025. —— 专门的监控模型检测 reward hacking，AUROC 达 0.96。

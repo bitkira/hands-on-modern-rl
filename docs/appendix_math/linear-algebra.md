@@ -82,11 +82,11 @@ $$\mathbf{A}\mathbf{v} = \lambda \mathbf{v}$$
 
 **向量范数**：
 
-| 范数 | 定义 | 特点 |
-| --- | --- | --- |
-| L1 范数 | $\|\mathbf{x}\|_1 = \sum \|x_i\|$ | 促进稀疏性 |
-| L2 范数 | $\|\mathbf{x}\|_2 = \sqrt{\sum x_i^2}$ | 最常用，对应欧氏距离 |
-| L$\infty$ 范数 | $\|\mathbf{x}\|_\infty = \max_i \|x_i\|$ | 度量最大分量 |
+| 范数           | 定义                                     | 特点                 |
+| -------------- | ---------------------------------------- | -------------------- |
+| L1 范数        | $\|\mathbf{x}\|_1 = \sum \|x_i\|$        | 促进稀疏性           |
+| L2 范数        | $\|\mathbf{x}\|_2 = \sqrt{\sum x_i^2}$   | 最常用，对应欧氏距离 |
+| L$\infty$ 范数 | $\|\mathbf{x}\|_\infty = \max_i \|x_i\|$ | 度量最大分量         |
 
 **矩阵范数**：
 
@@ -96,11 +96,11 @@ Frobenius 范数 $\|\mathbf{A}\|_F = \sqrt{\sum_{i,j} a_{ij}^2}$ 是矩阵的"L2
 
 ## 公式速查
 
-| 概念 | 公式 | RL 中的角色 |
-| --- | --- | --- |
-| 点积 | $\mathbf{u} \cdot \mathbf{v} = \sum u_i v_i$ | Q 值计算、相似度度量 |
-| 余弦相似度 | $\frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|}$ | embedding 比较 |
-| 矩阵-向量乘法 | $\mathbf{y} = \mathbf{A}\mathbf{x}$ | 神经网络层变换 |
-| 特征值分解 | $\mathbf{A}\mathbf{v} = \lambda \mathbf{v}$ | 收敛性分析、自然梯度 |
-| L2 范数 | $\|\mathbf{x}\|_2 = \sqrt{\sum x_i^2}$ | 梯度裁剪、权重衰减 |
-| Frobenius 范数 | $\|\mathbf{A}\|_F = \sqrt{\sum_{i,j} a_{ij}^2}$ | 参数正则化 |
+| 概念           | 公式                                                                | RL 中的角色          |
+| -------------- | ------------------------------------------------------------------- | -------------------- |
+| 点积           | $\mathbf{u} \cdot \mathbf{v} = \sum u_i v_i$                        | Q 值计算、相似度度量 |
+| 余弦相似度     | $\frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|}$ | embedding 比较       |
+| 矩阵-向量乘法  | $\mathbf{y} = \mathbf{A}\mathbf{x}$                                 | 神经网络层变换       |
+| 特征值分解     | $\mathbf{A}\mathbf{v} = \lambda \mathbf{v}$                         | 收敛性分析、自然梯度 |
+| L2 范数        | $\|\mathbf{x}\|_2 = \sqrt{\sum x_i^2}$                              | 梯度裁剪、权重衰减   |
+| Frobenius 范数 | $\|\mathbf{A}\|_F = \sqrt{\sum_{i,j} a_{ij}^2}$                     | 参数正则化           |

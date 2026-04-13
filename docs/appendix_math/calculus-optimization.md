@@ -134,11 +134,11 @@ PPO 的裁剪目标也有 Taylor 展开的影子。概率比 $r_t(\theta) = \pi_
 
 ## 公式速查
 
-| 概念 | 公式 | RL 中的角色 |
-| --- | --- | --- |
-| 导数 | $f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$ | 优化基础 |
-| 链式法则 | $\frac{d}{dx}f(g(x)) = f'(g) \cdot g'(x)$ | 反向传播、策略梯度计算 |
-| 梯度 | $\nabla f = [\partial f/\partial x_1, \ldots, \partial f/\partial x_n]^\top$ | 参数更新方向 |
-| 梯度下降 | $\theta \leftarrow \theta - \alpha \nabla \mathcal{L}$ | 所有 RL 算法的优化基础 |
-| Adam | $\theta \leftarrow \theta - \alpha \hat{m}/(\sqrt{\hat{v}} + \epsilon)$ | RL 最常用的优化器 |
+| 概念        | 公式                                                                                          | RL 中的角色             |
+| ----------- | --------------------------------------------------------------------------------------------- | ----------------------- |
+| 导数        | $f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$                                              | 优化基础                |
+| 链式法则    | $\frac{d}{dx}f(g(x)) = f'(g) \cdot g'(x)$                                                     | 反向传播、策略梯度计算  |
+| 梯度        | $\nabla f = [\partial f/\partial x_1, \ldots, \partial f/\partial x_n]^\top$                  | 参数更新方向            |
+| 梯度下降    | $\theta \leftarrow \theta - \alpha \nabla \mathcal{L}$                                        | 所有 RL 算法的优化基础  |
+| Adam        | $\theta \leftarrow \theta - \alpha \hat{m}/(\sqrt{\hat{v}} + \epsilon)$                       | RL 最常用的优化器       |
 | 一阶 Taylor | $f(\mathbf{x}+\boldsymbol{\delta}) \approx f(\mathbf{x}) + \nabla f^\top \boldsymbol{\delta}$ | PPO/GRPO 的局部近似分析 |

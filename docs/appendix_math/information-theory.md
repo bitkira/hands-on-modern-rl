@@ -118,11 +118,11 @@ $$I(X; Y) = D_{KL}(P_{XY} \| P_X \otimes P_Y) = H(X) - H(X \mid Y)$$
 
 ## 公式速查
 
-| 概念 | 公式 | RL 中的角色 |
-| --- | --- | --- |
-| 自信息 | $I(X) = -\log P(X)$ | 信息量的基本度量 |
-| 熵 | $H(X) = -\sum P(x)\log P(x)$ | SAC 熵正则化、探索策略 |
-| 交叉熵 | $H(P,Q) = -\sum P(x)\log Q(x)$ | 分类损失、策略蒸馏 |
-| KL 散度 | $D_{KL}(P\|Q) = \sum P(x)\log\frac{P(x)}{Q(x)}$ | RLHF KL 约束、PPO/GRPO |
-| 互信息 | $I(X;Y) = H(X) - H(X\|Y)$ | 表征学习 |
-| 隐式奖励 | $r(x,y) = \beta\log\frac{\pi_\theta(y\|x)}{\pi_{ref}(y\|x)}$ | DPO 的隐式 KL 正则化 |
+| 概念     | 公式                                                         | RL 中的角色            |
+| -------- | ------------------------------------------------------------ | ---------------------- |
+| 自信息   | $I(X) = -\log P(X)$                                          | 信息量的基本度量       |
+| 熵       | $H(X) = -\sum P(x)\log P(x)$                                 | SAC 熵正则化、探索策略 |
+| 交叉熵   | $H(P,Q) = -\sum P(x)\log Q(x)$                               | 分类损失、策略蒸馏     |
+| KL 散度  | $D_{KL}(P\|Q) = \sum P(x)\log\frac{P(x)}{Q(x)}$              | RLHF KL 约束、PPO/GRPO |
+| 互信息   | $I(X;Y) = H(X) - H(X\|Y)$                                    | 表征学习               |
+| 隐式奖励 | $r(x,y) = \beta\log\frac{\pi_\theta(y\|x)}{\pi_{ref}(y\|x)}$ | DPO 的隐式 KL 正则化   |
