@@ -1,3 +1,9 @@
+/* ===================================================
+   d2l-zh inspired theme for VitePress
+   参考: 动手学深度学习 (zh.d2l.ai)
+   =================================================== */
+
+/* ---- Brand & Colors ---- */
 :root {
   --vp-c-brand-1: #0f766e;
   --vp-c-brand-2: #115e59;
@@ -5,6 +11,16 @@
   --vp-c-brand-soft: rgba(15, 118, 110, 0.16);
   --ct-doc-font-size: 16px;
   --ct-doc-line-height: 1.75;
+
+  /* d2l-zh font stack */
+  --d2l-font-sans: Roboto, 'Noto Sans SC', system-ui, -apple-system,
+    'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --d2l-font-mono: Menlo, 'DejaVu Sans Mono', 'Liberation Mono', Consolas,
+    'Ubuntu Mono', 'Courier New', monospace;
+
+  /* Override VitePress default font to d2l style */
+  --vp-font-family-base: var(--d2l-font-sans);
+  --vp-font-family-mono: var(--d2l-font-mono);
   --vp-home-hero-name-background: linear-gradient(
     120deg,
     #0f172a 10%,
@@ -23,8 +39,25 @@
       transparent 44%
     );
   --vp-home-hero-image-filter: blur(52px);
+
+  /* d2l-inspired surface colors */
+  --d2l-nav-bg: #3f51b5;
+  --d2l-nav-link: #ffffff;
+  --d2l-sidebar-bg: #ffffff;
+  --d2l-sidebar-text: #757575;
+  --d2l-sidebar-active: #212121;
+  --d2l-sidebar-hover-bg: rgba(0, 0, 0, 0.04);
+  --d2l-sidebar-border: rgba(0, 0, 0, 0.1);
+  --d2l-code-bg: rgba(0, 0, 0, 0.05);
+  --d2l-code-text: rgba(0, 0, 0, 0.87);
+  --d2l-blockquote-border: rgba(0, 0, 0, 0.06);
+  --d2l-admonition-note: #00bcd4;
+  --d2l-admonition-tip: #8bc34a;
+  --d2l-admonition-warning: #ffc107;
+  --d2l-admonition-danger: #f44336;
 }
 
+/* ---- Homepage ---- */
 .VPHome {
   background:
     radial-gradient(
@@ -47,13 +80,140 @@
     rgba(255, 255, 255, 0.94),
     rgba(248, 250, 252, 0.94)
   );
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 
 .VPButton.brand {
   box-shadow: 0 18px 35px rgba(15, 118, 110, 0.22);
 }
 
+/* ===================================================
+   Navigation Bar (参考 d2l 顶部导航栏)
+   =================================================== */
+.VPNav {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.VPNavBar {
+  background: var(--vp-c-bg) !important;
+}
+
+.VPNavBar .title {
+  font-family: var(--d2l-font-sans) !important;
+  font-weight: 700 !important;
+}
+
+.VPNavBar .content-body .nav-link > a,
+.VPNavBar .nav-bar-title {
+  font-family: var(--d2l-font-sans);
+}
+
+.VPNavBarTranslations .items .nav-link a,
+.VPNavBarMenu .nav-link a {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.VPNavBarMenu .nav-link a:hover {
+  color: var(--vp-c-brand-1);
+}
+
+/* Social links */
+.VPNavBarSocialLinks .social-link {
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.VPNavBarSocialLinks .social-link:hover {
+  color: var(--vp-c-brand-1);
+}
+
+/* ===================================================
+   Sidebar (参考 d2l 侧边目录栏)
+   =================================================== */
+.VPSidebar {
+  background-color: var(--d2l-sidebar-bg) !important;
+  border-right: 1px solid var(--d2l-sidebar-border);
+  font-family: var(--d2l-font-sans);
+}
+
+.dark .VPSidebar {
+  --d2l-sidebar-bg: var(--vp-c-bg);
+  --d2l-sidebar-text: #9e9e9e;
+  --d2l-sidebar-active: #e0e0e0;
+  --d2l-sidebar-hover-bg: rgba(255, 255, 255, 0.04);
+  --d2l-sidebar-border: rgba(255, 255, 255, 0.08);
+  background-color: var(--d2l-sidebar-bg) !important;
+  border-right-color: var(--d2l-sidebar-border);
+}
+
+/* Sidebar scrollbar */
+.VPSidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.VPSidebar::-webkit-scrollbar-track {
+  border-radius: 6px;
+}
+
+.VPSidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.VPSidebar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+.dark .VPSidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Sidebar items */
+.VPSidebar .group-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--d2l-sidebar-text);
+}
+
+.VPSidebar .item .link {
+  color: var(--d2l-sidebar-text) !important;
+  font-size: 0.9rem;
+  min-height: 36px;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.VPSidebar .item .link:hover {
+  color: var(--vp-c-brand-1) !important;
+  background: var(--d2l-sidebar-hover-bg);
+}
+
+.VPSidebar .item .link.is-active {
+  color: var(--vp-c-brand-1) !important;
+  font-weight: 700;
+}
+
+/* Sidebar carets */
+.VPSidebar .item .caret {
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.VPSidebar .item:hover .caret {
+  opacity: 0.8;
+}
+
+/* ===================================================
+   Doc Content Area (d2l 排版风格)
+   =================================================== */
 .vp-doc {
   font-size: var(--ct-doc-font-size);
 }
@@ -73,13 +233,50 @@
   text-underline-offset: 0.2em;
 }
 
+/* ---- Headings (d2l 风格: 无衬线, 层级分明) ---- */
 .vp-doc h1,
-.vp-doc h2 {
-  font-family:
-    ui-serif, Georgia, Cambria, 'Times New Roman', Times, 'Noto Serif CJK SC',
-    'Noto Serif SC', 'Source Han Serif SC', 'Source Han Serif CN', 'Songti SC',
-    'STSong', 'STZhongsong', 'SimSun', serif;
+.vp-doc h2,
+.vp-doc h3,
+.vp-doc h4 {
+  font-family: var(--d2l-font-sans);
   font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc h1 {
+  font-size: 2rem;
+  line-height: 2.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.vp-doc h2 {
+  font-size: 1.75rem;
+  line-height: 2rem;
+  padding-top: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark .vp-doc h2 {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.vp-doc h3 {
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+  padding-top: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.vp-doc h4 {
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  padding-top: 0.75rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .vp-doc h2,
@@ -87,6 +284,209 @@
   scroll-margin-top: 80px;
 }
 
+/* ---- Paragraph spacing (d2l 紧凑感) ---- */
+.vp-doc p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.vp-doc ul li,
+.vp-doc ol li {
+  margin: 0.3rem 0;
+}
+
+/* ---- Code blocks (d2l 风格: 柔和背景, 小圆角) ---- */
+.vp-doc :not(pre) > code {
+  font-family: var(--d2l-font-mono);
+  font-size: 0.9em;
+  border-radius: 2px;
+  padding: 0.15em 0.4em;
+  background: var(--d2l-code-bg);
+  color: var(--d2l-code-text);
+}
+
+.vp-doc pre {
+  border-radius: 4px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.2s ease;
+}
+
+.vp-doc pre:hover {
+  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.14),
+    0 3px 3px -2px rgba(0, 0, 0, 0.2),
+    0 1px 8px 0 rgba(0, 0, 0, 0.12);
+}
+
+.vp-doc pre code {
+  font-family: var(--d2l-font-mono);
+  font-size: 0.9em;
+}
+
+.dark .vp-doc :not(pre) > code {
+  --d2l-code-bg: rgba(255, 255, 255, 0.08);
+  --d2l-code-text: rgba(255, 255, 255, 0.87);
+  background: var(--d2l-code-bg);
+  color: var(--d2l-code-text);
+}
+
+.dark .vp-doc pre {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.3),
+    0 3px 1px -2px rgba(0, 0, 0, 0.4),
+    0 1px 5px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* ---- Blockquote (d2l: 左侧细线) ---- */
+.vp-doc blockquote {
+  border-left: 3px solid var(--d2l-blockquote-border);
+  padding: 0 1rem;
+  color: var(--vp-c-text-2);
+  font-size: 1rem;
+}
+
+.dark .vp-doc blockquote {
+  --d2l-blockquote-border: rgba(255, 255, 255, 0.1);
+  border-left-color: var(--d2l-blockquote-border);
+}
+
+/* ---- Custom containers / Admonitions (d2l: 左侧色条) ---- */
+.vp-doc .custom-block {
+  border-left: 4px solid;
+  border-radius: 0;
+  padding: 12px 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.vp-doc .custom-block.tip {
+  border-left-color: var(--d2l-admonition-tip);
+  background-color: rgba(139, 195, 74, 0.08) !important;
+}
+
+.vp-doc .custom-block.info {
+  border-left-color: var(--d2l-admonition-note);
+  background-color: rgba(0, 188, 212, 0.08) !important;
+}
+
+.vp-doc .custom-block.warning {
+  border-left-color: var(--d2l-admonition-warning);
+  background-color: rgba(255, 193, 7, 0.08) !important;
+}
+
+.vp-doc .custom-block.danger {
+  border-left-color: var(--d2l-admonition-danger);
+  background-color: rgba(244, 67, 54, 0.08) !important;
+}
+
+.vp-doc .custom-block .custom-block-title {
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.vp-doc .custom-block.tip .custom-block-title {
+  color: var(--d2l-admonition-tip);
+}
+
+.vp-doc .custom-block.info .custom-block-title {
+  color: var(--d2l-admonition-note);
+}
+
+.vp-doc .custom-block.warning .custom-block-title {
+  color: var(--d2l-admonition-warning);
+}
+
+.vp-doc .custom-block.danger .custom-block-title {
+  color: var(--d2l-admonition-danger);
+}
+
+/* ---- Tables (d2l Material Design 风格) ---- */
+.vp-doc table {
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin: 1.5rem 0;
+  table-layout: fixed;
+  max-width: 100%;
+  min-width: 70%;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.vp-doc table th {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.54);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.vp-doc table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  white-space: normal;
+  overflow-wrap: break-word;
+  padding: 0.4rem 0.8rem;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+
+.vp-doc table tr:hover {
+  background-color: #eee;
+}
+
+.dark .vp-doc table {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.dark .vp-doc table th {
+  color: rgba(255, 255, 255, 0.5);
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark .vp-doc table td {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark .vp-doc table tr:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ---- Images (d2l: 居中, 适度圆角) ---- */
+.vp-doc p > img,
+.vp-doc figure > img,
+.vp-doc > img {
+  display: block;
+  margin: 1.5rem auto;
+  max-height: 280px;
+  width: auto;
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.dark .vp-doc p > img,
+.dark .vp-doc figure > img,
+.dark .vp-doc > img {
+  box-shadow: none;
+}
+
+/* ---- Mermaid diagrams ---- */
+.vp-doc .mermaid,
+.vp-doc pre.mermaid,
+.vp-doc div[class*='mermaid'],
+.mermaid-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 2.5rem 0;
+}
+
+/* ---- Dark mode: Feature cards ---- */
 .dark .VPFeature {
   border-color: rgba(148, 163, 184, 0.18);
   background: linear-gradient(
@@ -137,24 +537,29 @@
 .vp-doc .footnotes .footnote-backref:hover {
   text-decoration: underline;
 }
+
+/* ---- KaTeX / MathJax ---- */
 .katex {
   font-size: 1.1em;
 }
+
 .katex-html {
   line-height: normal;
 }
+
 .katex .base {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
+
 .katex-display {
   margin: 1em 0;
 }
+
 .katex-html {
   display: inline-block;
 }
 
-/* Fix MathJax 3 assistive math duplication when styles are stripped */
 mjx-assistive-mml {
   position: absolute !important;
   clip: rect(1px, 1px, 1px, 1px);
@@ -172,29 +577,9 @@ mjx-container[display='true'] {
   margin: 1em 0;
 }
 
-/* Center images and provide a sensible default max-width */
-.vp-doc p > img,
-.vp-doc figure > img,
-.vp-doc > img {
-  display: block;
-  margin: 1.5rem auto;
-  max-height: 280px; /* 限制图片最大高度 */
-  width: auto;
-  max-width: 100%;
-  border-radius: 8px;
-}
-
-/* Center mermaid diagrams and add spacing */
-.vp-doc .mermaid,
-.vp-doc pre.mermaid,
-.vp-doc div[class*='mermaid'],
-.mermaid-wrapper {
-  display: flex;
-  justify-content: center;
-  margin: 2.5rem 0;
-}
-
-/* ---- Theme Styles ---- */
+/* ===================================================
+   Theme Variants (阅读主题)
+   =================================================== */
 html:not(.dark)[data-ct-theme='claude'] {
   --vp-c-bg: #fcfbf9;
   --vp-c-bg-alt: #f6f5f2;
@@ -224,7 +609,9 @@ html:not(.dark)[data-ct-theme='gray'] {
   --vp-c-text-1: #1f2937;
 }
 
-/* ---- Full Width Layout ---- */
+/* ===================================================
+   Full Width Layout
+   =================================================== */
 :root {
   --vp-layout-max-width: 100%;
 }
@@ -261,13 +648,51 @@ html:not(.dark)[data-ct-theme='gray'] {
   }
 }
 
-/* ---- Aside Outline ---- */
+/* ===================================================
+   Aside Outline (参考 d2l localtoc)
+   =================================================== */
+/* Make outline scrollable when it exceeds viewport */
+.VPDocAsideOutline {
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+.VPDocAsideOutline::-webkit-scrollbar {
+  width: 4px;
+}
+
+.VPDocAsideOutline::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.VPDocAsideOutline::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+}
+
+.dark .VPDocAsideOutline {
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.dark .VPDocAsideOutline::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .VPDocAsideOutline .content {
   padding-left: 10px;
 }
 
 .VPDocAsideOutline .outline-title {
   margin-bottom: 2px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* Hide VitePress default outline marker bar (the fixed top indicator) */
+.VPDocAsideOutline .outline-marker {
+  display: none !important;
 }
 
 .VPDocAsideOutline .VPDocOutlineItem li {
@@ -281,20 +706,20 @@ html:not(.dark)[data-ct-theme='gray'] {
 
 .VPDocAsideOutline .VPDocOutlineItem .outline-link {
   display: block;
-  padding: 6px 0 6px 2px;
-  min-height: 32px;
-  line-height: 1.45;
+  padding: 6px 0 6px 8px;
+  min-height: 28px;
+  line-height: 1.4;
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
   overflow-wrap: anywhere;
   word-break: break-word;
-  border-radius: 10px;
+  border-radius: 0;
+  border-left: 2px solid transparent;
   transition:
-    color 0.25s ease,
-    background-color 0.25s ease,
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .VPDocAsideOutline .VPDocOutlineItem.nested {
@@ -302,18 +727,82 @@ html:not(.dark)[data-ct-theme='gray'] {
   padding-right: 0;
 }
 
+/* Hover */
 .VPDocAsideOutline .VPDocOutlineItem .outline-link:hover,
-.VPDocAsideOutline .VPDocOutlineItem .outline-link:focus-visible,
+.VPDocAsideOutline .VPDocOutlineItem .outline-link:focus-visible {
+  color: var(--vp-c-text-1);
+  background: rgba(0, 0, 0, 0.03);
+  border-left-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Active — d2l localtoc: left border stripe, no rounded bg */
 .VPDocAsideOutline .VPDocOutlineItem .outline-link.active {
-  margin: 0 -6px 0 -4px;
-  padding: 6px 6px 6px 8px;
-  background: color-mix(in srgb, var(--vp-c-bg-alt) 88%, transparent);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-  transform: translateX(-1px);
+  margin: 0;
+  padding: 6px 6px 6px 5px;
+  color: var(--vp-c-brand-1);
+  font-weight: 700;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  border-left: 3px solid var(--vp-c-brand-1);
 }
 
 .dark .VPDocAsideOutline .VPDocOutlineItem .outline-link:hover,
-.dark .VPDocAsideOutline .VPDocOutlineItem .outline-link:focus-visible,
+.dark .VPDocAsideOutline .VPDocOutlineItem .outline-link:focus-visible {
+  color: var(--vp-c-text-1);
+  background: rgba(255, 255, 255, 0.04);
+  border-left-color: rgba(255, 255, 255, 0.15);
+}
+
 .dark .VPDocAsideOutline .VPDocOutlineItem .outline-link.active {
-  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.32);
+  background: none;
+  box-shadow: none;
+}
+
+/* ===================================================
+   Prev / Next Navigation (页面底部导航)
+   =================================================== */
+.VPDocFooter .pager {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark .VPDocFooter .pager {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.VPDocFooter .pager-link {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.VPDocFooter .pager-link:hover {
+  border-color: var(--vp-c-brand-1);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.dark .VPDocFooter .pager-link {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .VPDocFooter .pager-link:hover {
+  border-color: var(--vp-c-brand-1);
+  box-shadow: none;
+}
+
+/* ===================================================
+   Edit Link
+   =================================================== */
+.VPDocFooter .edit-link a {
+  font-size: 0.85rem;
+  color: var(--vp-c-text-2);
+  transition: color 0.2s ease;
+}
+
+.VPDocFooter .edit-link a:hover {
+  color: var(--vp-c-brand-1);
 }
