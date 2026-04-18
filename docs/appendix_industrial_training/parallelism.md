@@ -87,13 +87,6 @@ RL 训练（PPO/GRPO）比普通微调复杂，因为要同时管理多个模型
 
 ## 参考文献
 
-- [^1] HuggingFace Blog, [Async RL Training Landscape — 16 Open-Source Libraries Compared](https://huggingface.co/blog/async-rl-training-landscape), 2026.
-- [^2] PyTorch Blog, [A Primer on LLM Post-Training](https://pytorch.org/blog/a-primer-on-llm-post-training/), 2025.
-- [^3] OpenRLHF, [OpenRLHF: A High-Performance RLHF Framework](https://arxiv.org/html/2501.03262v4), EMNLP 2025 Demo.
-- [^4] DeepSeek-AI, [DeepSeek-V3 Technical Report](https://arxiv.org/abs/2412.19437), 2024.
-
-## 参考文献
-
 [^1]: HuggingFace Blog, [Async RL Training Landscape — 16 Open-Source Libraries Compared](https://huggingface.co/blog/async-rl-training-landscape), 2026.
 
 [^2]: PyTorch Blog, [A Primer on LLM Post-Training](https://pytorch.org/blog/a-primer-on-llm-post-training/), 2025.

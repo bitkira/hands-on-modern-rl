@@ -40,7 +40,7 @@ BFCL 的评测方式是纯文本的：给定函数签名和用户请求，模型
 
 ### ACEBench
 
-**ACEBench** 从更细的粒度评估工具使用能力。评测分为三个类别：Normal（基础调用）、Special（高级场景如并行调用、长上下文）和 Agent（多智能体协作）。ACEBench 被 ACL 2025 收录，是目前最全面的工具使用评测之一。
+**ACEBench** 从更细的粒度评估工具使用能力。评测分为三个类别：Normal（基础调用）、Special（高级场景如并行调用、长上下文）和 Agent（多智能体协作）。ACEBench 被 EMNLP 2025 Findings 收录，是目前最全面的工具使用评测之一。
 
 ### API-Bank
 
@@ -817,14 +817,14 @@ $$
 
 ## 参考资料
 
-- Patil S, et al. "[The Berkeley Function Calling Leaderboard](https://gorilla.cs.berkeley.edu/leaderboard.html)." 2023. —— BFCL 排行榜，评估 LLM 函数调用能力。
+- Patil S, et al. "[The Berkeley Function Calling Leaderboard](https://gorilla.cs.berkeley.edu/leaderboard.html)." ICML 2025. —— BFCL 排行榜，评估 LLM 函数调用能力。
 - Jimenez C E, et al. "[SWE-bench: Can Language Models Resolve Real-World GitHub Issues?](https://arxiv.org/abs/2310.06770)." ICLR 2024. —— 代码智能体评估基准。
 - Zhou S, et al. "[WebArena: A Realistic Web Environment for Building Autonomous Agents](https://arxiv.org/abs/2307.13854)." ICLR 2024. —— Web Agent 评估环境。
-- Mialon G, Fourrier C, Wolf T, et al. "[GAIA: A Benchmark for General AI Assistants](https://arxiv.org/abs/2311.12983)." NeurIPS 2023. —— 通用 AI 助手评测。
-- Ma L, et al. "[ACEBench: Who Wins the Match Point in Tool Usage?](https://arxiv.org/abs/2501.12851)." ACL 2025. —— 综合工具使用评测。
+- Mialon G, Fourrier C, Wolf T, et al. "[GAIA: A Benchmark for General AI Assistants](https://arxiv.org/abs/2311.12983)." ICLR 2024. —— 通用 AI 助手评测。
+- Chen C, et al. "[ACEBench: Who Wins the Match Point in Tool Usage?](https://arxiv.org/abs/2501.12851)." EMNLP 2025 Findings. —— 综合工具使用评测。
 - Sierra Team. "[τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains](https://arxiv.org/abs/2406.12045)." arXiv:2406.12045, 2024. —— 对话式智能体评测。
 - Li M, et al. "[API-Bank: A Comprehensive Benchmark for Tool-Augmented LLMs](https://arxiv.org/abs/2304.08244)." EMNLP 2023. —— 工具增强 LLM 评测。
-- Ji H, et al. "[The Tool Decathlon](https://arxiv.org/abs/2510.25726)." arXiv:2510.25726, 2024. —— Toolathlon，多工具长时间工作流评测。
+- Li J, et al. "[The Tool Decathlon](https://arxiv.org/abs/2510.25726)." ICLR 2026. —— Toolathlon，多工具长时间工作流评测。
 
 [^benchmark-exploit]: Berkeley RDI. "[Trustworthy Benchmarks for Contamination](https://rdi.berkeley.edu/blog/trustworthy-benchmarks-cont)." 2025. —— 几乎所有主流 agentic benchmark 都可以被钻空子拿到接近满分，SWE-bench、WebArena、GAIA 均不例外。
 
@@ -844,7 +844,7 @@ $$
 
 [^anthropic-eval]: Anthropic Engineering. "[Demystifying Evals for AI Agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents)." 2025. —— 工业界 Agent 评测实践：混合评分策略、两套评测集、从真实失败中提取任务。
 
-[^design2code]: Si Y, et al. "[Design2Code: How Far Are We from Automating Front-End Engineering?](https://salt-nlp.github.io/Design2Code/)." NAACL 2025. —— 前端代码生成的视觉评测基准，提出 Block-Match、Text Accuracy、Position Alignment、CIEDE2000、CLIP Similarity 五个细粒度指标。
+[^design2code]: Si C, et al. "[Design2Code: How Far Are We from Automating Front-End Engineering?](https://salt-nlp.github.io/Design2Code/)." NAACL 2025. —— 前端代码生成的视觉评测基准，提出 Block-Match、Text Accuracy、Position Alignment、CIEDE2000、CLIP Similarity 五个细粒度指标。
 
 [^omni-i2c]: Omni-I2C Team. "[Omni-I2C: A Holistic Benchmark for Image-to-Code](https://arxiv.org/abs/2603.17508)." 2025. —— 发现 LMM Judge 与人类判断相关性达 Tau=0.83，远高于 SSIM（0.12）和 CLIP Score（0.44）。
 

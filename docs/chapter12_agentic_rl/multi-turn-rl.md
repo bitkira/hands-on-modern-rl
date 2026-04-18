@@ -458,7 +458,7 @@ def verification_augmented_reward(trajectory, final_answer, ground_truth):
 
 ## 参考资料
 
-[^lightman]: Lightman H, et al. "[Let's Verify Step by Step](https://arxiv.org/abs/2305.20050)." arXiv:2305.20050, 2023. —— 提出 ORM vs PRM 的对比框架，证明过程监督（PRM）在数学推理上显著优于结果监督（ORM）。
+[^lightman]: Lightman H, et al. "[Let's Verify Step by Step](https://arxiv.org/abs/2305.20050)." ICLR 2024. —— 提出 ORM vs PRM 的对比框架，证明过程监督（PRM）在数学推理上显著优于结果监督（ORM）。
 
 [^mathshepherd]: Wang P, Li L, Shao Z, et al. "[Math-Shepherd: Verify and Reinforce LLMs Step-by-step without Human Annotations](https://arxiv.org/abs/2312.08935)." ACL 2024. —— 自动化过程奖励标注，无需人工标注中间步骤。
 
@@ -468,36 +468,36 @@ def verification_augmented_reward(trajectory, final_answer, ground_truth):
 
 [^verlog]: Chen W-T, et al. "[Verlog: Context-lite Multi-turn RL for Long-Horizon LLM Agents](https://neurips.cc/virtual/2025/128043)." NeurIPS 2025 Workshop. —— 支持变长 episode 的多轮 RL 训练框架。
 
-[^salt]: Li Z, Wang et al. "[SALT: Step-level Advantage Assignment for Long-horizon Agents via Trajectory Graph](https://arxiv.org/abs/2510.20022)." EACL 2026 Findings. —— 通过轨迹图量化每步质量，为 GRPO 提供步骤级 advantage 分配，不需要额外奖励模型。
+[^salt]: Li J, Wang Y, et al. "[SALT: Step-level Advantage Assignment for Long-horizon Agents via Trajectory Graph](https://arxiv.org/abs/2510.20022)." EACL 2026 Findings. —— 通过轨迹图量化每步质量，为 GRPO 提供步骤级 advantage 分配，不需要额外奖励模型。
 
 [^agentgym]: Xi Z, Huang et al. "[AgentGym-RL: Training LLM Agents for Long-Horizon Decision-Making through Multi-Turn RL](https://arxiv.org/abs/2509.08755)." ICLR 2026. —— 用 ScalingInter-RL 渐进式课程解决长程策略崩塌问题。[GitHub](https://github.com/WooooDyy/AgentGym-RL)
 
-[^webshepherd]: Web-Shepherd Team. "[Web-Shepherd: Advancing PRMs for Reinforcing Web Agents](https://arxiv.org/abs/2505.15277)." NeurIPS 2025 Spotlight. —— 首个网页导航专用的步骤级 PRM，成本仅为 LLM 判官的 1/10。
+[^webshepherd]: Chae H, et al. "[Web-Shepherd: Advancing PRMs for Reinforcing Web Agents](https://arxiv.org/abs/2505.15277)." NeurIPS 2025 Spotlight. —— 首个网页导航专用的步骤级 PRM，成本仅为 LLM 判官的 1/10。
 
-[^treerl]: TreeRL Team. "[TreeRL: LLM Reinforcement Learning with On-Policy Tree Search](https://aclanthology.org/2025.acl-long.1234)." ACL 2025. 将树搜索与 RL 结合训练，模型学会有目的地搜索推理树。
+[^treerl]: Hou Z, Hu Z, Li Y, et al. "[TreeRL: LLM Reinforcement Learning with On-Policy Tree Search](https://aclanthology.org/2025.acl-long.604)." ACL 2025. 将树搜索与 RL 结合训练，模型学会有目的地搜索推理树。
 
-[^pgts]: Li Y, et al. "[Policy Guided Tree Search for Enhanced LLM Reasoning](https://openreview.net/forum?id=pgts2025)." ICML 2025. 将 MCTS 引入 LLM 推理，策略引导的搜索树展开。
+[^pgts]: Li Y, et al. "[Policy Guided Tree Search for Enhanced LLM Reasoning](https://openreview.net/forum?id=NNWSNy4YB4)." ICML 2025. 将 MCTS 引入 LLM 推理，策略引导的搜索树展开。
 
 [^tot]: Yao S, et al. "[Tree of Thoughts: Deliberate Problem Solving with Large Language Models](https://arxiv.org/abs/2305.10601)." NeurIPS 2023. 将推理展开为搜索树的经典框架。
 
-[^deepresearcher]: Jin J, et al. "[DeepResearcher: Scaling Deep Research via Reinforcement Learning in Real-world Environments](https://arxiv.org/abs/2504.0327)." arXiv, 2025. 在真实网络环境中 RL 训练涌现出规划和交叉验证行为。
+[^deepresearcher]: Zheng Y, et al. "[DeepResearcher: Scaling Deep Research via Reinforcement Learning in Real-world Environments](https://arxiv.org/abs/2504.03160)." arXiv, 2025. 在真实网络环境中 RL 训练涌现出规划和交叉验证行为。
 
-[^agentq]: Putta A, et al. "[Agent Q: Advancing Agentic AI via On-Policy Tree Search and Self-Correction](https://arxiv.org/abs/2408.07399)." arXiv, 2024. 将 MCTS 与 DPO 结合解决 Web Agent 的稀疏奖励问题。
+[^agentq]: Putta A, et al. "[Agent Q: Advanced Reasoning and Learning for Autonomous AI Agents](https://arxiv.org/abs/2408.07199)." arXiv, 2024. 将 MCTS 与 DPO 结合解决 Web Agent 的稀疏奖励问题。
 
-[^sparl]: Yang Y, et al. "[SPA-RL: Step-level Reward Attribution for Long-horizon Reinforcement Learning](https://arxiv.org/abs/2505.20732)." arXiv, 2025. 通过路径分析精确归因每步贡献。
+[^sparl]: Wang L, et al. "[SPA-RL: Reinforcing LLM Agents via Stepwise Progress Attribution](https://arxiv.org/abs/2505.20732)." arXiv, 2025. 通过步骤级进度归因精确分配每步贡献。
 
-[^watchevery]: Song J, et al. "[Watch Every Step: Step-Level Reward Matters for Long-Horizon Agent RL](https://arxiv.org/abs/2505.17773)." arXiv, 2025. 系统研究步骤级奖励在 Agent 训练中的价值。
+[^watchevery]: Xiong X, et al. "[Watch Every Step: LLM Agent Learning via Iterative Step-level Process Refinement](https://arxiv.org/abs/2406.11176)." EMNLP 2024. 系统研究步骤级奖励在 Agent 训练中的价值。
 
-[^storl]: Wang Z, et al. "[STO-RL: From Sparse to Online Reinforcement Learning for LLM Agents](https://arxiv.org/abs/2505.18772)." arXiv, 2025. 离线预热 + 在线精修的两阶段策略。
+[^storl]: Wang Z, et al. "[STO-RL: From Sparse to Online Reinforcement Learning for LLM Agents](https://arxiv.org/abs/2601.08107)." arXiv, 2026. 离线预热 + 在线精修的两阶段策略。
 
-[^s2r]: Zhang Y, et al. "[S2R: Teaching LLMs to Self-verify and Self-correct via Reinforcement Learning](https://arxiv.org/abs/2502.12853)." arXiv, 2025. 首个系统性用 RL 训练自我验证与纠错闭环的工作。
+[^s2r]: Ma R, et al. "[S2R: Teaching LLMs to Self-verify and Self-correct via Reinforcement Learning](https://arxiv.org/abs/2502.12853)." arXiv, 2025. 首个系统性用 RL 训练自我验证与纠错闭环的工作。
 
-[^reveal]: Wu Z, et al. "[ReVeal: Retrieval-Augmented Verification for Code Generation](https://arxiv.org/abs/2506.11442)." arXiv, 2025. 通过自动生成测试用例验证代码正确性。
+[^reveal]: Jin Y, et al. "[ReVeal: Self-Evolving Code Agents via Reliable Self-Verification](https://arxiv.org/abs/2506.11442)." arXiv, 2025. 通过自动生成测试用例验证代码正确性。
 
 [^critic]: Gou Z, et al. "[CRITIC: Large Language Models Can Self-Correct with Tool-Interactive Critiquing](https://arxiv.org/abs/2305.11738)." ICLR 2024. 通过工具交互进行纠错的框架。
 
 [^reflexion]: Shinn N, et al. "[Reflexion: Language Agents with Verbal Reinforcement Learning](https://arxiv.org/abs/2303.11366)." NeurIPS 2023. 引入语言反思机制的 Agent 框架。
 
-[^metareflect]: Chen Z, et al. "[Meta-RL Self-Reflection: Learning to Reflect via Meta-Reinforcement Learning](https://arxiv.org/abs/2603.11327)." arXiv, 2026. 将自我反思能力嵌入元学习过程。
+[^metareflect]: Chen Z, et al. "[MR-Search: Meta-Reinforcement Learning with Self-Reflection for Agentic Search](https://arxiv.org/abs/2603.11327)." arXiv, 2026. 将自我反思能力嵌入元学习过程，用于智能体搜索场景。
 
-[^rerest]: Gulcehre C, et al. "[Re-ReST: Emitting Reasoning and Self-Training with Self-Correction for Language Models](https://arxiv.org/abs/2312.11703)." EMNLP 2024. 自我纠错与迭代自训练的结合。
+[^rerest]: Dou Z-Y, et al. "[Re-ReST: Reflection-Reinforced Self-Training for Language Agents](https://arxiv.org/abs/2406.01495)." EMNLP 2024. 自我纠错与迭代自训练的结合。

@@ -159,10 +159,10 @@ RL 训练后的生成模型通常比原始模型更"聪明"（更懂用户意图
 ## 参考资料
 
 - Black K, Janner M, Du Y, et al. "[Training Diffusion Models with Reinforcement Learning](https://arxiv.org/abs/2305.13301)." ICLR 2024. —— DDPO，把 Diffusion 去噪过程建模为 MDP，用策略梯度优化。首次证明 RL 可以显著提升 Diffusion 模型的指令遵循能力。
-- Fan Y, Watkins O, Du Y, et al. "[DPG: Reinforcement Learning for Diffusion Models](https://arxiv.org/abs/2404.08001)." 2024. —— 直接用 PPO 训练 Diffusion 模型的策略优化方法。
-- Clark K, et al. "[Directly Fine-Tuning Diffusion Models on Differentiable Rewards](https://arxiv.org/abs/2307.00440)." 2023. —— 用可微 reward 直接微调 Diffusion 模型，无需 RL。
+- Fan Y, Watkins O, Du Y, et al. "[DPOK: Reinforcement Learning for Fine-tuning Text-to-Image Diffusion Models](https://arxiv.org/abs/2305.16381)." NeurIPS 2023. —— 将策略优化与 KL 正则化结合，在线 RL 微调文本到图像扩散模型。
+- Clark K, et al. "[Directly Fine-Tuning Diffusion Models on Differentiable Rewards](https://arxiv.org/abs/2309.17400)." ICLR 2024. —— 用可微 reward 直接微调 Diffusion 模型，无需 RL。
 - Prabhudesai M, et al. "[Aligning Text-to-Image Diffusion Models with Reward Backpropagation](https://arxiv.org/abs/2310.03739)." 2023. —— 通过 reward 反向传播来对齐 Diffusion 模型。
 - Wu X, et al. "[Human Preference Score v2: A Benchmark for Evaluating Human Preferences of Text-to-Image Synthesis](https://arxiv.org/abs/2306.09341)." NeurIPS 2023. —— HPS v2，大规模人类偏好评分数据集和 reward model。
 - Kirstain S, et al. "[Pick-a-Pic: Open Dataset of Human Preferences for Text-to-Image Generation](https://arxiv.org/abs/2305.01569)." NeurIPS 2023. —— 人类对生成图像的偏好数据集，用于训练 reward model。
-- Dai X, et al. "[Emu Video: Factorizing Text-to-Video Generation](https://arxiv.org/abs/2311.10713)." 2024. —— 视频生成模型，涉及视频质量的多维度评估。
-- Bronstein O, et al. "[VideoRL: Reinforcement Learning for Video Generation](https://arxiv.org/abs/2412.19392)." 2024. —— 用 RL 优化视频生成质量的探索。
+- Girdhar R, et al. "[Emu Video: Factorizing Text-to-Video Generation by Explicit Image Conditioning](https://arxiv.org/abs/2311.10709)." ECCV 2024. —— 视频生成模型，涉及视频质量的多维度评估。
+- Li X, et al. "[Boosting Text-to-Video Generative Model with MLLMs Feedback](https://neurips.cc/virtual/2024/poster/96722)." NeurIPS 2024. —— 用多模态 LLM 反馈作为 reward model，通过 RL 微调视频生成模型。

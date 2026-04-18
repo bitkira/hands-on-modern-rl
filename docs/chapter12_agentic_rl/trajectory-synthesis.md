@@ -337,13 +337,13 @@ def compute_quality(traj):
 
 [^magnet]: Yin F, Wang Z, Hsu I-H, et al. "[Magnet: Multi-turn Tool-use Data Synthesis and Distillation via Graph Translation](https://arxiv.org/abs/2503.07826)." ACL 2025. —— 基于函数签名图的轨迹合成，通过 MAGNIFY/CONNECT 图操作生成合法调用路径。
 
-[^looptool]: LoopTool Team. "[LoopTool: Closing the Data-Training Loop for Robust LLM Tool Calls](https://arxiv.org/abs/2511.09148)." arXiv:2511.09148, 2024. —— 闭环迭代框架，用 GCP+JGLV+EDDE 三模块实现"模型驱动数据进化"。[GitHub](https://github.com/Rednote-DeepExperience/LoopTool)
+[^looptool]: LoopTool Team. "[LoopTool: Closing the Data-Training Loop for Robust LLM Tool Calls](https://arxiv.org/abs/2511.09148)." arXiv:2511.09148, 2025. —— 闭环迭代框架，用 GCP+JGLV+EDDE 三模块实现"模型驱动数据进化"。[GitHub](https://github.com/Rednote-DeepExperience/LoopTool)
 
-[^hardgen]: HardGen Team. "[From Failure to Mastery: Generating Hard Samples for Tool-use Agents](https://arxiv.org/abs/2601.01498)." arXiv:2601.01498, 2026. —— 从模型失败案例中定向生成高难度训练数据。[数据集](https://huggingface.co/datasets/Bingguang/HardGen)
+[^hardgen]: Hao B, et al. "[From Failure to Mastery: Generating Hard Samples for Tool-use Agents](https://arxiv.org/abs/2601.01498)." arXiv:2601.01498, 2026. —— 从模型失败案例中定向生成高难度训练数据。[数据集](https://huggingface.co/datasets/Bingguang/HardGen)
 
-[^echo]: Shinn A, et al. "[Sample-Efficient Online Learning in LM Agents via Hindsight Trajectory Rewriting](https://arxiv.org/abs/2510.10304)." arXiv:2510.10304, 2025. —— ECHO：借鉴 HER 的后见之明经验回放，将失败轨迹重写为针对其他目标的成功案例，极大提升样本效率。
+[^echo]: Hu B, et al. "[Sample-Efficient Online Learning in LM Agents via Hindsight Trajectory Rewriting](https://arxiv.org/abs/2510.10304)." arXiv:2510.10304, 2025. —— ECHO：借鉴 HER 的后见之明经验回放，将失败轨迹重写为针对其他目标的成功案例，极大提升样本效率。
 
-[^astra]: ASTRA Team. "[ASTRA: Automated Synthesis of agentic Trajectories and Reinforcement Arenas](https://arxiv.org/abs/2601.21558)." arXiv:2601.21558, 2026. —— 端到端框架：自动合成多轮交互轨迹并打包为可验证 RL 环境。[GitHub](https://github.com/LianjiaTech/astra)
+[^astra]: Tian X, Wang H, et al. "[ASTRA: Automated Synthesis of agentic Trajectories and Reinforcement Arenas](https://arxiv.org/abs/2601.21558)." arXiv:2601.21558, 2026. —— 端到端框架：自动合成多轮交互轨迹并打包为可验证 RL 环境。[GitHub](https://github.com/LianjiaTech/astra)
 
 [^tsr]: Djuhera A, Kadhe S, et al. "[TSR: Trajectory-Search Rollouts for Multi-Turn RL of LLM Agents](https://arxiv.org/abs/2602.11767)." arXiv:2602.11767, 2026. —— 将测试时搜索（束搜索、best-of-N）搬到训练阶段 rollout，最高 15% 性能提升。
 

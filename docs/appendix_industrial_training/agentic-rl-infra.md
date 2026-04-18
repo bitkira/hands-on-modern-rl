@@ -147,7 +147,7 @@ Relax 是目前唯一同时支持全模态和全异步弹性扩展的 Agentic RL
 
 ## 参考文献
 
-[^relax_paper]: Xiaohongshu AI Infra Team. "[Relax: Reinforcement Learning Engine Leveraging Agentic X-modality](https://arxiv.org/abs/2604.11554)." arXiv:2604.11554, 2026. [GitHub](https://github.com/redai-infra/Relax)
+[^relax_paper]: Xiaohongshu AI Infra Team. "[Relax: An Asynchronous Reinforcement Learning Engine for Omni-Modal Post-Training at Scale](https://arxiv.org/abs/2604.11554)." arXiv:2604.11554, 2026. [GitHub](https://github.com/redai-infra/Relax)
 
 [^1]: HuggingFace Blog, "[Async RL Training Landscape — 16 Open-Source Libraries Compared](https://huggingface.co/blog/async-rl-training-landscape)", 2026.
 
