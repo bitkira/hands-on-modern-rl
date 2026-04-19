@@ -1,4 +1,4 @@
-# 第3章：RL 通识——理论地图与全局视野
+# Chapter 3. Foundations of RL: MDP, Value Functions & Policy Optimization
 
 在前两章中，我们做了两件事：第 1 章让一根木棍在小车上学会了直立不倒，第 2 章让一个小模型学会了在被拒绝时保持礼貌。两次都做成了——CartPole 拿到了高分，DPO 产出了更友好的回复。
 
@@ -6,9 +6,9 @@
 
 PPO 为什么能在 20000 步之后突然"开窍"？DPO 的损失函数为什么能把偏好信号注入模型参数？要回答这些问题，我们需要一套数学语言来精确描述"学习"的过程。这套语言就是马尔可夫决策过程（Markov Decision Process, MDP）及其衍生出的价值函数、贝尔曼方程和策略优化理论。
 
-## 本章要解决的核心问题
+## Core Questions
 
-所有 RL 算法都在回答同一个问题：**如何选择动作以最大化累积回报？** 围绕这个问题，本章将沿着一条问题驱动的路径展开：
+所有 RL 算法都在回答同一个问题：**How to select actions to maximize cumulative reward?** 围绕这个问题，本章将沿着一条问题驱动的路径展开：
 
 - 怎么量化策略的好坏？→ 期望回报
 - 怎么定义游戏规则？→ MDP 五元组
@@ -18,16 +18,17 @@ PPO 为什么能在 20000 步之后突然"开窍"？DPO 的损失函数为什么
   - 路线一：$Q(s,a)$——给动作打分，选最高的
   - 路线二：$J(\theta)$——跳过打分，直接优化策略
 
-## 章节导航
+## Lecture Guide
 
-| 小节 | 你会回答的问题 |
+| Section | Guiding Question |
 | --- | --- |
-| [两台老虎机](./bandit) | RL 决策的核心矛盾是什么？期望回报怎么量化策略好坏？ |
-| [MDP 五元组、折扣回报与策略](./mdp) | 如何用数学精确定义"游戏规则"和"策略"？ |
-| [V(s) 与贝尔曼方程](./value-bellman) | "这个局面值多少分"怎么只看一步就算？ |
-| [经典方法速览：DP、MC 与 TD](./dp-mc-td) | 三种算 V 的方法，各自解决什么问题？ |
-| [路线一：Q(s,a)](./value-q) | 怎么给每个动作打分，选最高的？ |
-| [路线二：J(θ)](./policy-objective) | 怎么跳过打分，直接优化策略？ |
-| [全景地图](./panorama) | 两条路线各自面对什么困境？后续怎么走？ |
+| [3.1 Multi-Armed Bandits: Exploration vs Exploitation](./bandit) | What is the core tension in RL decision-making? How does expected return quantify policy quality? |
+| [3.2 Markov Decision Processes](./mdp) | How do we formally define "the rules of the game" and "a policy"? |
+| [3.3 Value Functions & Bellman Equations](./value-bellman) | How do we compute "how good is this state" using only a one-step lookahead? |
+| [3.4 Dynamic Programming, Monte Carlo & Temporal Difference](./dp-mc-td) | What problems does each of the three methods for computing $V$ solve? |
+| [3.5 Value-Based: Action-Value Q(s, a)](./value-q) | How do we score every action and pick the best? |
+| [3.6 Policy-Based: Objective J(θ)](./policy-objective) | How do we bypass scoring and directly optimize the policy? |
+| [3.7 Reward Shaping & Design](./reward-design) | Where does the optimization objective come from? |
+| [3.8 Landscape: Taxonomy & Roadmap](./panorama) | What dilemmas do the two routes face? Where do we go from here? |
 
-下一节将从两台老虎机开始，亲身体验 RL 最核心的决策困境。[两台老虎机](./bandit)
+下一节将从两台老虎机开始，亲身体验 RL 最核心的决策困境。[3.1 Multi-Armed Bandits](./bandit)

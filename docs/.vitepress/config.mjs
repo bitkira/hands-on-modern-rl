@@ -112,18 +112,18 @@ const zhSidebar = {
       text: '第二篇：核心理论与方法',
       items: [
         {
-          text: '第3章：RL 通识——理论地图与全局视野',
+          text: 'Chapter 3. Foundations of RL: MDP, Value Functions & Policy Optimization',
           collapsed: false,
           items: [
-            { text: '章节导览', link: '/chapter03_mdp/intro' },
-            { text: '动手：两台老虎机', link: '/chapter03_mdp/bandit' },
-            { text: 'MDP 五元组、折扣回报与策略', link: '/chapter03_mdp/mdp' },
-            { text: 'V(s) 与贝尔曼方程', link: '/chapter03_mdp/value-bellman' },
-            { text: '经典方法速览：DP、MC 与 TD', link: '/chapter03_mdp/dp-mc-td' },
-            { text: '路线一：Q(s,a)', link: '/chapter03_mdp/value-q' },
-            { text: '路线二：J(θ)', link: '/chapter03_mdp/policy-objective' },
-            { text: '奖励函数设计', link: '/chapter03_mdp/reward-design' },
-            { text: '全景地图', link: '/chapter03_mdp/panorama' }
+            { text: 'Chapter Overview', link: '/chapter03_mdp/intro' },
+            { text: '3.1 Multi-Armed Bandits: Exploration vs Exploitation', link: '/chapter03_mdp/bandit' },
+            { text: '3.2 Markov Decision Processes', link: '/chapter03_mdp/mdp' },
+            { text: '3.3 Value Functions & Bellman Equations', link: '/chapter03_mdp/value-bellman' },
+            { text: '3.4 Dynamic Programming, Monte Carlo & Temporal Difference', link: '/chapter03_mdp/dp-mc-td' },
+            { text: '3.5 Value-Based: Action-Value Q(s, a)', link: '/chapter03_mdp/value-q' },
+            { text: '3.6 Policy-Based: Objective J(θ)', link: '/chapter03_mdp/policy-objective' },
+            { text: '3.7 Reward Shaping & Design', link: '/chapter03_mdp/reward-design' },
+            { text: '3.8 Landscape: Taxonomy & Roadmap', link: '/chapter03_mdp/panorama' }
           ]
         },
         {
