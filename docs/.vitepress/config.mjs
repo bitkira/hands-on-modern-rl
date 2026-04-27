@@ -80,387 +80,403 @@ const zhSidebar = {
     {
       text: '前言',
       items: [
-        { text: '写在开头', link: '/preface/intro' },
+        { text: '课程导读', link: '/preface/intro' },
         { text: '强化学习简史', link: '/preface/brief-history' }
       ]
     },
     {
-      text: '第一篇：基础导论',
+      text: '安装',
+      items: [{ text: '环境安装指南', link: '/appendix_env_install/intro' }]
+    },
+    {
+      text: '基础导论',
       items: [
         {
-          text: '第1章：RL初印象',
+          text: '1. CartPole 倒立摆',
           link: '/chapter01_cartpole/intro',
           collapsed: false,
           items: [
-            { text: '核心原理', link: '/chapter01_cartpole/principles' },
-            { text: '训练与指标', link: '/chapter01_cartpole/metrics' }
+            {
+              text: '1.1 状态、动作、奖励与策略',
+              link: '/chapter01_cartpole/principles'
+            },
+            {
+              text: '1.2 奖励、熵、Value Loss 与 KL',
+              link: '/chapter01_cartpole/metrics'
+            }
           ]
         },
         {
-          text: '第2章：现代RL初体验',
+          text: '2. DPO 偏好微调',
           link: '/chapter02_dpo/intro',
           collapsed: false,
           items: [
-            { text: '核心原理', link: '/chapter02_dpo/principles' },
-            { text: '训练与指标', link: '/chapter02_dpo/metrics' }
+            {
+              text: '2.1 Post-Training 与 DPO 目标',
+              link: '/chapter02_dpo/principles'
+            },
+            {
+              text: '2.2 Loss、Reward Margin 与 Accuracy',
+              link: '/chapter02_dpo/metrics'
+            }
           ]
         },
-        { text: '第一篇总结', link: '/summaries/part1-summary' }
+        { text: '本篇小结', link: '/summaries/part1-summary' }
       ]
     },
     {
-      text: '第二篇：核心理论与方法',
+      text: '核心理论与方法',
       items: [
         {
-          text: '第3章：强化学习理论基础——MDP、价值函数与策略优化',
+          text: '3. MDP 与价值函数',
           link: '/chapter03_mdp/intro',
           collapsed: false,
           items: [
-            { text: '探索与利用：多臂老虎机', link: '/chapter03_mdp/bandit' },
-            { text: '马尔可夫决策过程', link: '/chapter03_mdp/mdp' },
+            { text: '3.1 多臂老虎机', link: '/chapter03_mdp/bandit' },
+            { text: '3.2 马尔可夫决策过程', link: '/chapter03_mdp/mdp' },
             {
-              text: '价值函数与贝尔曼方程',
+              text: '3.3 V(s) 与贝尔曼方程',
               link: '/chapter03_mdp/value-bellman'
             },
             {
-              text: '价值计算：动态规划、蒙特卡洛与时序差分',
+              text: '3.4 DP、MC、TD',
               link: '/chapter03_mdp/dp-mc-td'
             },
-            { text: '动作价值函数 Q(s, a)', link: '/chapter03_mdp/value-q' },
+            { text: '3.5 Q(s, a)', link: '/chapter03_mdp/value-q' },
             {
-              text: '策略优化目标 J(θ)',
+              text: '3.6 策略目标 J(theta)',
               link: '/chapter03_mdp/policy-objective'
             },
-            { text: '奖励函数设计', link: '/chapter03_mdp/reward-design' },
-            { text: '算法范式总览', link: '/chapter03_mdp/panorama' }
+            { text: '3.7 Reward Shaping', link: '/chapter03_mdp/reward-design' },
+            { text: '3.8 算法地图', link: '/chapter03_mdp/panorama' }
           ]
         },
         {
-          text: '第4章：Value-Based 方法：Q-Learning 与深度 Q 网络',
+          text: '4. Q-Learning 与 DQN',
           link: '/chapter04_dqn/intro',
           collapsed: false,
           items: [
             {
-              text: 'Q-Learning：TD 方法 for Q',
+              text: '4.1 Q-Learning',
               link: '/chapter04_dqn/q-learning'
             },
             {
-              text: '从 Q-Learning 到 DQN',
+              text: '4.2 从表格 Q 到 DQN',
               link: '/chapter04_dqn/from-q-to-dqn'
             },
-            { text: 'DQN 三大组件', link: '/chapter04_dqn/dqn-components' },
+            { text: '4.3 Replay、Target 与 CNN', link: '/chapter04_dqn/dqn-components' },
             {
-              text: '动手：DQN 玩 CartPole',
+              text: '4.4 DQN 玩 CartPole',
               link: '/chapter04_dqn/cartpole-dqn'
             },
             {
-              text: '动手：从像素学玩 Atari',
+              text: '4.5 从像素学玩 Atari',
               link: '/chapter04_dqn/atari-dqn'
             },
             {
-              text: '动手：3D 第一人称 ViZDoom',
+              text: '4.6 ViZDoom 第一人称任务',
               link: '/chapter04_dqn/vizdoom-dqn'
             },
             {
-              text: '动手：stable-retro 玩宝可梦',
+              text: '4.7 stable-retro 玩宝可梦',
               link: '/chapter04_dqn/retro-pokemon'
             },
-            { text: '观察训练过程', link: '/chapter04_dqn/training-analysis' },
-            { text: 'DQN 家族与视角迁移', link: '/chapter04_dqn/dqn-family' }
+            { text: '4.8 训练过程分析', link: '/chapter04_dqn/training-analysis' },
+            { text: '4.9 Double、Dueling 与 Rainbow', link: '/chapter04_dqn/dqn-family' }
           ]
         },
         {
-          text: '第5章：Policy-Based 方法：策略梯度与 REINFORCE',
+          text: '5. 策略梯度与 REINFORCE',
           link: '/chapter05_policy_gradient/intro',
           collapsed: false,
           items: [
             {
-              text: '动手：摇骰子赌博机',
+              text: '5.1 摇骰子赌博机',
               link: '/chapter05_policy_gradient/dice-game'
             },
             {
-              text: '策略梯度定理与 REINFORCE',
+              text: '5.2 策略梯度与 REINFORCE',
               link: '/chapter05_policy_gradient/policy-gradient'
             },
             {
-              text: '基线实验',
+              text: '5.3 Baseline 降方差',
               link: '/chapter05_policy_gradient/baseline-experiment'
             }
           ]
         },
         {
-          text: '第6章：Actor-Critic 架构',
+          text: '6. Actor-Critic',
           link: '/chapter06_actor_critic/intro',
           collapsed: false,
           items: [
             {
-              text: '优势函数',
+              text: '6.1 优势函数',
               link: '/chapter06_actor_critic/advantage-function'
             },
             {
-              text: 'Critic 训练方法',
+              text: '6.2 TD 误差训练 Critic',
               link: '/chapter06_actor_critic/critic-training'
             },
             {
-              text: 'Actor-Critic 架构',
+              text: '6.3 Actor-Critic 架构',
               link: '/chapter06_actor_critic/actor-critic'
             },
             {
-              text: '动手：AlphaGo 简单复现',
+              text: '6.4 AlphaGo 简单复现',
               link: '/chapter06_actor_critic/alphago'
             }
           ]
         },
         {
-          text: '第7章：PPO——稳定训练的艺术',
+          text: '7. PPO',
           link: '/chapter06_ppo/intro',
           collapsed: false,
           items: [
             {
-              text: '动手：PPO 训练 LunarLander',
+              text: '7.1 PPO 训练 LunarLander',
               link: '/chapter06_ppo/ppo-lunar-lander'
             },
-            { text: 'PPO 数学推导', link: '/chapter06_ppo/ppo-math' },
+            { text: '7.2 PPO 数学推导', link: '/chapter06_ppo/ppo-math' },
             {
-              text: '信任域与裁剪机制',
+              text: '7.3 信任域与裁剪',
               link: '/chapter06_ppo/trust-region-clipping'
             },
             {
-              text: 'GAE、奖励模型与 LLM 对齐',
+              text: '7.4 GAE 与奖励模型',
               link: '/chapter06_ppo/gae-reward-model'
             }
           ]
         },
-        { text: '第二篇总结', link: '/summaries/part2-summary' }
+        { text: '本篇小结', link: '/summaries/part2-summary' }
       ]
     },
     {
-      text: '第三篇：大模型强化学习',
+      text: '大模型 RL',
       items: [
         {
-          text: '第8章：RLHF 完整流水线',
+          text: '8. RLHF',
           link: '/chapter10_rlhf/intro',
           collapsed: false,
           items: [
             {
-              text: '动手：亲手制造一场 Reward Hacking',
+              text: '8.1 奖励黑客实战',
               link: '/chapter10_rlhf/reward-hacking-hands-on'
             },
             {
-              text: '模仿学习与数据工程',
+              text: '8.2 SFT 与偏好数据',
               link: '/chapter10_rlhf/imitation-learning-pipeline'
             },
             {
-              text: '奖励函数设计',
+              text: '8.3 奖励函数设计',
               link: '/chapter10_rlhf/reward-function-design'
             },
             {
-              text: '训练稳定性与奖励黑客',
+              text: '8.4 KL、崩溃与稳定性',
               link: '/chapter10_rlhf/training-stability-hacking'
             },
             {
-              text: '自我博弈与数据飞轮',
+              text: '8.5 自我博弈与数据飞轮',
               link: '/chapter10_rlhf/rlaif-and-data-cycle'
             }
           ]
         },
         {
-          text: '第9章：对齐与推理强化（DPO / GRPO / RLVR）',
+          text: '9. 推理强化',
           link: '/chapter07_alignment/intro',
           collapsed: false,
           items: [
             {
-              text: '动手：DPO 对齐实验',
+              text: '9.1 DPO 对齐实验',
               link: '/chapter07_alignment/dpo-hands-on'
             },
             {
-              text: 'DPO 原理、数学与选型',
+              text: '9.2 DPO、IPO 与 KTO',
               link: '/chapter07_alignment/dpo-theory-and-family'
             },
             {
-              text: '动手：GRPO 训练与核心机制',
+              text: '9.3 GRPO 训练循环',
               link: '/chapter08_grpo_rlvr/grpo-practice-and-mechanism'
             },
             {
-              text: 'DeepSeek、DAPO 与 RLVR',
+              text: '9.4 DeepSeek、DAPO 与 RLVR',
               link: '/chapter08_grpo_rlvr/deepseek-dapo-rlvr'
             },
             {
-              text: 'RL Scaling 与前沿展望',
+              text: '9.5 RL Scaling 展望',
               link: '/chapter08_grpo_rlvr/rl-scaling-outlook'
             },
             {
-              text: '知识蒸馏——从大模型到小模型的知识迁移',
+              text: '9.6 On-Policy Distillation',
               link: '/chapter08_grpo_rlvr/on-policy-distillation'
             }
           ]
         },
         {
-          text: '第10章：Agentic RL——工具调用、多轮交互与智能体训练',
+          text: '10. Agentic RL',
           link: '/chapter12_agentic_rl/intro',
           collapsed: false,
           items: [
             {
-              text: '动手：Mini Agent Loop——ORM vs PRM 对比',
+              text: '10.1 ORM 与 PRM 对比',
               link: '/chapter12_agentic_rl/agent-loop-hands-on'
             },
             {
-              text: '多轮交互 RL 与信用分配',
+              text: '10.2 多轮交互与信用分配',
               link: '/chapter12_agentic_rl/multi-turn-rl'
             },
             {
-              text: '轨迹合成与数据工程',
+              text: '10.3 轨迹合成与数据工程',
               link: '/chapter12_agentic_rl/trajectory-synthesis'
             },
             {
-              text: '工具调用 RL：Web Agent 与 Code Agent',
+              text: '10.4 工具调用 RL',
               link: '/chapter12_agentic_rl/tool-use-agents'
             },
             {
-              text: '动手：端到端 Agentic RL 训练——从目标到效果',
+              text: '10.5 端到端 Agentic 训练',
               link: '/chapter12_agentic_rl/agentic-training-hands-on'
             },
             {
-              text: 'Agentic RL 工程实战与总结',
+              text: '10.6 Agentic 工程',
               link: '/chapter12_agentic_rl/agentic-engineering'
             },
             {
-              text: '工业界实战：各家的 Agentic RL 都怎么做的？',
+              text: '10.7 工业实践',
               link: '/chapter12_agentic_rl/industrial-practice'
             },
             {
-              text: 'Agentic 评测体系与 Benchmark 全景',
+              text: '10.8 Benchmark 与评测',
               link: '/chapter12_agentic_rl/evaluation-benchmarks'
             },
             {
-              text: '深度研究智能体：Deep Research Agent',
+              text: '10.9 Deep Research Agent',
               link: '/chapter12_agentic_rl/deep-research-agent'
             },
             {
-              text: '延伸阅读索引',
+              text: '10.10 延伸阅读',
               link: '/chapter12_agentic_rl/extended-readings'
             }
           ]
         },
-        { text: '第三篇总结', link: '/summaries/part3-summary' }
+        { text: '本篇小结', link: '/summaries/part3-summary' }
       ]
     },
     {
-      text: '第四篇：前沿与进阶专题',
+      text: '前沿',
       items: [
         {
-          text: '第11章：VLM 强化学习',
+          text: '11. VLM 强化学习',
           link: '/chapter11_vlm_rl/intro',
           collapsed: false,
           items: [
             {
-              text: '动手：GRPO 训练 VLM',
+              text: '11.1 GRPO 训练 VLM',
               link: '/chapter11_vlm_rl/vlm-grpo-hands-on'
             },
             {
-              text: 'VLM RL 的特殊挑战',
+              text: '11.2 视觉奖励与幻觉',
               link: '/chapter11_vlm_rl/vlm-challenges'
             },
             {
-              text: 'VLM RL 框架与前沿',
+              text: '11.3 Open-R1、R1-V 与 VLM-R1',
               link: '/chapter11_vlm_rl/vlm-frameworks'
             },
             {
-              text: '视觉生成模型的 RL 后训练',
+              text: '11.4 视觉生成 RL',
               link: '/chapter11_vlm_rl/visual-generation-rl'
             }
           ]
         },
         {
-          text: '第12章：连续动作算法与具身智能',
+          text: '12. 连续控制',
           link: '/chapter09_continuous_control/intro',
           collapsed: false,
           items: [
             {
-              text: '动手：PyBullet 机器人仿真',
+              text: '12.1 PyBullet 机器人仿真',
               link: '/chapter09_continuous_control/pybullet-hands-on'
             },
             {
-              text: '连续策略与 DDPG/TD3',
+              text: '12.2 DDPG 与 TD3',
               link: '/chapter09_continuous_control/continuous-policy-ddpg-td3'
             },
             {
-              text: 'SAC、算法对比与并行采样',
+              text: '12.3 SAC、PPO 与 TD3 对比',
               link: '/chapter09_continuous_control/sac-comparison'
             },
             {
-              text: 'HER：把失败变成成功',
+              text: '12.4 HER',
               link: '/chapter09_continuous_control/her-sparse-reward'
             },
             {
-              text: '扩散策略：生成式连续控制',
+              text: '12.5 扩散策略',
               link: '/chapter09_continuous_control/diffusion-policy'
             },
             {
-              text: '从仿真到现实：具身智能',
+              text: '12.6 Sim-to-Real',
               link: '/chapter09_continuous_control/embodied-intelligence'
             }
           ]
         },
         {
-          text: '第13章：未来趋势',
+          text: '13. 未来趋势',
           link: '/chapter13_future_trends/intro',
           collapsed: false,
           items: [
             {
-              text: '测试时计算与 RL 推理',
+              text: '13.1 Test-Time Scaling',
               link: '/chapter13_future_trends/test-time-reasoning'
             },
             {
-              text: '多智能体 RL 与基于模型的 RL',
+              text: '13.2 多智能体与模型基 RL',
               link: '/chapter13_future_trends/marl-model-based'
             },
             {
-              text: '自博弈、自进化与学习路线',
+              text: '13.3 Self-Play 与自进化',
               link: '/chapter13_future_trends/self-play-outlook'
             },
             {
-              text: 'LLM 多智能体强化学习',
+              text: '13.4 LLM 多智能体 RL',
               link: '/chapter13_future_trends/llm-multi-agent-rl'
             },
             {
-              text: '离线强化学习（CQL / IQL / DT）',
+              text: '13.5 离线强化学习',
               link: '/chapter13_future_trends/offline-rl'
             },
             {
-              text: '动手：PettingZoo 多智能体',
+              text: '13.6 PettingZoo',
               link: '/chapter13_future_trends/pettingzoo'
             }
           ]
         },
-        { text: '第四篇总结', link: '/summaries/part4-summary' }
+        { text: '本篇小结', link: '/summaries/part4-summary' }
       ]
     },
     {
       text: '附录',
       items: [
         {
-          text: '附录A：强化学习训练调试指南',
+          text: 'A. 训练调试指南',
           link: '/appendix_common_pitfalls/intro',
           collapsed: false,
           items: [
             {
-              text: '策略崩溃与奖励投机',
+              text: 'A.1 策略崩溃与奖励投机',
               link: '/appendix_common_pitfalls/policy-collapse-reward-hacking'
             },
             {
-              text: '资源溢出与收敛失效',
+              text: 'A.2 资源溢出与收敛失效',
               link: '/appendix_common_pitfalls/oom-nonconvergence'
             }
           ]
         },
         {
-          text: '附录B：RL 工程实践指南',
+          text: 'B. RL 工程实践',
           link: '/appendix_industrial_training/intro',
           collapsed: false,
           items: [
             {
-              text: 'B.1 RL 采样基础设施',
+              text: 'B.1 采样基础设施',
               link: '/appendix_industrial_training/rl-infrastructure'
             },
             {
@@ -476,7 +492,7 @@ const zhSidebar = {
               link: '/appendix_industrial_training/agentic-rl-infra'
             },
             {
-              text: 'B.5 评测体系与 Badcase 分析',
+              text: 'B.5 评测与 Badcase',
               link: '/appendix_industrial_training/evaluation-badcase'
             },
             {
@@ -488,49 +504,88 @@ const zhSidebar = {
               link: '/appendix_industrial_training/industrial-exercises'
             },
             {
-              text: 'B.8 大模型 RL 训练指标词典',
+              text: 'B.8 训练指标词典',
               link: '/appendix_industrial_training/metrics-glossary'
             }
           ]
         },
         {
-          text: '附录C：算法选型与工程框架',
+          text: 'C. 算法选型与工程框架',
           link: '/appendix_algorithm_guide/intro',
           collapsed: false,
           items: [
             {
-              text: '算法选型决策',
+              text: 'C.1 算法选型',
               link: '/appendix_algorithm_guide/algorithm-selection'
             },
             {
-              text: '训练框架与模型基方法',
+              text: 'C.2 训练框架与模型基方法',
               link: '/appendix_algorithm_guide/framework-mbrl'
             }
           ]
         },
         {
-          text: '附录D：强化学习经典项目',
+          text: 'D. 强化学习经典项目',
           link: '/appendix_game_projects/intro'
         },
         {
-          text: '附录E：数学基础',
+          text: 'E. 强化学习的数学基础',
           link: '/appendix_math/intro',
           collapsed: false,
           items: [
-            { text: 'E.1 线性代数', link: '/appendix_math/linear-algebra' },
             {
-              text: 'E.2 概率与统计',
-              link: '/appendix_math/probability-statistics'
+              text: 'E.1 数学对象与线性代数',
+              link: '/appendix_math/linear-algebra',
+              collapsed: true,
+              items: [
+                { text: '基础对象', link: '/appendix_math/linear-algebra-basics' },
+                { text: '贝尔曼矩阵', link: '/appendix_math/linear-algebra-bellman' },
+                { text: '函数近似', link: '/appendix_math/linear-algebra-function-approx' },
+                { text: '收敛与信任域', link: '/appendix_math/linear-algebra-advanced' },
+                { text: '公式与练习', link: '/appendix_math/linear-algebra-formulas-exercises' }
+              ]
+            },
+            {
+              text: 'E.2 概率、期望与随机估计',
+              link: '/appendix_math/probability-statistics',
+              collapsed: true,
+              items: [
+                { text: '概率基础', link: '/appendix_math/probability-basics' },
+                { text: '回报与价值', link: '/appendix_math/probability-value' },
+                { text: '采样估计', link: '/appendix_math/probability-sampling' },
+                { text: '轨迹与 GAE', link: '/appendix_math/probability-trajectory-td' },
+                { text: '贝尔曼期望', link: '/appendix_math/probability-bellman-advanced' },
+                { text: '公式与练习', link: '/appendix_math/probability-formulas-exercises' }
+              ]
             },
             {
               text: 'E.3 微积分与优化',
-              link: '/appendix_math/calculus-optimization'
+              link: '/appendix_math/calculus-optimization',
+              collapsed: true,
+              items: [
+                { text: '导数与梯度', link: '/appendix_math/calculus-basics' },
+                { text: '策略梯度', link: '/appendix_math/calculus-policy-gradient' },
+                { text: 'PPO 与 Adam', link: '/appendix_math/calculus-ppo' },
+                { text: '推导工具', link: '/appendix_math/calculus-derivations' },
+                { text: '完整公式', link: '/appendix_math/calculus-advanced-formulas' },
+                { text: '公式与练习', link: '/appendix_math/calculus-formulas-exercises' }
+              ]
             },
-            { text: 'E.4 信息论', link: '/appendix_math/information-theory' }
+            {
+              text: 'E.4 信息论与分布距离',
+              link: '/appendix_math/information-theory',
+              collapsed: true,
+              items: [
+                { text: '熵与探索', link: '/appendix_math/information-basics' },
+                { text: '交叉熵与 KL', link: '/appendix_math/information-cross-entropy-kl' },
+                { text: 'RLHF 与 DPO', link: '/appendix_math/information-rlhf-dpo' },
+                { text: '互信息', link: '/appendix_math/information-mutual-info' },
+                { text: '完整公式', link: '/appendix_math/information-advanced-formulas' },
+                { text: '公式与练习', link: '/appendix_math/information-formulas-exercises' }
+              ]
+            }
           ]
-        },
-        { text: '附录G：术语对照表', link: '/appendix_terminology/intro' },
-        { text: '附录H：环境安装指南', link: '/appendix_env_install/intro' }
+        }
       ]
     }
   ]
