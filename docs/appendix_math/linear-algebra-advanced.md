@@ -1,149 +1,319 @@
-# E.1.4 收敛性、谱半径与信任域
+# E.1.4 收敛性、特征值与信任域
 
-## 第 07 讲：特征值与价值迭代为什么会收敛
+> **前置知识**：[E.1.2 贝尔曼矩阵形式](./linear-algebra-bellman)——你需要知道贝尔曼方程的矩阵形式 $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$。[E.1.3 点积与范数](./linear-algebra-function-approx)——你需要知道 L2 范数的定义。
 
-现在进入稍微抽象一点、但非常关键的一步：为什么贝尔曼更新反复做下去会稳定？
+---
 
-先看一个纯数字变换：
+## 这一篇要做什么
 
-$$
-x_{k+1}=0.5x_k.
-$$
+前两篇推导了贝尔曼方程的矩阵形式 $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$，也讨论了函数近似。两者有一个共同的前提：训练过程要反复应用更新规则。不管是值迭代 $v_{k+1} = r + \gamma P v_k$ 还是 SGD 更新权重 $\boldsymbol{w} \leftarrow \boldsymbol{w} - \alpha \boldsymbol{g}$，都在反复迭代。
 
-如果 $x_0=8$，那么：
+上一篇结尾留下了两个问题：
 
-$$
-8 \rightarrow 4 \rightarrow 2 \rightarrow 1 \rightarrow 0.5 \rightarrow \cdots
-$$
+1. 反复迭代 $v_{k+1} = r + \gamma P v_k$，**凭什么相信它会收敛，而不是震荡或发散？**
+2. 策略参数更新时，梯度裁剪限制"走了多远"，但**不同方向上同样走 $0.1$，对策略的影响完全不同**——怎么处理？
 
-因为每一步都乘以 $0.5$，误差会越来越小。换成向量时，矩阵也会在某些方向上“放大”或“缩小”误差。特征值就是描述这种放缩比例的工具。
+这两个问题的答案涉及三个数学工具，构成训练安全性的**三层防线**。本篇的完成体公式是：
 
-如果存在非零向量 $\boldsymbol{u}$ 和标量 $\lambda$，使得：
+**第一层：特征值保证收敛**
 
 $$
-A\boldsymbol{u}=\lambda \boldsymbol{u},
+\boxed{\rho(\gamma P) \leq \gamma < 1 \quad\Longrightarrow\quad \|\boldsymbol{e}_{k}\| \leq \gamma^k \|\boldsymbol{e}_0\| \to 0}
 $$
 
-那么 $\boldsymbol{u}$ 是矩阵 $A$ 的特征向量，$\lambda$ 是对应特征值。意思是：矩阵 $A$ 作用在 $\boldsymbol{u}$ 上时，没有改变方向，只把长度缩放了 $\lambda$ 倍。
-
-回到贝尔曼更新：
+**第二层：范数限制单步幅度**
 
 $$
-\boldsymbol{v}_{k+1}=\boldsymbol{r}+\gamma P\boldsymbol{v}_k.
+\boxed{\|\boldsymbol{g}_{clipped}\|_2 = \min\!\left(\|\boldsymbol{g}\|_2,\; c\right)}
 $$
 
-假设真实解是 $\boldsymbol{v}^\*$，它满足：
+**第三层：加权范数实现方向敏感的安全更新**
 
 $$
-\boldsymbol{v}^\*=\boldsymbol{r}+\gamma P\boldsymbol{v}^\*.
+\boxed{\Delta\theta^\top F\,\Delta\theta \leq \delta}
 $$
 
-两式相减，得到误差递推：
+下面逐一展开。先从最基本的问题开始：迭代会不会收敛？
+
+---
+
+## 第一层防线：迭代发散——为什么贝尔曼更新会收敛
+
+### 从一维到二维：收敛的直觉
+
+先看一个简单的数字变换：
 
 $$
-\boldsymbol{v}_{k+1}-\boldsymbol{v}^\*
-=\gamma P(\boldsymbol{v}_k-\boldsymbol{v}^\*).
+x_{k+1} = 0.5\,x_k.
 $$
 
-令误差 $\boldsymbol{e}_k=\boldsymbol{v}_k-\boldsymbol{v}^\*$，则：
+如果 $x_0=8$，那么 $8 \to 4 \to 2 \to 1 \to 0.5 \to \cdots$。因为每一步都乘以 $0.5$（绝对值小于 $1$），最终收敛到 $0$。
+
+现在换成二维。一个变换把向量的两个分量分别乘以 $0.5$ 和 $0.3$：
 
 $$
-\boldsymbol{e}_{k+1}=\gamma P\boldsymbol{e}_k.
+A = \begin{bmatrix} 0.5 & 0 \\ 0 & 0.3 \end{bmatrix}.
 $$
 
-这和一开始的一维例子 $x_{k+1}=0.5x_k$ 是同一种结构。只不过这里的“乘以 $0.5$”变成了“乘以矩阵 $\gamma P$”。当 $0<\gamma<1$ 且 $P$ 是转移概率矩阵时，这个变换会压缩误差，所以价值迭代会收敛。
+那么 $A^k$ 把第一个分量乘以 $0.5^k$，第二个分量乘以 $0.3^k$。随着 $k$ 增大，两个分量都趋于 $0$。
 
-更正式地说，贝尔曼算子：
+关键观察：**这个变换在两个方向上分别放缩 $0.5$ 和 $0.3$ 倍**。$0.5$ 和 $0.3$ 就是这个矩阵的**特征值**。
 
-$$
-\mathcal{T}\boldsymbol{v}=\boldsymbol{r}+\gamma P\boldsymbol{v}
-$$
+### 特征值与特征向量
 
-是一个压缩映射。对任意两个价值向量 $\boldsymbol{u},\boldsymbol{v}$，有：
+更一般地，如果存在非零向量 $\boldsymbol{u}$ 和标量 $\lambda$，使得：
 
 $$
-\|\mathcal{T}\boldsymbol{u}-\mathcal{T}\boldsymbol{v}\|_\infty
-\leq \gamma \|\boldsymbol{u}-\boldsymbol{v}\|_\infty.
+A\boldsymbol{u} = \lambda \boldsymbol{u},
 $$
 
-这条公式看起来复杂，但它只是在说：**做一次贝尔曼更新后，两个价值估计之间的差距最多变成原来的 $\gamma$ 倍**。由于 $\gamma<1$，差距会越来越小。
+那么 $\boldsymbol{u}$ 是矩阵 $A$ 的**特征向量**，$\lambda$ 是对应的**特征值**。意思是：矩阵 $A$ 作用在 $\boldsymbol{u}$ 上时，没有改变方向，只把长度缩放了 $\lambda$ 倍。
 
-## 第 08 讲：从普通长度到信任域椭球
+### 具体计算步骤
 
-前面说的 L2 范数是普通长度：
+先用一个一般的矩阵学习特征值的计算方法，然后再把结论用到贝尔曼更新上——看看为什么贝尔曼更新对应的特征值一定小于 $1$。
 
-$$
-\|\boldsymbol{x}\|_2^2=\boldsymbol{x}^\top \boldsymbol{x}.
-$$
-
-例如：
+看一个 $2\times2$ 矩阵：
 
 $$
-\boldsymbol{x}=
-\begin{bmatrix}
-3 \\
-4
-\end{bmatrix},
-\qquad
-\boldsymbol{x}^\top\boldsymbol{x}=3^2+4^2=25.
+A = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}.
 $$
 
-但有时不同方向的“风险”不一样。比如参数空间里，向右走一点可能让策略变化很小，向上走一点却让策略变化很大。这时我们不用普通长度，而用一个矩阵 $F$ 定义加权长度：
+特征值满足特征方程 $\det(A - \lambda I) = 0$：
 
 $$
-\|\boldsymbol{x}\|_F^2=\boldsymbol{x}^\top F\boldsymbol{x}.
+\det\begin{bmatrix} 4-\lambda & 1 \\ 2 & 3-\lambda \end{bmatrix} = 0.
+$$
+
+展开：
+
+$$
+(4-\lambda)(3-\lambda) - 2 = 0 \quad\Longrightarrow\quad \lambda^2 - 7\lambda + 10 = 0.
+$$
+
+解这个二次方程：
+
+$$
+\lambda = \frac{7 \pm \sqrt{49-40}}{2} = \frac{7 \pm 3}{2}.
+$$
+
+所以 $\lambda_1 = 5$，$\lambda_2 = 2$。几何含义：在这个矩阵的作用下，某些方向的向量被拉长 $5$ 倍，另一些方向被拉长 $2$ 倍。反复应用 $A$ 时，$\lambda_1 = 5$ 方向的增长会主导。
+
+直接的联系是：**如果一个矩阵的最大特征值绝对值大于 $1$，反复应用会让向量越来越大（发散）；如果小于 $1$，向量会越来越小（收敛）。**
+
+### 为什么贝尔曼更新会收敛
+
+一维时乘以 $0.5$ 会收敛，二维时两个特征值都小于 $1$ 也会收敛。现在把这个结论应用到贝尔曼更新上。
+
+$$
+\boldsymbol{v}_{k+1} = \boldsymbol{r} + \gamma P\boldsymbol{v}_k.
+$$
+
+假设真实解是 $\boldsymbol{v}^*$，满足 $\boldsymbol{v}^* = \boldsymbol{r} + \gamma P\boldsymbol{v}^*$。两式相减，得到误差递推：
+
+$$
+\boldsymbol{v}_{k+1} - \boldsymbol{v}^* = \gamma P(\boldsymbol{v}_k - \boldsymbol{v}^*).
+$$
+
+令误差 $\boldsymbol{e}_k = \boldsymbol{v}_k - \boldsymbol{v}^*$，则：
+
+$$
+\boldsymbol{e}_{k+1} = \gamma P\,\boldsymbol{e}_k.
+$$
+
+这和一开始的一维例子 $x_{k+1} = 0.5\,x_k$ 是同一种结构。只不过这里的"乘以 $0.5$"变成了"乘以矩阵 $\gamma P$"。
+
+$P$ 是转移概率矩阵，每行概率和为 $1$，所以它的谱半径（最大特征值的绝对值）满足 $\rho(P) \leq 1$。乘上折扣因子后：
+
+$$
+\rho(\gamma P) \leq \gamma < 1.
+$$
+
+于是 $\gamma P$ 的所有特征值绝对值都小于 $1$。误差在每个方向上都在缩小——**贝尔曼更新会收敛**。
+
+这就是第 3 章里 DP 方法"反复迭代直到收敛"背后的数学保证。$\gamma < 1$ 不只是一个工程选择——它是收敛的数学前提。
+
+### $\gamma$ 大小对收敛速度的影响
+
+$\gamma$ 不仅影响是否收敛，还影响收敛速度。
+
+| $\gamma$ | $\rho(\gamma P)$ | 收敛速度 | 含义                   |
+| -------- | ---------------- | -------- | ---------------------- |
+| $0.1$    | $\leq 0.1$       | 很快     | 只看眼前，价值很快稳定 |
+| $0.5$    | $\leq 0.5$       | 较快     | 兼顾近期和远期         |
+| $0.9$    | $\leq 0.9$       | 较慢     | 看得很远，需要更多迭代 |
+| $0.99$   | $\leq 0.99$      | 很慢     | 非常重视远期回报       |
+
+数值演示：假设初始误差 $\|\boldsymbol{e}_0\|=10$，$k$ 次迭代后的误差上界是：
+
+| 迭代次数 $k$ | $\gamma=0.5$ 误差 | $\gamma=0.9$ 误差 | $\gamma=0.99$ 误差 |
+| ------------ | ----------------- | ----------------- | ------------------ |
+| $1$          | $5$               | $9$               | $9.9$              |
+| $5$          | $0.31$            | $5.9$             | $9.51$             |
+| $10$         | $0.01$            | $3.49$            | $9.04$             |
+| $50$         | $\approx 0$       | $0.005$           | $6.05$             |
+| $100$        | $\approx 0$       | $\approx 0$       | $3.66$             |
+
+$\gamma$ 越接近 $1$，收敛越慢，但最终结果越"看得远"。这就是 RL 中常见的"精度-效率权衡"。
+
+### 压缩映射：收敛的形式化保证
+
+特征值说明了"误差在每个方向上都在缩小"。数学上有一个更优雅的方式来表达这件事——**压缩映射**。可以证明贝尔曼算子 $\mathcal{T}\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$ 满足：
+
+$$
+\|\mathcal{T}\boldsymbol{u} - \mathcal{T}\boldsymbol{v}\|_\infty \leq \gamma \|\boldsymbol{u}-\boldsymbol{v}\|_\infty.
+$$
+
+这条公式的意思是：**做一次贝尔曼更新后，两个估计之间的差距最多变成原来的 $\gamma$ 倍**。由于 $\gamma < 1$，差距会越来越小。这意味着迭代有且仅有一个不动点——就是我们要找的真实价值 $\boldsymbol{v}^*$。
+
+<details>
+<summary>展开：Banach 不动点定理</summary>
+
+压缩映射有一个优美的性质（Banach 不动点定理）：在完备度量空间中，压缩映射有且仅有一个不动点，且迭代收敛。$\boldsymbol{v}^*$ 就是这个不动点。
+
+你不需要记住定理的完整表述，只需要知道：**$\gamma < 1$ 是贝尔曼更新收敛的数学保证**。如果 $\gamma = 1$（不折扣），在某些情况下更新可能不收敛。
+
+</details>
+
+---
+
+特征值从长期保证了迭代收敛。但收敛只说明"反复迭代能到终点"，不保证每一步都走得很稳。E.1.3 里学的梯度裁剪用 L2 范数限制了每一步的步长，已经能防住大部分训练不稳定。但它有一个盲区：**不同方向上参数变化对策略的影响完全不同**，而 L2 范数对所有方向一视同仁。要解决这个问题，需要把"普通长度"升级成"加权长度"。这就进入第三层防线。
+
+---
+
+## 第三层防线：方向敏感——从普通范数到信任域
+
+### 普通距离为什么不够？
+
+回忆 L2 范数的定义：
+
+$$
+\|\boldsymbol{x}\|_2^2 = \boldsymbol{x}^\top \boldsymbol{x}.
+$$
+
+例如 $\boldsymbol{x} = [3, 4]^\top$，则 $\boldsymbol{x}^\top\boldsymbol{x} = 9 + 16 = 25$。L2 范数把每个方向同等对待——向右走 $1$ 步和向上走 $1$ 步，"距离"相同。
+
+但在参数空间中，不同方向的"风险"不一样。考虑两个参数更新方向：
+
+**方向 A**：$\Delta\theta = [1, 0]^\top$
+
+这个方向主要改变第一个参数。假设第一个参数控制的是"选择动作 left 的 logit"，变化 $1$ 个单位只会让概率从 $0.5$ 变到约 $0.73$。
+
+**方向 B**：$\Delta\theta = [0, 1]^\top$
+
+这个方向改变第二个参数。假设第二个参数控制的是"输出的尺度"，变化 $1$ 个单位可能让所有动作概率都剧烈变化。
+
+两个方向的 L2 范数都是 $1$，但对策略分布的影响完全不同。用普通 L2 范数约束 $\|\Delta\theta\|_2 \leq \delta$ 无法区分这种差异。
+
+### 加权范数：不同方向不同价格
+
+为了区分不同方向的"风险"，我们用矩阵 $F$ 定义一种**加权长度**，取代普通的 L2 范数：
+
+$$
+\|\boldsymbol{x}\|_F^2 = \boldsymbol{x}^\top F\,\boldsymbol{x}.
 $$
 
 看一个具体数字：
 
 $$
-F=
-\begin{bmatrix}
-1 & 0 \\
-0 & 4
-\end{bmatrix},
-\qquad
-\boldsymbol{x}=
-\begin{bmatrix}
-1 \\
-1
-\end{bmatrix}.
+F = \begin{bmatrix} 1 & 0 \\ 0 & 4 \end{bmatrix}, \qquad \boldsymbol{x} = \begin{bmatrix} 1 \\ 1 \end{bmatrix}.
 $$
 
 那么：
 
 $$
-\boldsymbol{x}^\top F\boldsymbol{x}
-=
-\begin{bmatrix}
-1 & 1
-\end{bmatrix}
-\begin{bmatrix}
-1 & 0 \\
-0 & 4
-\end{bmatrix}
-\begin{bmatrix}
-1 \\
-1
-\end{bmatrix}
-=5.
+\boldsymbol{x}^\top F\,\boldsymbol{x}
+= \begin{bmatrix} 1 & 1 \end{bmatrix}
+\begin{bmatrix} 1 & 0 \\ 0 & 4 \end{bmatrix}
+\begin{bmatrix} 1 \\ 1 \end{bmatrix}
+= 1 \times 1 + 4 \times 1 = 5.
 $$
 
-第二个方向被权重 $4$ 放大了，所以同样走 $1$ 步，它更“贵”。
+第二个方向被权重 $4$ 放大了，所以同样走 $1$ 步，它更"贵"。这就好比打车：不同方向的计价标准不同——堵车方向按时间加价，高速方向按里程收费。
+
+### 信任域约束
 
 TRPO 的信任域约束就长这样：
 
 $$
-(\theta-\theta_{old})^\top F(\theta-\theta_{old})\leq \delta.
+(\theta - \theta_{old})^\top F(\theta - \theta_{old}) \leq \delta.
 $$
 
-其中 $F$ 通常是 Fisher 信息矩阵。直觉是：**参数更新不能只看欧氏距离，还要看这一步会让策略分布变化多大**。如果某个方向会让策略急剧变化，$F$ 会把这个方向的步长压小。
+其中 $F$ 通常是 **Fisher 信息矩阵**。它的直觉是：**参数更新不能只看欧氏距离，还要看这一步会让策略分布变化多大**。如果某个方向会让策略急剧变化，$F$ 会把这个方向的步长压小；如果某个方向策略不怎么变化，$F$ 允许更大的步长。
 
-所以从普通范数到信任域约束，其实是一条自然升级路径：
+Fisher 信息矩阵 $F$ 的 $(i,j)$ 元素是：
 
 $$
-\|\Delta\theta\|_2^2
-=\Delta\theta^\top \Delta\theta
-\quad\Longrightarrow\quad
-\Delta\theta^\top F\Delta\theta\leq\delta.
+F_{ij} = \mathbb{E}_\pi\left[\frac{\partial \log \pi_\theta(a\mid s)}{\partial \theta_i}\frac{\partial \log \pi_\theta(a\mid s)}{\partial \theta_j}\right].
 $$
+
+不需要记住这个公式。上面的直觉已经足够：$F$ 把"参数空间中的距离"翻译成了"策略分布空间中的距离"。
+
+### 从 TRPO 到 PPO
+
+TRPO 直接解这个二次约束优化问题，计算量大（需要算 Fisher 矩阵）。PPO 的思路是简化——第 3 章提到过 PPO 是工业界主流的 RL 算法，它的简化策略是：
+
+- 不显式计算 $F$，而是用概率比 $r_t(\theta) = \pi_\theta(a_t\mid s_t)/\pi_{old}(a_t\mid s_t)$ 代替。
+- 不解约束优化，而是用裁剪 `clip(r_t, 1-\epsilon, 1+\epsilon)` 间接限制变化幅度。
+
+所以从普通范数到信任域的升级路径是：
+
+$$
+\|\Delta\theta\|_2^2 = \Delta\theta^\top \Delta\theta \quad\longrightarrow\quad \Delta\theta^\top F\,\Delta\theta \leq \delta \quad\longrightarrow\quad \text{clip}(r_t,\; 1-\epsilon,\; 1+\epsilon)
+$$
+
+每一步都在做同样的事——**限制策略变化幅度**——只是精确度和计算成本的权衡不同。
+
+::: warning 常见误区
+TRPO 的信任域约束不是限制参数的欧氏距离，而是限制参数变化对策略分布的影响。同样的 $\|\Delta\theta\|_2 = 0.1$，在不同方向上可能导致完全不同的策略变化。
+:::
+
+---
+
+## 三层防线全景
+
+把本篇的三个工具放在一起，它们回答的是同一个大问题的三个层面：
+
+| 防线 | 问题         | 工具              | 公式                                              |
+| ---- | ------------ | ----------------- | ------------------------------------------------- |
+| 第一层 | 迭代会不会发散？ | 特征值、谱半径    | $\rho(\gamma P) \leq \gamma < 1$                  |
+| 第二层 | 单步会不会爆炸？ | L2 范数、梯度裁剪 | $\|\boldsymbol{g}_{clipped}\|_2 \leq c$           |
+| 第三层 | 方向敏不敏感？   | 加权范数、信任域  | $\Delta\theta^\top F\,\Delta\theta \leq \delta$   |
+
+三层防线的递进关系：特征值从**长期**保证了迭代收敛，范数从**短期**限制了单步更新幅度，加权范数从**精细**层面区分了不同方向的风险。从第一层到第三层，约束越来越精细，计算成本也越来越高。
+
+---
+
+## E.1 模块全景：四篇文章的逻辑链
+
+这一篇是 E.1 模块的最后一篇正文。把四篇文章串起来，整个模块回答的是一个大问题：**贝尔曼方程 $V(s) = R(s) + \gamma\sum P V(s')$ 能不能真正算出来？** 计算过程中遇到三道墙，每道墙引入一组新的数学工具：
+
+```
+第3章的贝尔曼方程
+  │
+  ▼ 第一道墙：方程太多写不完
+E.1.1 + E.1.2  向量、矩阵、线性方程组
+  │  → v = r + γPv  一次写出
+  │  → v = (I-γP)⁻¹r  一步解出
+  │  但状态太多，矩阵存不下
+  ▼ 第二道墙：状态太多存不下
+E.1.3  点积、范数、函数近似
+  │  → ŵ(s) = wᵀx(s)  用点积近似
+  │  → ∥g∥₂ ≤ c  用范数限制更新
+  │  但近似+迭代，训练会不会爆炸？
+  ▼ 第三道墙：训练会不会爆炸
+E.1.4  特征值、加权范数、信任域
+     → 三层防线：收敛保证 + 梯度裁剪 + 信任域
+```
+
+对应到 RL 中的核心问题：
+
+| 问题                     | 数学工具         | RL 含义             | 出现在哪篇 |
+| ------------------------ | ---------------- | ------------------- | ---------- |
+| 如何表示状态和价值？     | 向量、矩阵       | 查表法的基础        | E.1.1      |
+| 如何压缩贝尔曼方程？     | 线性方程组       | 策略评估的理论基础  | E.1.2      |
+| 如何近似无法查表的价值？ | 点积、范数       | 函数近似和神经网络  | E.1.3      |
+| 为什么训练能稳定？       | 特征值、压缩映射 | 收敛保证            | E.1.4      |
+| 如何安全地更新策略？     | 加权范数、信任域 | TRPO/PPO 的数学基础 | E.1.4      |
+
+> **下一篇**：[E.1.5 公式速查与练习](./linear-algebra-formulas-exercises) —— 回到第 3 章再看一遍：用线性代数视角重新审视你已经学过的 RL 概念。

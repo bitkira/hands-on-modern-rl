@@ -1,170 +1,119 @@
 # E.1.5 线性代数公式速查与练习
 
-## 本书中你会遇到的线性代数公式
+> **前置知识**：本页汇总 E.1 模块所有公式，建议在读完 [E.1.1](./linear-algebra-basics) 到 [E.1.4](./linear-algebra-advanced) 后再来回顾。如果你是第一次读，先跳到正文章节。
 
-| 概念           | 公式                                                                                                               | 强化学习含义                         |
-| -------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------ |
-| 价值向量       | $\boldsymbol{v} = [v(s_1), \ldots, v(s_n)]^\top$                                                                   | 把所有状态价值放在一起               |
-| 状态转移矩阵   | $P_{ij}=p(s_j \mid s_i)$                                                                                           | 第 $i$ 个状态转到第 $j$ 个状态的概率 |
-| 贝尔曼矩阵形式 | $\boldsymbol{v}=\boldsymbol{r}+\gamma P\boldsymbol{v}$                                                             | 当前价值等于即时奖励加未来价值       |
-| 线性方程解     | $\boldsymbol{v}=(I-\gamma P)^{-1}\boldsymbol{r}$                                                                   | 已知模型时求策略价值                 |
-| Bellman 压缩   | $\|\mathcal{T}\boldsymbol{u}-\mathcal{T}\boldsymbol{v}\|_\infty\leq\gamma\|\boldsymbol{u}-\boldsymbol{v}\|_\infty$ | 价值迭代收敛保证                     |
-| 点积           | $\boldsymbol{w}^\top\boldsymbol{x}=\sum_i w_ix_i$                                                                  | 线性价值函数、神经网络层             |
-| 线性 Q 近似    | $Q(s,a)=\boldsymbol{w}^\top\phi(s,a)$                                                                              | 用特征向量估计动作价值               |
-| 特征值         | $A\boldsymbol{u}=\lambda\boldsymbol{u}$                                                                            | 分析矩阵在不同方向上的放缩           |
-| L2 范数        | $\|\boldsymbol{x}\|_2=\sqrt{\sum_i x_i^2}$                                                                         | 梯度裁剪、参数正则化                 |
-| 信任域约束     | $(\theta-\theta_{old})^\top F(\theta-\theta_{old})\leq\delta$                                                      | TRPO/PPO 背后的安全更新思想          |
+---
 
-## 阶段小结：先掌握这些
+## 回到第 3 章再看一遍
 
-到这里，你已经能把单个状态的价值推广到价值向量，把单步转移推广到转移矩阵，把一条贝尔曼方程推广到整个方程组。下面进入更完整的公式层：收敛性、Q 值近似和信任域约束。
+现在你有了向量、矩阵、点积、范数、特征值这些工具。回头看看第 3 章学过的东西，会发现很多"当时只是接受"的公式，其实都有更简洁的矩阵表达。
 
-## 进阶公式：从矩阵贝尔曼方程到收敛性
+### 贝尔曼方程：从逐个手写到一行矩阵
 
-前面我们已经看过两状态方程：
+第 3 章里，贝尔曼期望方程写成：
 
 $$
-\boldsymbol{v}=\boldsymbol{r}+\gamma P\boldsymbol{v}.
+V^\pi(s) = \sum_{a} \pi(a|s)\left[R(s,a) + \gamma\sum_{s'} P(s'|s,a)V^\pi(s')\right].
 $$
 
-现在把它推广到任意有限状态空间。设共有 $n$ 个状态，固定策略 $\pi$ 后：
-
-- $\boldsymbol{v}_\pi \in \mathbb{R}^n$ 是状态价值向量。
-- $\boldsymbol{r}_\pi \in \mathbb{R}^n$ 是每个状态在策略 $\pi$ 下的期望即时奖励。
-- $P_\pi \in \mathbb{R}^{n\times n}$ 是策略诱导的状态转移矩阵。
-
-完整的策略评估方程是：
+有了矩阵之后，$n$ 个这样的方程压缩成一行：
 
 $$
-\boldsymbol{v}_\pi = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_\pi.
+\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}.
 $$
 
-移项后得到：
+闭式解是 $\boldsymbol{v} = (I-\gamma P)^{-1}\boldsymbol{r}$。第 3 章的 DP 方法反复做 $v_{k+1} = r + \gamma Pv_k$，本质上是在迭代逼近这个闭式解。
+
+### TD Error：增量更新与矩阵方程的关系
+
+第 3 章的 TD 更新是：
 
 $$
-(I-\gamma P_\pi)\boldsymbol{v}_\pi=\boldsymbol{r}_\pi.
+V(s) \leftarrow V(s) + \alpha\left[r + \gamma V(s') - V(s)\right].
 $$
 
-如果 $I-\gamma P_\pi$ 可逆，就有：
+用向量语言看，这可以写成：
 
 $$
-\boldsymbol{v}_\pi=(I-\gamma P_\pi)^{-1}\boldsymbol{r}_\pi.
+\boldsymbol{v} \leftarrow \boldsymbol{v} + \alpha \cdot \boldsymbol{e}_s \cdot \delta,
 $$
 
-这个式子是动态规划里“已知模型、已知策略时求价值”的封闭形式。前面的两状态例子只是它的 $n=2$ 特例。
+其中 $\boldsymbol{e}_s$ 是状态 $s$ 的 one-hot 向量（只有第 $s$ 个位置为 $1$，其余为 $0$），$\delta = r + \gamma V(s') - V(s)$ 是 TD Error。这和 E.1.2 的贝尔曼矩阵形式 $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$ 是同一个东西的两种表达——前者是逐步增量更新（每次只改一个分量），后者是整体方程（所有分量同时满足）。
 
-为什么 $\gamma<1$ 时通常可以放心？因为 $P_\pi$ 是转移概率矩阵，每行概率和为 $1$。它的谱半径满足：
+### Q-Learning 表格法：one-hot + 点积的特例
 
-$$
-\rho(P_\pi) \le 1.
-$$
+第 3 章的 Q-Learning 为每个 (状态, 动作) 对存一个数。从线性代数的视角看，这就是用了 one-hot 特征的线性近似：$Q(s,a) = \boldsymbol{w}^\top \boldsymbol{x}(s,a)$，其中 $\boldsymbol{x}(s,a)$ 是 one-hot 向量。查表是线性近似的特例。
 
-乘上折扣因子后：
+### 策略梯度更新：范数和信任域的舞台
 
-$$
-\rho(\gamma P_\pi) \le \gamma < 1.
-$$
+第 3 章路线二定义了策略目标 $J(\theta)$。更新参数时，梯度裁剪限制 $\|\boldsymbol{g}\|_2 \leq c$，信任域约束 $\Delta\theta^\top F\,\Delta\theta \leq \delta$——这些都是在用线性代数工具保证训练安全。
 
-这意味着不断应用贝尔曼更新：
+---
 
-$$
-\boldsymbol{v}_{k+1}=\boldsymbol{r}_\pi+\gamma P_\pi\boldsymbol{v}_k
-$$
+## 概念地图
 
-会逐步收敛到唯一的不动点 $\boldsymbol{v}_\pi$。这就是“价值迭代为什么能稳定下来”的线性代数解释。
+下面这张表按依赖关系组织了 E.1 模块的所有概念。可以顺着依赖链从上往下读，也可以当作索引直接跳到某个概念。
 
-## 进阶公式：Q 值线性近似
+| 概念           | 核心公式                                                                                                           | 依赖          | RL 角色            |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ | ------------- | ------------------ |
+| 标量           | $r=2$，$\gamma=0.9$                                                                                                | 无            | 奖励、超参数       |
+| 向量           | $\boldsymbol{v}\in\mathbb{R}^n$                                                                                    | 标量          | 装所有状态的价值   |
+| 矩阵           | $P\in\mathbb{R}^{n\times n}$                                                                                       | 向量          | 装所有状态间的转移 |
+| 矩阵乘法       | $(Pv)_i = \sum_j P_{ij}v_j$                                                                                        | 矩阵 + 向量   | 概率加权未来价值   |
+| 贝尔曼矩阵形式 | $\boldsymbol{v}=\boldsymbol{r}+\gamma P\boldsymbol{v}$                                                             | 矩阵乘法      | 价值递推方程       |
+| 线性方程解     | $\boldsymbol{v}=(I-\gamma P)^{-1}\boldsymbol{r}$                                                                   | 贝尔曼矩阵    | 理论闭式解         |
+| 点积           | $\boldsymbol{w}^\top\boldsymbol{x}=\sum_i w_ix_i$                                                                  | 向量          | 线性价值/策略近似  |
+| L2 范数        | $\|\boldsymbol{x}\|_2=\sqrt{\sum_i x_i^2}$                                                                         | 向量          | 梯度裁剪、正则化   |
+| 特征值         | $A\boldsymbol{u}=\lambda \boldsymbol{u}$                                                                           | 矩阵          | 分析矩阵的放缩特性 |
+| 谱半径与收敛   | $\rho(\gamma P) \leq \gamma < 1$                                                                                   | 特征值        | 值迭代收敛保证     |
+| 信任域约束     | $(\theta-\theta_{old})^\top F(\theta-\theta_{old})\leq\delta$                                                      | 范数 + 特征值 | TRPO 的安全更新    |
 
-在大状态空间中，不能给每个状态动作对都存一张表。一个简单办法是用特征向量近似：
+沿着这张表从上往下读，每个概念都在前一个的基础上增加新能力。如果某个概念卡住了，回到它"依赖"的那一行重新看。
 
-$$
-Q(s,a)=\boldsymbol{w}^\top\phi(s,a).
-$$
+---
 
-这和前面的点积例子完全一样：
+## 三道墙与三层防线
 
-- $\phi(s,a)$ 是状态动作的特征向量。
-- $\boldsymbol{w}$ 是需要学习的权重。
-- 点积结果就是当前对 $Q(s,a)$ 的估计。
+E.1 模块的核心叙事可以用一张表概括——从"算不出来"到"算得安全"：
 
-例如：
+| 阶段     | 遇到的困难               | 引入的数学工具   | 关键公式                                        |
+| -------- | ------------------------ | ---------------- | ----------------------------------------------- |
+| 第一道墙 | 1000 个状态 = 1000 个方程 | 向量、矩阵、方程组 | $\boldsymbol{v} = (I-\gamma P)^{-1}\boldsymbol{r}$ |
+| 第二道墙 | 状态太多存不下价值表     | 点积、范数       | $\hat{v}(s) = \boldsymbol{w}^\top\boldsymbol{x}(s)$，$\|\boldsymbol{g}\|_2 \leq c$ |
+| 第三道墙 | 训练会不会发散/爆炸/偏移 | 特征值、加权范数 | $\rho(\gamma P) \leq \gamma < 1$，$\Delta\theta^\top F\,\Delta\theta \leq \delta$ |
 
-$$
-\phi(s,a)=
-\begin{bmatrix}
-1 \\
-0.5 \\
-2
-\end{bmatrix},
-\qquad
-\boldsymbol{w}=\begin{bmatrix}
-0.2 \\
-1.0 \\
--0.1
-\end{bmatrix},
-$$
-
-则：
-
-$$
-Q(s,a)=0.2\times1+1.0\times0.5-0.1\times2=0.5.
-$$
-
-深度 Q 网络只是把这个线性近似推广成神经网络：
-
-$$
-Q(s,a;\theta) \approx Q^*(s,a).
-$$
-
-线性代数仍然在内部发挥作用，因为神经网络每一层都包含矩阵乘法。
-
-## 进阶公式：信任域里的二次型
-
-PPO 的前身 TRPO 用一个二次型限制参数变化：
-
-$$
-(\theta-\theta_{old})^\top F(\theta-\theta_{old})\le \delta.
-$$
-
-先把它看成二维例子。令：
-
-$$
-F=
-\begin{bmatrix}
-4 & 0 \\
-0 & 1
-\end{bmatrix},
-\qquad
-\theta-\theta_{old}=
-\begin{bmatrix}
-0.2 \\
-0.3
-\end{bmatrix}.
-$$
-
-则：
-
-$$
-(\theta-\theta_{old})^\top F(\theta-\theta_{old})
-=4\times0.2^2+1\times0.3^2=0.25.
-$$
-
-如果 $\delta=0.3$，这次更新在安全范围内；如果 $\delta=0.1$，这次更新太大。
-
-这里的 $F$ 可以理解成一种“带权距离”。普通 L2 距离只看参数变了多少，$F$ 加权后的距离还考虑“哪些方向更敏感”。这就是自然梯度和信任域方法背后的几何直觉。
-
-## 最终小结
-
-本页的层次是：先从价值向量、转移矩阵和两状态贝尔曼方程开始，再推广到 $\boldsymbol{v}_\pi=(I-\gamma P_\pi)^{-1}\boldsymbol{r}_\pi$、$Q(s,a)=\boldsymbol{w}^\top\phi(s,a)$ 和 TRPO 的二次型约束。读复杂公式时，先找出其中的向量、矩阵和点积，再把它们还原成“很多状态一起算”或“参数空间里的方向和距离”。
+---
 
 ## 常见误区
 
-1. **把矩阵当成抽象符号。** 在贝尔曼方程里，转移矩阵 $P$ 的每一行都是“从当前状态出发，下一步去哪里”的概率表。
-2. **以为求逆就是实际算法。** $\boldsymbol{v}=(I-\gamma P)^{-1}\boldsymbol{r}$ 是理论闭式解，真实大规模问题通常用迭代或函数近似。
-3. **忽略向量方向。** 梯度、优势更新、信任域约束都不仅关心“数值大小”，还关心参数空间中的方向。
+1. **把矩阵当成抽象符号。** 在贝尔曼方程里，转移矩阵 $P$ 的每一行都是"从当前状态出发，下一步去哪里"的概率表。
+2. **以为求逆就是实际算法。** $\boldsymbol{v}=(I-\gamma P)^{-1}\boldsymbol{r}$ 是理论闭式解，真实大规模问题通常用迭代或函数近似——这就是第 3 章 DP → MC → TD 的演进逻辑。
+3. **忽略向量方向。** 梯度、优势更新、信任域约束都不仅关心"数值大小"，还关心参数空间中的方向。
+4. **混淆范数和正则化。** 范数是度量工具（"有多大"），正则化是把范数加入训练目标来约束参数，梯度裁剪是限制单步更新的幅度——三种不同用途。
+5. **以为 L2 范数是唯一的范数。** L1 范数产生稀疏解，Frobenius 范数衡量矩阵大小，加权范数（二次型）考虑方向敏感度——不同场景用不同范数。
 
-## 小练习
+---
 
-1. 若 $\gamma=0.9$，$v_1=1+0.9v_2$，$v_2=2+0.9v_1$，试手算 $v_1,v_2$。
-2. 写出上题对应的 $\boldsymbol{r}$ 和 $P$。
-3. 若梯度为 $[6,8]^\top$，最大范数设为 $5$，裁剪后的梯度是多少？
+## 练习
+
+### 基础题
+
+1. **贝尔曼方程手算。** 若 $\gamma=0.9$，$v_1=1+0.9v_2$，$v_2=2+0.9v_1$，试手算 $v_1,v_2$。
+
+2. **写出矩阵。** 写出上题对应的 $\boldsymbol{r}$ 和 $P$，然后验证 $\boldsymbol{v} = (I - \gamma P)^{-1}\boldsymbol{r}$ 是否等于你的手算结果。
+
+3. **梯度裁剪。** 若梯度为 $[6,8]^\top$，最大范数设为 $5$，裁剪后的梯度是多少？
+
+### 进阶题
+
+4. **特征值计算。** 矩阵 $A = \begin{bmatrix} 3 & 1 \\ 0 & 2 \end{bmatrix}$ 的特征值是多少？它是上三角矩阵，特征值有什么规律？
+
+5. **三状态贝尔曼方程。** 三个状态，转移矩阵 $P = \begin{bmatrix} 0.2 & 0.5 & 0.3 \\ 0.0 & 0.4 & 0.6 \\ 0.7 & 0.3 & 0.0 \end{bmatrix}$，奖励向量 $\boldsymbol{r}=[1, 2, 3]^\top$，$\gamma=0.5$。写出贝尔曼矩阵形式，不做求解。
+
+6. **点积近似。** 状态 $s$ 的特征是 $\boldsymbol{x}(s)=[0.3, -0.5, 0.8]^\top$，权重 $\boldsymbol{w}=[2, -1, 3]^\top$。计算 $Q(s,a) = \boldsymbol{w}^\top\boldsymbol{x}(s)$。如果 $Q(s,a)$ 的真实值是 $5$，误差是多少？
+
+### 挑战题
+
+7. **收敛速度估计。** 假设 $\gamma=0.95$，初始误差 $\|\boldsymbol{e}_0\|=100$。至少需要多少次贝尔曼更新才能让误差降到 $0.01$ 以下？（提示：$\|\boldsymbol{e}_k\| \leq \gamma^k \|\boldsymbol{e}_0\|$）
+
+8. **信任域验证。** $F = \begin{bmatrix} 2 & 0 \\ 0 & 8 \end{bmatrix}$，$\Delta\theta = [0.3, 0.1]^\top$，$\delta = 0.5$。这次更新在信任域内吗？如果 $\Delta\theta = [0.3, 0.2]^\top$ 呢？解释为什么第二个方向更"贵"。
