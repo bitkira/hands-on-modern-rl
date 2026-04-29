@@ -32,11 +32,15 @@ $$\text{Pre-training} \;\xrightarrow{\text{Base Model}}\; \underbrace{\text{SFT}
 - **目标**：在问答数据上继续做 Next-Token Prediction，使模型模仿人类的回答格式。
 - **结果**：一个能以对话方式交互的指令模型（Instruct Model）。
 - **数据示例（问答对）**：
+
   ```json
   {
     "messages": [
-      {"role": "user", "content": "请问法国的首都是哪里？"},
-      {"role": "assistant", "content": "法国的首都是巴黎。它位于法国北部巴黎盆地的中央。"}
+      { "role": "user", "content": "请问法国的首都是哪里？" },
+      {
+        "role": "assistant",
+        "content": "法国的首都是巴黎。它位于法国北部巴黎盆地的中央。"
+      }
     ]
   }
   ```
@@ -157,7 +161,7 @@ $$\mathcal{L}_{DPO} = -\ln \sigma \left( \beta \ln \frac{\pi_\theta(y_w | x)}{\p
 
 Rafailov 等人（2023）发现，在这个 KL 约束下求解最优策略，会得到一个简洁的关系：
 
-$$ r(x, y) \propto \log \frac{\pi_\theta(y | x)}{\pi_{ref}(y | x)} $$
+$$ r(x, y) \propto \log \frac{\pi*\theta(y | x)}{\pi*{ref}(y | x)} $$
 
 即一个回答的奖励分数 $r(x,y)$，正比于"当前模型给出这个回答的概率"与"原始模型给出这个回答的概率"之比的对数。这个关系不是近似的，而是数学上精确的。它意味着奖励分数可以直接从两个模型的概率比值中算出来，单独训练一个奖励模型不再是必需的——只需要保留原始模型 $\pi_{ref}$ 作为参照，比较训练中模型 $\pi_\theta$ 的概率变化即可。
 
@@ -188,13 +192,13 @@ $$ \mathcal{L}_{DPO} = -\ln \sigma \left( \beta \ln \frac{\pi_\theta(y_w | x)}{\
 
 公式中出现的符号含义如下：
 
-| 符号    | 含义                             | 学术名称          |
-| ------- | -------------------------------- | ----------------- |
-| x       | 用户的提问词                     | Prompt / Context  |
-| y_w     | 好的回答（Winner）               | Chosen Response   |
-| y_l     | 坏的回答（Loser）                | Rejected Response |
-| π_θ     | 正在训练的策略模型               | Policy Model      |
-| π_ref   | 微调前的参考模型                 | Reference Model   |
+| 符号  | 含义               | 学术名称          |
+| ----- | ------------------ | ----------------- |
+| x     | 用户的提问词       | Prompt / Context  |
+| y_w   | 好的回答（Winner） | Chosen Response   |
+| y_l   | 坏的回答（Loser）  | Rejected Response |
+| π_θ   | 正在训练的策略模型 | Policy Model      |
+| π_ref | 微调前的参考模型   | Reference Model   |
 
 **第一步：条件概率。** 语言模型生成一段文本的方式是逐个 token 预测的。给定提示词 $x$，模型对回答 $y$ 中每个 token 依次给出概率，把这些概率乘起来，就得到整个回答的条件概率 $\pi_\theta(y | x)$。在 DPO 中，我们关注两个概率：$\pi_\theta(y_w | x)$ 是当前模型生成好回答的概率，$\pi_\theta(y_l | x)$ 是生成坏回答的概率。
 

@@ -36,13 +36,13 @@
 
 ### 回合平均奖励
 
-*平均奖励*（mean reward）是判断训练效果最直接的指标。
+_平均奖励_（mean reward）是判断训练效果最直接的指标。
 在 CartPole 中，智能体每保持平衡 1 步获得 +1 奖励，
 一局结束时的总步数即为该局的累积奖励，上限为 500 分。
 由于单局得分存在较大波动
 （同一策略可能一局得 480 分、下一局仅得 200 分），
 实际中通常取最近若干局的得分均值，
-记为 `ep_rew_mean`（*rollout episode reward mean*），
+记为 `ep_rew_mean`（_rollout episode reward mean_），
 以更稳定地反映智能体当前的真实水平。
 
 训练完成后得到的奖励曲线如下图所示，
@@ -78,7 +78,7 @@
 
 ### 策略熵
 
-*策略熵*（policy entropy）度量智能体在动作选择上的不确定性。
+_策略熵_（policy entropy）度量智能体在动作选择上的不确定性。
 熵来自信息论，在这里反映的是策略的随机性：
 高熵表示智能体仍在广泛探索（动作分布接近均匀），
 低熵表示智能体逐渐确定了最优动作（动作分布趋于集中）。
@@ -98,10 +98,10 @@
 
 ### 价值损失
 
-PPO 内部包含一个 *Critic* 组件，
+PPO 内部包含一个 _Critic_ 组件，
 其任务是预测*状态价值函数*——
 即"从当前状态出发，未来预期能获得的总奖励"。
-*价值损失*（value loss）度量的就是 Critic 的预测值与实际回报之间的偏差。
+_价值损失_（value loss）度量的就是 Critic 的预测值与实际回报之间的偏差。
 
 训练初期，Critic 尚未学会准确评估状态价值（value_loss 较大）。
 随着训练推进，Critic 的预测逐渐趋近实际回报（value_loss 逐步减小）。
@@ -123,7 +123,7 @@ PPO 内部包含一个 *Critic* 组件，
 
 PPO 的核心思想是"每次只对策略做小幅修改"。
 判断修改幅度是否合理，需要关注两个指标：
-*近似 KL 散度*（approximate KL divergence）和*裁剪比例*（clip fraction）。
+_近似 KL 散度_（approximate KL divergence）和*裁剪比例*（clip fraction）。
 
 KL 散度衡量新旧策略之间的差异程度。
 KL = 0 表示完全没变，KL 越大说明改得越多。
@@ -240,24 +240,24 @@ CartPole-v1 的最大步数为 500 步（满分 500），
 在我们的训练脚本中，SwanLab 会记录完整的训练指标，
 分成三大类：
 
-| 类别 | 指标 | 含义 |
-|------|------|------|
-| **Rollout（策略表现）** | `ep_rew_mean` | 回合平均奖励 |
-| | `ep_len_mean` | 回合平均长度 |
-| **Train（训练过程）** | `value_loss` | Critic 预测误差 |
-| | `entropy_loss` | 策略随机性 |
-| | `policy_gradient_loss` | 策略损失 |
-| | `approx_kl` | 新旧策略差异 |
-| | `clip_fraction` | 裁剪触发比例 |
-| | `explained_variance` | Critic 拟合质量 |
-| | `learning_rate` | 当前学习率 |
-| | `loss` | 总损失（SB3） |
-| | `clip_range` | 裁剪范围 |
-| | `n_updates` | 梯度更新次数 |
-| **Time（进度追踪）** | `total_timesteps` | 累计交互步数 |
-| | `iterations` | PPO 迭代轮数 |
-| | `fps` | 每秒步数（SB3） |
-| | `time_elapsed` | 已用时间（SB3） |
+| 类别                    | 指标                   | 含义            |
+| ----------------------- | ---------------------- | --------------- |
+| **Rollout（策略表现）** | `ep_rew_mean`          | 回合平均奖励    |
+|                         | `ep_len_mean`          | 回合平均长度    |
+| **Train（训练过程）**   | `value_loss`           | Critic 预测误差 |
+|                         | `entropy_loss`         | 策略随机性      |
+|                         | `policy_gradient_loss` | 策略损失        |
+|                         | `approx_kl`            | 新旧策略差异    |
+|                         | `clip_fraction`        | 裁剪触发比例    |
+|                         | `explained_variance`   | Critic 拟合质量 |
+|                         | `learning_rate`        | 当前学习率      |
+|                         | `loss`                 | 总损失（SB3）   |
+|                         | `clip_range`           | 裁剪范围        |
+|                         | `n_updates`            | 梯度更新次数    |
+| **Time（进度追踪）**    | `total_timesteps`      | 累计交互步数    |
+|                         | `iterations`           | PPO 迭代轮数    |
+|                         | `fps`                  | 每秒步数（SB3） |
+|                         | `time_elapsed`         | 已用时间（SB3） |
 
 下面是 SB3 PPO 和自研 PyTorch PPO
 在同一个 CartPole 任务上的真实训练曲线对比
@@ -271,11 +271,11 @@ CartPole-v1 的最大步数为 500 步（满分 500），
 
 ### Episode Reward（回合奖励）
 
-*回合奖励*（episode reward）是一个回合中所有步骤奖励的总和。
+_回合奖励_（episode reward）是一个回合中所有步骤奖励的总和。
 在 CartPole 中，每步奖励固定为 +1，
 因此回合奖励就等于杆子保持平衡的总步数。
 SwanLab 中记录为 `rollout/ep_rew_mean`，
-即每次 *Rollout*（策略与环境交互收集数据的过程）
+即每次 _Rollout_（策略与环境交互收集数据的过程）
 中得到的所有回合的奖励均值：
 
 $$G = \sum_{t=0}^{T} r_t = T$$
@@ -339,7 +339,7 @@ SwanLab 中的 `rollout/ep_len_mean` 记录的是
   长回合反而是坏事。
 
 在这些场景下，
-*回合平均长度*（episode length mean）即成为
+_回合平均长度_（episode length mean）即成为
 独立于回合奖励的重要信号。
 建议从现在起养成同时观察两项指标的习惯。
 
@@ -387,7 +387,7 @@ $$H(\pi) = -\sum_{a} \pi(a | s) \log \pi(a | s)$$
 训练日志中的 `value_loss` 是 Critic 网络的损失值。
 Critic 的工作是预测*状态价值函数*（state value function）$V(s)$，
 即"从当前状态出发，未来预期能拿多少总奖励"。
-*价值损失*（value loss）衡量的是 Critic 的预测值与实际回报之间的差距：
+_价值损失_（value loss）衡量的是 Critic 的预测值与实际回报之间的差距：
 
 $$\mathcal{L}_{\text{value}} = \frac{1}{|B|} \sum_{i \in B} \left(V(s_i) - G_i\right)^2$$
 
@@ -415,7 +415,7 @@ $B$ 是当前批次（batch）的样本集合。
 
 ### Explained Variance（解释方差）
 
-*解释方差*（explained variance）是 Critic 拟合质量的另一个角度。
+_解释方差_（explained variance）是 Critic 拟合质量的另一个角度。
 它的定义是：
 
 $$EV = 1 - \frac{\text{Var}(G - V(s))}{\text{Var}(G)}$$
@@ -495,7 +495,7 @@ PPO 的核心思想是"每次只改一点点策略"，
 "改了多少？有没有改过头？"
 
 **Approx KL** 衡量的是更新前后两个策略之间的差异程度，
-用的是 *KL 散度*（Kullback-Leibler Divergence）的近似值：
+用的是 _KL 散度_（Kullback-Leibler Divergence）的近似值：
 
 $$\text{KL}(\pi_{\text{old}} \| \pi_{\text{new}}) \approx \mathbb{E}\left[\log \frac{\pi_{\text{old}}(a|s)}{\pi_{\text{new}}(a|s)}\right]$$
 
@@ -528,10 +528,10 @@ Clip Fraction 即安全阀被触发的比例。
   <em>图 1-14：SB3 PPO 和 PyTorch PPO 的 Clip Fraction 偶尔冲高但不持续在高位，安全阀正常工作。</em>
 </div>
 
-| 指标              | 健康范围      | 危险信号           | 含义                               |
-| ----------------- | ------------- | ------------------ | ---------------------------------- |
-| **Approx KL**     | 0.001 ~ 0.02  | > 0.03             | 策略单步变化过大，有崩溃风险       |
-| **Clip Fraction** | 0% ~ 20%      | 长期 > 30%         | 太低说明裁剪范围过宽；太高说明策略变化过于剧烈 |
+| 指标              | 健康范围     | 危险信号   | 含义                                           |
+| ----------------- | ------------ | ---------- | ---------------------------------------------- |
+| **Approx KL**     | 0.001 ~ 0.02 | > 0.03     | 策略单步变化过大，有崩溃风险                   |
+| **Clip Fraction** | 0% ~ 20%     | 长期 > 30% | 太低说明裁剪范围过宽；太高说明策略变化过于剧烈 |
 
 > **动手实验**：打开 [2-pytorch_ppo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/2-pytorch_ppo.py)，
 > 找到 `clip_range` 参数，把它从 `0.2` 改成 `0.5`，重新运行。
@@ -597,12 +597,12 @@ $$n_{\text{updates}} = \text{iterations} \times \text{epochs} \times \frac{\text
 `time/` 前缀下的四个指标都是进度信息，
 不是训练诊断指标：
 
-| 指标 | 含义 | 说明 |
-|------|------|------|
-| `total_timesteps` | 累计交互步数 | 每次与环境交互（执行一步动作）加 1 |
-| `iterations` | PPO 迭代轮数 | 每次"收集数据 → 更新策略"算一轮 |
-| `fps` | 每秒交互步数 | 衡量训练速度（仅 SB3 记录） |
-| `time_elapsed` | 已用时间（秒） | 从训练开始到当前的耗时（仅 SB3 记录） |
+| 指标              | 含义           | 说明                                  |
+| ----------------- | -------------- | ------------------------------------- |
+| `total_timesteps` | 累计交互步数   | 每次与环境交互（执行一步动作）加 1    |
+| `iterations`      | PPO 迭代轮数   | 每次"收集数据 → 更新策略"算一轮       |
+| `fps`             | 每秒交互步数   | 衡量训练速度（仅 SB3 记录）           |
+| `time_elapsed`    | 已用时间（秒） | 从训练开始到当前的耗时（仅 SB3 记录） |
 
 它们可用于估算剩余训练时间。
 例如 `fps = 5000` 且剩余 10000 步时，约需 2 秒。
@@ -612,10 +612,10 @@ $$n_{\text{updates}} = \text{iterations} \times \text{epochs} \times \frac{\text
 我们的自研 PPO 在训练结束后会运行 20 回合的独立评估
 （不探索，纯确定性策略），记录两个指标：
 
-| 指标 | 含义 |
-|------|------|
-| `eval/mean_reward` | 20 回合的平均得分 |
-| `eval/std_reward` | 20 回合得分的标准差 |
+| 指标               | 含义                |
+| ------------------ | ------------------- |
+| `eval/mean_reward` | 20 回合的平均得分   |
+| `eval/std_reward`  | 20 回合得分的标准差 |
 
 Eval 指标和训练时的 `rollout/ep_rew_mean` 有本质区别——
 训练时 Agent 仍在探索（策略具有随机性），
@@ -630,31 +630,31 @@ Eval 指标和训练时的 `rollout/ep_rew_mean` 有本质区别——
 
 ### 核心指标（训练诊断用）
 
-| 指标                     | SwanLab Key | 数学定义                              | 健康表现            | 异常信号                   |
-| ------------------------ | ----------- | ------------------------------------- | ------------------- | -------------------------- |
-| **Episode Reward**       | `rollout/ep_rew_mean` | $G = \sum_{t=0}^{T} r_t$             | 持续上升 → 趋于稳定 | 暴跌到 0 / 始终不动        |
-| **Episode Length**       | `rollout/ep_len_mean` | 回合步数的均值 | 趋势与 Reward 一致 | 与 Reward 趋势背离 |
-| **Entropy**              | `train/entropy_loss` | $H = -\sum_a \pi(a\|s) \log \pi(a\|s)$ | 从高到低逐步下降    | 过快降到 0 / 长期不降      |
-| **Value Loss**           | `train/value_loss` | $\frac{1}{\|B\|}\sum(V(s_i) - G_i)^2$ | 逐步减小            | 长期不降 / 反而增大        |
-| **Explained Variance**   | `train/explained_variance` | $1 - \frac{\text{Var}(G-V)}{\text{Var}(G)}$ | 趋向 1 | 始终 ≤ 0 |
-| **Policy Gradient Loss** | `train/policy_gradient_loss` | $-\min(r_t \hat{A}_t, \text{clip}(r_t, 1-\epsilon, 1+\epsilon) \hat{A}_t)$ | 小范围波动          | 突然出现极端值             |
-| **Total Loss**           | `train/loss` | $\mathcal{L}_{\text{policy}} + 0.5 \mathcal{L}_{\text{value}} - 0.01 H$ | 各分项健康的综合信号 | 突然飙升 |
-| **Approx KL**            | `train/approx_kl` | $\mathbb{E}[\log \pi_{\text{old}}(a\|s) - \log \pi_{\text{new}}(a\|s)]$ | 0.001 ~ 0.02       | > 0.03 策略更新过猛        |
-| **Clip Fraction**        | `train/clip_fraction` | $\frac{1}{\|B\|}\sum \mathbb{1}[\|r_t - 1\| > \epsilon]$ | 0% ~ 20%           | > 30% 变化太剧烈           |
-| **Learning Rate**        | `train/learning_rate` | $\theta \leftarrow \theta - \alpha \nabla \mathcal{L}$ | SB3 恒定；PyTorch 线性衰减       | 调大 → 训练崩溃；调小 → 收敛过慢 |
+| 指标                     | SwanLab Key                  | 数学定义                                                                   | 健康表现                   | 异常信号                         |
+| ------------------------ | ---------------------------- | -------------------------------------------------------------------------- | -------------------------- | -------------------------------- |
+| **Episode Reward**       | `rollout/ep_rew_mean`        | $G = \sum_{t=0}^{T} r_t$                                                   | 持续上升 → 趋于稳定        | 暴跌到 0 / 始终不动              |
+| **Episode Length**       | `rollout/ep_len_mean`        | 回合步数的均值                                                             | 趋势与 Reward 一致         | 与 Reward 趋势背离               |
+| **Entropy**              | `train/entropy_loss`         | $H = -\sum_a \pi(a\|s) \log \pi(a\|s)$                                     | 从高到低逐步下降           | 过快降到 0 / 长期不降            |
+| **Value Loss**           | `train/value_loss`           | $\frac{1}{\|B\|}\sum(V(s_i) - G_i)^2$                                      | 逐步减小                   | 长期不降 / 反而增大              |
+| **Explained Variance**   | `train/explained_variance`   | $1 - \frac{\text{Var}(G-V)}{\text{Var}(G)}$                                | 趋向 1                     | 始终 ≤ 0                         |
+| **Policy Gradient Loss** | `train/policy_gradient_loss` | $-\min(r_t \hat{A}_t, \text{clip}(r_t, 1-\epsilon, 1+\epsilon) \hat{A}_t)$ | 小范围波动                 | 突然出现极端值                   |
+| **Total Loss**           | `train/loss`                 | $\mathcal{L}_{\text{policy}} + 0.5 \mathcal{L}_{\text{value}} - 0.01 H$    | 各分项健康的综合信号       | 突然飙升                         |
+| **Approx KL**            | `train/approx_kl`            | $\mathbb{E}[\log \pi_{\text{old}}(a\|s) - \log \pi_{\text{new}}(a\|s)]$    | 0.001 ~ 0.02               | > 0.03 策略更新过猛              |
+| **Clip Fraction**        | `train/clip_fraction`        | $\frac{1}{\|B\|}\sum \mathbb{1}[\|r_t - 1\| > \epsilon]$                   | 0% ~ 20%                   | > 30% 变化太剧烈                 |
+| **Learning Rate**        | `train/learning_rate`        | $\theta \leftarrow \theta - \alpha \nabla \mathcal{L}$                     | SB3 恒定；PyTorch 线性衰减 | 调大 → 训练崩溃；调小 → 收敛过慢 |
 
 ### 辅助指标（进度追踪）
 
-| 指标 | SwanLab Key | 含义 |
-|------|-------------|------|
-| **Clip Range** | `train/clip_range` | 裁剪参数 $\epsilon$，训练中不变 |
-| **N Updates** | `train/n_updates` | 梯度更新累计次数 |
-| **Total Timesteps** | `time/total_timesteps` | 环境交互累计步数 |
-| **Iterations** | `time/iterations` | PPO 迭代轮数 |
-| **FPS** | `time/fps` | 每秒交互步数（仅 SB3） |
-| **Time Elapsed** | `time/time_elapsed` | 训练耗时（仅 SB3） |
-| **Eval Mean** | `eval/mean_reward` | 训练后确定性策略评估得分 |
-| **Eval Std** | `eval/std_reward` | 评估得分标准差 |
+| 指标                | SwanLab Key            | 含义                            |
+| ------------------- | ---------------------- | ------------------------------- |
+| **Clip Range**      | `train/clip_range`     | 裁剪参数 $\epsilon$，训练中不变 |
+| **N Updates**       | `train/n_updates`      | 梯度更新累计次数                |
+| **Total Timesteps** | `time/total_timesteps` | 环境交互累计步数                |
+| **Iterations**      | `time/iterations`      | PPO 迭代轮数                    |
+| **FPS**             | `time/fps`             | 每秒交互步数（仅 SB3）          |
+| **Time Elapsed**    | `time/time_elapsed`    | 训练耗时（仅 SB3）              |
+| **Eval Mean**       | `eval/mean_reward`     | 训练后确定性策略评估得分        |
+| **Eval Std**        | `eval/std_reward`      | 评估得分标准差                  |
 
 ## 本章小结
 
