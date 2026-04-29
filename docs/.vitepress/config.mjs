@@ -442,7 +442,7 @@ const zhSidebar = {
               link: '/chapter03_mdp/policy-objective'
             },
             { text: '3.7 Reward Shaping', link: '/chapter03_mdp/reward-design' },
-            { text: '3.8 算法地图', link: '/chapter03_mdp/panorama' }
+            { text: '3.8 本章总结', link: '/chapter03_mdp/panorama' }
           ]
         },
         {
@@ -451,7 +451,7 @@ const zhSidebar = {
           collapsed: false,
           items: [
             {
-              text: '4.1 Q-Learning',
+              text: '4.1 动手：Q-Learning 与 GridWorld',
               link: '/chapter04_dqn/q-learning'
             },
             {

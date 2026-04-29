@@ -1,39 +1,10 @@
-# Q-Learning：TD 方法 for Q
+# 动手：Q-Learning 与 GridWorld
 
 第 3 章介绍了路线一的核心思路：学习 $Q(s,a)$ 给每个动作打分，然后选分数最高的。我们还速览了三种估计价值的方法——DP、MC、TD——其中 TD 方法不需要环境模型，走一步就能更新，是最实用的选择。
 
 本节将 TD 方法应用到 $Q$ 上，得到强化学习最经典的算法之一——Q-Learning。
 
-## 从 TD 到 Q-Learning
-
-第 3 章的 TD 方法用以下公式更新 $V(s)$：
-
-$$V(s) \leftarrow V(s) + \alpha \underbrace{\left[ r + \gamma V(s') - V(s) \right]}_{\text{TD Error } \delta}$$
-
-Q-Learning 做的事情完全类似，只是把 $V$ 换成 $Q$，并且在 TD Target 中用 $\max$ 代替对下一状态的估计：
-
-$$Q(s, a) \leftarrow Q(s, a) + \alpha \left[ r + \gamma \max_{a'} Q(s', a') - Q(s, a) \right]$$
-
-逐项拆解：
-
-| 符号 | 含义 |
-| --- | --- |
-| $Q(s, a)$ | 当前对"在状态 $s$ 做动作 $a$ 值多少分"的估计 |
-| $r + \gamma \max_{a'} Q(s', a')$ | TD Target：即时奖励 + 下一状态中最好动作的价值 |
-| $\max_{a'} Q(s', a')$ | "到了 $s'$ 之后，最好的动作值多少分" |
-| $r + \gamma \max_{a'} Q(s', a') - Q(s, a)$ | TD Error：预测与现实的落差 |
-
-注意那个 $\max_{a'}$——它不看所有动作的平均，只看最好的那个。这意味着 Q-Learning 学的是**最优动作价值 $Q^*$**，不管当前用什么策略在探索。这就是离策略（off-policy）学习：用 $\varepsilon$-贪婪策略收集数据，但学的是最优策略的 $Q$ 值。
-
-## ε-贪婪：平衡探索与利用
-
-Q-Learning 需要数据来学习，但它学的是最优 $Q^*$，而不是当前策略的 $Q$。那收集数据时用什么策略？
-
-最常用的选择是 **$\varepsilon$-贪婪（$\varepsilon$-greedy）**：
-
-$$a = \begin{cases} \arg\max_a Q(s, a) & \text{以概率 } 1 - \varepsilon \text{（利用）} \\ \text{随机动作} & \text{以概率 } \varepsilon \text{（探索）} \end{cases}$$
-
-$\varepsilon$ 控制探索的程度：$\varepsilon = 0.1$ 意味着 90% 的时间选当前最好的动作，10% 的时间随机尝试。这正是第 3 章讨论的探索-利用困境在路线一中的具体体现——用一个参数来人工平衡。
+先不急着看公式——跑一个最小的例子，亲眼看看 Q-Learning 在做什么，然后再拆解原理。
 
 ## 动手：4×4 GridWorld
 
@@ -141,6 +112,43 @@ $$Q((0,0), \text{右}) \approx -1 - 0.9 - 0.81 - 0.729 - 0.656 - 0.590 = -4.685$
 实际值约 -5.69（因为路径可能不是最优的 6 步直线路径）。此时 TD Error $\approx 0$——预判和实际一致了，学习完成。
 
 这个过程揭示了 Q-Learning 的本质：TD Error 从一开始的 -1，通过成百上千次的微调，逐渐趋近于 0。每一次微调都是在说"上次猜错了，这次修一点"。
+
+## 从 TD 到 Q-Learning
+
+跑完了例子，现在回头看看代码里那几行更新到底在数学上做了什么。
+
+第 3 章的 TD 方法用以下公式更新 $V(s)$：
+
+$$V(s) \leftarrow V(s) + \alpha \underbrace{\left[ r + \gamma V(s') - V(s) \right]}_{\text{TD Error } \delta}$$
+
+Q-Learning 做的事情完全类似，只是把 $V$ 换成 $Q$，并且在 TD Target 中用 $\max$ 代替对下一状态的估计：
+
+$$Q(s, a) \leftarrow Q(s, a) + \alpha \left[ r + \gamma \max_{a'} Q(s', a') - Q(s, a) \right]$$
+
+逐项拆解：
+
+| 符号 | 含义 |
+| --- | --- |
+| $Q(s, a)$ | 当前对"在状态 $s$ 做动作 $a$ 值多少分"的估计 |
+| $r + \gamma \max_{a'} Q(s', a')$ | TD Target：即时奖励 + 下一状态中最好动作的价值 |
+| $\max_{a'} Q(s', a')$ | "到了 $s'$ 之后，最好的动作值多少分" |
+| $r + \gamma \max_{a'} Q(s', a') - Q(s, a)$ | TD Error：预测与现实的落差 |
+
+注意那个 $\max_{a'}$——它不看所有动作的平均，只看最好的那个。这意味着 Q-Learning 学的是**最优动作价值 $Q^*$**，不管当前用什么策略在探索。这就是离策略（off-policy）学习：用 $\varepsilon$-贪婪策略收集数据，但学的是最优策略的 $Q$ 值。
+
+回过头看刚才的手算：TD Target $= -1 + 0.9 \times 0 = -1$，就是"即时奖励 $r=-1$ 加上下一步的最好估计 $0$"。TD Error $= -1 - 0 = -1$，就是"预判的 0 和实际的 -1 之间的落差"。这个落差乘以学习率 $\alpha = 0.1$，就是 Q 值的修正量。
+
+## ε-贪婪：平衡探索与利用
+
+Q-Learning 需要数据来学习，但它学的是最优 $Q^*$，而不是当前策略的 $Q$。那收集数据时用什么策略？
+
+最常用的选择是 **$\varepsilon$-贪婪（$\varepsilon$-greedy）**：
+
+$$a = \begin{cases} \arg\max_a Q(s, a) & \text{以概率 } 1 - \varepsilon \text{（利用）} \\ \text{随机动作} & \text{以概率 } \varepsilon \text{（探索）} \end{cases}$$
+
+$\varepsilon$ 控制探索的程度：$\varepsilon = 0.1$ 意味着 90% 的时间选当前最好的动作，10% 的时间随机尝试。这正是第 3 章讨论的探索-利用困境在路线一中的具体体现——用一个参数来人工平衡。
+
+代码里 `if np.random.random() < epsilon: action = np.random.randint(4)` 就是这行公式的直接翻译。
 
 ## Q-Learning 的关键性质
 
