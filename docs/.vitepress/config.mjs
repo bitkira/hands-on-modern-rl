@@ -734,11 +734,11 @@ const zhSidebar = {
             },
             {
               text: '12.3 LLM 多智能体 RL',
-              link: '/chapter13_future_trends/llm-multi-agent-rl'
+              link: '/chapter13_future_trends/llm-multi-agent-rl/'
             },
             {
               text: '12.4 离线强化学习',
-              link: '/chapter13_future_trends/offline-rl'
+              link: '/chapter13_future_trends/offline-rl/'
             }
           ]
         },

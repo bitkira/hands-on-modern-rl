@@ -1,6 +1,41 @@
 # 12.3 LLM 多智能体强化学习
 
-在讨论 LLM 驱动的多智能体系统之前，先快速回顾传统多智能体 RL（MARL）的核心框架。MARL 最大的挑战是**非平稳性**：当你学习新策略时，队友也在学习——你面对的"环境"在不断变化。当前主流范式是 **CTDE（集中训练，分布执行）**：训练时有一个"上帝视角"的全局 Critic 看到所有智能体的观测和动作，执行时每个智能体只能根据自己的局部观测做决策。
+在讨论 LLM 驱动的多智能体系统之前，先快速回顾传统多智能体 RL（MARL）的核心框架。MARL 最大的挑战是**非平稳性**：当你学习新策略时，队友也在学习——你面对的"环境"在不断变化。当前主流范式是 **CTDE（集中训练，分布执行，Centralized Training with Decentralized Execution）**：训练时有一个"上帝视角"的全局 Critic 看到所有智能体的观测和动作，执行时每个智能体只能根据自己的局部观测做决策。
+
+```mermaid
+flowchart TD
+    subgraph "Centralized Training (集中训练阶段)"
+        C["全局 Critic (上帝视角)"]
+        O1["智能体1 观测 (O₁)"] --> C
+        O2["智能体2 观测 (O₂)"] --> C
+        A1["智能体1 动作 (A₁)"] --> C
+        A2["智能体2 动作 (A₂)"] --> C
+
+        C -->|"计算全局 Q 值 / Advantage"| R["Reward & 策略梯度更新"]
+    end
+
+    subgraph "Decentralized Execution (分布执行阶段)"
+        Actor1["智能体1 Actor"]
+        Actor2["智能体2 Actor"]
+
+        O1_E["局部观测 (O₁)"] --> Actor1
+        Actor1 -->|"独立决策"| A1_E["动作 (A₁)"]
+
+        O2_E["局部观测 (O₂)"] --> Actor2
+        Actor2 -->|"独立决策"| A2_E["动作 (A₂)"]
+    end
+
+    R -.->|"更新参数"| Actor1
+    R -.->|"更新参数"| Actor2
+
+    style C fill:#fce4ec,stroke:#c62828,color:#000
+    style Actor1 fill:#e3f2fd,stroke:#1976d2,color:#000
+    style Actor2 fill:#e3f2fd,stroke:#1976d2,color:#000
+```
+
+<div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
+  <em>图：CTDE (集中训练，分布执行) 范式。这是 MAPPO 和 MADDPG 等强化学习算法的核心。在 LLM 场景下，全局 Critic 通常由一个能够审查所有 Agent 对话历史的强大模型（如 GPT-4）或基于结果的验证器来充当。</em>
+</div>
 
 | 算法       | 核心思路                           | 适用场景                |
 | ---------- | ---------------------------------- | ----------------------- |
@@ -23,9 +58,15 @@
 
 ## 三种典型架构
 
-### 架构一：角色分工协作
+### 架构一：角色分工协作 (Role-Playing Collaboration)
 
-这是最直觉的架构——多个 LLM Agent 扮演不同角色，各自负责擅长的子任务，协作完成一个复杂目标。
+这是最直觉的架构——多个 LLM Agent 扮演不同角色，各自负责擅长的子任务，协作完成一个复杂目标。清华与清华系初创公司面壁智能联合提出的 **ChatDev** 就是这一架构的代表作。
+
+![ChatDev Architecture](./images/chatdev.png)
+
+<div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
+  <em>图 1：ChatDev 虚拟软件公司架构。通过为 LLM 赋予 CEO、CTO、Programmer、Reviewer 等不同角色，并通过多智能体协作流（设计、编码、测试、文档），模型能够像人类团队一样自动完成软件开发。来源：<a href="https://arxiv.org/abs/2307.07924" target="_blank" rel="noopener noreferrer">ChatDev Paper</a></em>
+</div>
 
 ```
 任务: "修复这个 GitHub Issue"
@@ -37,13 +78,13 @@
 
 这种架构和上面提到的 CTDE 思路一致，但关键区别在于**RL 训练方式**。传统 MARL 用全局 Critic 评估每个智能体的贡献，但 LLM Agent 的"动作"是一段完整的文本（可能是几百个 token），用传统 Q 值难以评估"这段代码的质量"。
 
-实践中更常用的方案是**结果驱动的 reward**——只看最终结果（Issue 是否修复？测试是否通过？），然后用 9.1 节讨论的信用分配方法（ORM vs PRM）来分配 reward 到各个角色。
+实践中更常用的方案是**结果驱动的 reward**——只看最终结果（Issue 是否修复？测试是否通过？），然后用 9.1 节讨论的信用分配方法（ORM vs PRM）来分配 reward 到各个角色。另一个代表作是 **MetaGPT**，它将标准化操作程序（SOP）编码进 Prompt，让 LLM 严格按照人类产品经理的流程工作。
 
-### 架构二：辩论对抗
+### 架构二：辩论对抗 (Debate and Competition)
 
-12.4 节介绍了辩论式自博弈训练，这里我们从**多智能体 RL** 的视角重新审视。辩论架构中，两个 LLM Agent 对同一个问题给出不同回答，通过多轮辩论互相挑战，最终由 Judge 判定胜负。
+13.2 介绍了辩论式自博弈训练，这里我们从**多智能体 RL** 的视角重新审视。辩论架构中，两个 LLM Agent 对同一个问题给出不同回答，通过多轮辩论互相挑战，最终由 Judge 判定胜负。
 
-和 12.4 节的区别在于：自博弈通常用**同一个模型的多个实例**，而多智能体视角下的辩论可以用**不同训练策略的模型**。这引入了种群训练（Population Training）的思想——维持多个策略不同的模型，随机配对辩论，避免所有模型收敛到同一个策略。
+和 13.2 节的区别在于：自博弈通常用**同一个模型的多个实例**，而多智能体视角下的辩论可以用**不同训练策略的模型**。这引入了种群训练（Population Training）的思想——维持多个策略不同的模型，随机配对辩论，避免所有模型收敛到同一个策略。
 
 ```mermaid
 flowchart TD
@@ -63,17 +104,19 @@ flowchart TD
     style B fill:#fce4ec,stroke:#c62828,color:#000
 ```
 
-### 架构三：人机协作
+### 架构三：多智能体社会模拟 (Social Simulation)
 
-这是 JD 中最关注、也是最具挑战性的架构。LLM Agent 不是和另一个 Agent 协作，而是**和一个真实的人类协作**。例如直播场景中，AI Agent 辅助主播完成选题策划、弹幕互动、节奏把控。
+除了工具协作和对抗，多智能体还有一个极具科幻色彩的分支：**社会模拟（Social Simulation）**。这不完全是为了完成某个具体的代码修复任务，而是为了研究 LLM 在交互中涌现出的复杂社会学行为。
 
-人机协作的独特挑战在于：
+![MetaGPT Pipeline](./images/metagpt.png)
 
-**人类行为不可控**。Agent 面对的"环境"包括人类——但人类不是固定的环境。同一个主播今天心情好，可能很配合 Agent 的建议；明天心情差，可能完全忽略。这比传统 MARL 的非平稳性（12.3 节）更严重——至少其他 Agent 的策略是可以通过训练影响的，但人类的行为模式只能适应。
+<div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
+  <em>图 2：MetaGPT 架构。不仅将不同角色的 Agent 封装，更引入了 Standardized Operating Procedures (SOPs) 约束 Agent 的工作流和通信协议，从而极大地缓解了多智能体交流时的“信息幻觉”问题。来源：<a href="https://arxiv.org/abs/2308.01432" target="_blank" rel="noopener noreferrer">MetaGPT Paper</a></em>
+</div>
 
-**信任建立是隐式目标**。Agent 不能只学会"完成任务"，还要学会"让人类愿意接受它的建议"。一个总是给出正确建议但语气生硬、时机不当的 Agent，实际效果可能不如一个偶尔出错但沟通自然的 Agent。这意味着 reward 不应该只衡量"任务是否完成"，还要衡量"人类是否满意这次协作"。
+最具代表性的是斯坦福大学的 **Generative Agents (斯坦福小镇)** 工作。在这个虚拟小镇中，25 个由大语言模型驱动的 Agent 有自己的工作、家庭、记忆和性格。它们通过互相聊天、观察、反思（Reflection）来决定每天的行程——甚至能够自发地组织一场情人节派对。
 
-**多源稀疏奖励**。reward 信号来自多个源头：任务结果（客观可衡量）、人类反馈（主观且稀疏——不会每一步都给反馈）、系统指标（如直播的观众留存率）。如何把这些不同粒度、不同可靠性的信号融合成统一的 reward，是核心难题。
+在强化学习的视角下，这可以被视为一个**极高自由度的开放式环境（Open-ended Environment）**。这里的 Reward 不是单一的“得分”，而是保持“行为连贯度（Coherence）”和“社会合理性（Social Plausibility）”。
 
 ## LLM 多智能体 RL 的核心挑战
 
@@ -128,6 +171,12 @@ flowchart LR
 ## 代表性工作
 
 ### MAPoRL：多智能体协作训练新范式
+
+![MAPoRL Architecture](./images/maporl.png)
+
+<div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
+  <em>图 3：MAPoRL 架构。这是一种为协作大语言模型专门设计的多智能体 RL 强化微调（Post-Co-Training）框架。它不仅评估每个模型完成其独立任务的质量，还专门设计了“协作 Reward”来评估不同角色间交互（如 Coder 和 Reviewer）的配合度，用 RL 直接优化多模型间的交互效率。来源：<a href="https://arxiv.org/abs/2502.18439" target="_blank" rel="noopener noreferrer">MAPoRL Paper</a></em>
+</div>
 
 MAPoRL [^maporl] 将多个 LLM Agent 的协作建模为一个联合策略优化问题。核心创新是引入了**协作奖励**——不只评估每个角色独立完成子任务的效果，还评估角色之间的"配合度"。例如，Coder 生成的代码是否容易被 Reviewer 理解？Tester 的测试用例是否覆盖了 Coder 代码的边界情况？
 
