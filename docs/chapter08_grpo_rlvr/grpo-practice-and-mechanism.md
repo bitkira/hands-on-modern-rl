@@ -135,6 +135,78 @@ $$
 | **[G]** | `train_step`                      | 采样、打分、优势、loss、反向传播如何接起来    |
 | **[H]** | `train_grpo`                      | 为什么 GRPO 是在线训练，每轮都生成新回答      |
 
+## 从 PPO 改到 GRPO：到底替换了哪几行
+
+如果不改成 GRPO，而是继续按 PPO / RLHF 的方式训练，代码直觉通常是这样：
+
+```python
+# PPO / RLHF：在线生成，然后让 Critic 估计基线
+responses = policy_old.generate(prompts)
+logps_old = sequence_logprob(policy_old, prompts, responses).detach()
+
+rewards = reward_model(prompts, responses)
+values = critic(prompts, responses)
+advantages = rewards - values
+
+logps_new = sequence_logprob(policy, prompts, responses)
+ratio = torch.exp(logps_new - logps_old)
+ppo_loss = -torch.min(
+    ratio * advantages,
+    torch.clamp(ratio, 1 - clip_eps, 1 + clip_eps) * advantages,
+).mean()
+```
+
+这里的 `critic` 就是前面说的价值模型。它的工作不是生成答案，而是估计一个基线：**这个 prompt 和当前回答前缀，大概应该拿多少分**。然后 PPO 用 `rewards - values` 得到优势，判断某个回答是“比预期好”还是“比预期差”。
+
+GRPO 的改法很集中：**保留在线生成、概率比值和裁剪，但不再训练 Critic；优势改成从同一个 prompt 的一组回答里算出来**。
+
+```python
+# GRPO：同一个 prompt 生成 G 个回答，然后做组内比较
+responses = generate_many(policy_old, prompts, num_generations=G)
+logps_old = sequence_logprob(policy_old, prompts, responses).detach()
+
+rewards = reward_fn(prompts, responses)
+rewards_by_group = rewards.view(batch_size, G)
+
+group_mean = rewards_by_group.mean(dim=1, keepdim=True)
+group_std = rewards_by_group.std(dim=1, keepdim=True)
+advantages = ((rewards_by_group - group_mean) / (group_std + 1e-4)).view(-1)
+
+logps_new = sequence_logprob(policy, prompts, responses)
+ratio = torch.exp(logps_new - logps_old)
+grpo_loss = -torch.min(
+    ratio * advantages,
+    torch.clamp(ratio, 1 - clip_eps, 1 + clip_eps) * advantages,
+).mean()
+```
+
+把真正变化的几行单独拎出来，就是：
+
+```diff
+  responses = policy_old.generate(prompts)
+  rewards = reward_model_or_rule(prompts, responses)
+- values = critic(prompts, responses)
+- advantages = rewards - values
+
++ rewards_by_group = rewards.view(batch_size, G)
++ group_mean = rewards_by_group.mean(dim=1, keepdim=True)
++ group_std = rewards_by_group.std(dim=1, keepdim=True)
++ advantages = ((rewards_by_group - group_mean) / (group_std + 1e-4)).view(-1)
+
+  loss = ppo_style_clipped_loss(logps_new, logps_old, advantages)
+```
+
+所以 GRPO 不是“把 PPO 全删掉”，也不是“只剩一个组内归一化公式”。更准确地说，**GRPO 把 PPO 里的 Critic 基线换成了组内平均基线**：原来问“这个回答比 Critic 预期好吗”，现在问“这个回答比同题其他回答好吗”。
+
+TRL 的真实源码也正是这个结构。2026-05-01 查看 Hugging Face TRL main 分支时，可以在 [`GRPOTrainer`](https://github.com/huggingface/trl/blob/main/trl/trainer/grpo_trainer.py) 里看到这些对应关系：
+
+1. `GRPOTrainer` 的初始化参数里有 `reward_funcs`，它可以是奖励模型，也可以是普通 Python 函数。也就是说，数学题这类任务可以直接用规则函数打分，不一定要先训练 RM。
+2. `self.num_generations = args.num_generations` 对应公式里的 $G$，也就是**每个 prompt 生成几个回答**。
+3. 源码会把 rewards reshape 成 `(-1, num_generations)`，计算 `mean_grouped_rewards` 和组内 `std_rewards`，再得到 `advantages = rewards - mean_grouped_rewards`，必要时除以标准差。
+4. 损失部分仍然计算 `coef_1 = exp(log_ratio)`，再用 `torch.clamp` 得到 `coef_2`，最后对 `coef_1 * advantages` 和 `coef_2 * advantages` 取 `min`。这就是 PPO-style 裁剪目标。
+
+对照 [`PPOTrainer`](https://github.com/huggingface/trl/blob/main/trl/experimental/ppo/ppo_trainer.py)，差别就更清楚：PPOTrainer 需要 `reward_model` 和 `value_model`，并用 `value_model` 产生优势估计；GRPOTrainer 不需要单独的 `value_model`，它把**同题多答的组内相对分数**直接变成优势。
+
 ## 读公式前：GRPO 的一组样本长什么样
 
 GRPO 的训练样本不是“一个 prompt 配一个回答”，而是**一个 prompt 配一组回答**。假设一个 batch 里有多个题目，用 $j$ 表示第几个题目，用 $i$ 表示这个题目下第几个回答：

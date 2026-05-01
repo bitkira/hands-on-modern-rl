@@ -93,6 +93,76 @@ DPO 的切入点不一样。DPO 论文先指出 RLHF 往往复杂且不稳定，
 
 如果鼠标移到代码透镜上，或者点击标题栏，就能看到完整代码；默认视图只显示当前段落需要的行。
 
+## 从 PPO/RLHF 改到 DPO：代码到底少了什么
+
+看到这里，可以先暂停一下。DPO 和 PPO/RLHF 的差异，不只是“换了一个 loss 名字”，而是**训练代码的输入、模型组件和更新方式都变了**。
+
+如果还沿用 PPO/RLHF 的思路，训练循环大概会像这样：
+
+```python
+# PPO / RLHF 的训练直觉：先在线生成，再打分，再用优势更新
+responses = policy.generate(prompts)
+logps_old = policy_logprob(policy, prompts, responses).detach()
+
+rewards = reward_model(prompts, responses)
+values = critic(prompts, responses)
+advantages = rewards - values
+
+logps_new = policy_logprob(policy, prompts, responses)
+ratio = torch.exp(logps_new - logps_old)
+policy_loss = -torch.min(
+    ratio * advantages,
+    torch.clamp(ratio, 1 - clip_eps, 1 + clip_eps) * advantages,
+).mean()
+```
+
+这段代码里，核心工作是：**当前模型先生成回答**，然后 **Reward Model 给回答打分**，再让 **Critic 估计基线**，最后用 PPO 的 `ratio + clip` 更新策略。
+
+如果改成 DPO，训练循环的形状会变成这样：
+
+```python
+# DPO 的训练直觉：不在线生成，直接学习偏好对
+batch = {
+    "prompt": prompt,
+    "chosen": chosen_answer,
+    "rejected": rejected_answer,
+}
+
+chosen_logps = sequence_logprob(policy, prompt, chosen_answer)
+rejected_logps = sequence_logprob(policy, prompt, rejected_answer)
+
+ref_chosen_logps = sequence_logprob(reference, prompt, chosen_answer)
+ref_rejected_logps = sequence_logprob(reference, prompt, rejected_answer)
+
+chosen_logratio = chosen_logps - ref_chosen_logps
+rejected_logratio = rejected_logps - ref_rejected_logps
+dpo_loss = -F.logsigmoid(beta * (chosen_logratio - rejected_logratio)).mean()
+```
+
+把两边放在一起看，差别会更明显：
+
+```diff
+- responses = policy.generate(prompts)
+- rewards = reward_model(prompts, responses)
+- values = critic(prompts, responses)
+- advantages = rewards - values
+- loss = ppo_clip_loss(logps_new, logps_old, advantages)
+
++ chosen_logratio = chosen_logps - ref_chosen_logps
++ rejected_logratio = rejected_logps - ref_rejected_logps
++ loss = -log_sigmoid(beta * (chosen_logratio - rejected_logratio))
+```
+
+所以，DPO 的“Direct”不是说它没有数学，而是说它**不再显式走“在线采样 → RM 打分 → Critic 估值 → PPO 更新”这条工程路线**。它直接把偏好对变成一个可反向传播的比较目标。
+
+TRL 的真实源码也是这个结构。2026-05-01 查看 Hugging Face TRL main 分支时，可以在 [`DPOTrainer`](https://github.com/huggingface/trl/blob/main/trl/trainer/dpo_trainer.py) 里看到三件事：
+
+1. 数据整理器 `DataCollatorForPreference` 期待样本里有 `prompt_ids`、`chosen_ids`、`rejected_ids`。它把 batch 的前半部分放 chosen，后半部分放 rejected。
+2. Reference 概率可以提前算好并放进 `ref_chosen_logps`、`ref_rejected_logps`，也可以训练时由 reference model 现算。
+3. 损失部分先算 `chosen_logratios` 和 `rejected_logratios`，再把二者做差，默认 sigmoid 版本就是对这个差值做 `-logsigmoid`。
+
+对照 [`PPOTrainer`](https://github.com/huggingface/trl/blob/main/trl/experimental/ppo/ppo_trainer.py)，区别更直接：PPOTrainer 初始化时需要 `policy model`、`ref_model`、`reward_model`、`value_model`；训练过程中会在线 `generate`，计算 reward 和 value，再构造 advantage。DPOTrainer 则主要需要 **Policy、Reference 和偏好数据**。
+
 ## 读公式前：DPO 的数据和概率
 
 DPO 的训练样本不是单独一个回答，而是一个**偏好三元组**：

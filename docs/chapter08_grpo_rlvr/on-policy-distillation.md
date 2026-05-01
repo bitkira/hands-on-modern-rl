@@ -4,7 +4,13 @@
 
 这就是在线策略蒸馏（On-Policy Distillation, OPD）。
 
-它听起来像知识蒸馏，但更接近 RL。普通蒸馏让 student 模仿 teacher 写过的答案；OPD 让 student 自己先写，再让 teacher 在 student 真实走到的上下文里给反馈。换成 RL 语言：student 是策略，生成 token 是动作，teacher 的 log-prob 是密集奖励。
+它听起来像知识蒸馏，但更接近 RL。普通蒸馏让 student 模仿 teacher 写过的答案；OPD 让 student 自己先写，再让 teacher 在 student 真实走到的上下文里给反馈。
+
+先不用急着理解“策略”“动作”“log-prob”这些术语。想象 student 正在一个词一个词地写答案。每写下一小段文字，它都要做一次选择：下一步写 “therefore”，还是写 “so”，还是写一个不该出现的词？在 RL 里，**负责做选择的东西叫策略（policy）**，所以 student 模型就是策略；**被选出来的下一小段文字叫 token**，它可能是一个字、一个词，或者词的一部分；**选择这个 token 的行为就是动作（action）**。
+
+那 teacher 做什么？teacher 不一定重新写一份标准答案，而是看 student 已经写出的前文，再判断 student 刚选的这个 token 合不合理。如果 teacher 觉得“这个位置写这个词很像一个好答案”，分数就高；如果 teacher 觉得“这里写得很奇怪”，分数就低。论文里常用 teacher 对这个 token 的 **log-prob** 表示这个分数。你可以先把 log-prob 理解成：**老师心里觉得这个 token 有多合理**。
+
+最后，“密集奖励”是什么意思？它不是等整篇答案写完才给一个总分，而是几乎每生成一个 token 都能给一次小反馈。GRPO/RLVR 常常像考试：最后答案对了给 1 分，错了给 0 分。OPD 更像老师坐在旁边批改草稿：学生每写一步，老师都能说“这一步像样”或“这一步不太对”。
 
 为什么这件事最近重要？因为 LLM 后训练的核心瓶颈不是“有没有一个 loss”，而是**训练信号从哪里来、信号有多密、是不是落在 student 自己会遇到的状态上**。
 
@@ -28,6 +34,73 @@ OPD 容易被误解成“又一种 SFT”。真正关键的差别不是 student 
 **方式三：自己做题，老师逐题批改（on-policy 蒸馏）。** student 先自己生成回答，teacher 再看 student 真实写出来的前缀，逐 token 判断“这一步像不像一个好答案”。这里 teacher 的角色变成了**在线评价器**：它不一定重新写一份标准答案，而是在 student 自己访问到的状态上给反馈。
 
 这就是 OPD 的核心区别：**teacher 从“数据生产者”变成了“奖励提供者”，student 从“模仿老师轨迹”变成了“在自己的轨迹上被老师纠偏”。** 这为什么重要？因为 student 推理时看到的是自己生成的上下文。如果训练时只见过 teacher 的上下文，一旦自己走偏，就会进入训练数据没有覆盖的区域。OPD 直接在这些 student 自己走到的区域给信号，缓解的正是这个分布偏移。
+
+## 先把三个词分清
+
+要理解 OPD，先把 **distillation**、**off-policy / offline** 和 **on-policy** 三个词分清。它们经常被混在一起，但指的是不同层面的事情。
+
+**蒸馏（distillation）** 说的是 teacher-student 关系：一个强模型 $q$ 把能力迁移给一个较小或较便宜的模型 $\pi_\theta$。最朴素的蒸馏是让 teacher 生成答案，student 对这些答案做交叉熵训练：
+
+$$
+\mathcal{L}_{\text{hard KD}}
+= -\sum_t \log \pi_\theta(y_t^T \mid x, y_{<t}^T)
+$$
+
+这里 student 看到的是 teacher 选出来的 token $y_t^T$。如果你能拿到 teacher 的完整概率分布，还可以做“软蒸馏”：不只告诉 student 正确 token 是什么，还告诉它其他 token 有多合理。
+
+$$
+\mathcal{L}_{\text{soft KD}}
+= \sum_t D_{\text{KL}}\left(q(\cdot \mid c_t) \| \pi_\theta(\cdot \mid c_t)\right)
+$$
+
+软蒸馏的信息量更大。比如 teacher 可能认为 “therefore” 很好，“so” 也可以，“banana” 完全不行。硬标签只告诉你 teacher 最后选了哪个词，软标签告诉你 teacher 对整个动作空间的判断。
+
+**policy（策略）** 在 LLM 里就是“给定上下文，输出下一个 token 分布”的模型：
+
+$$
+\pi_\theta(a_t \mid s_t)
+\quad \Longleftrightarrow \quad
+\pi_\theta(y_t \mid x, y_{<t})
+$$
+
+这里的状态 $s_t$ 是 prompt 加已生成前缀，动作 $a_t$ 是下一个 token。谁生成轨迹，谁就是行为策略（behavior policy）。这件事决定了训练数据的分布。
+
+**Off-policy** 指的是：训练数据不是当前 student 自己生成的，而是来自另一个策略 $\mu$。这个 $\mu$ 可以是 teacher、旧 checkpoint、用户日志、历史模型，也可以是一批固定数据集。普通 teacher 蒸馏就是典型 off-policy：
+
+$$
+y \sim q(\cdot \mid x),
+\quad
+\text{update } \pi_\theta
+$$
+
+数据来自 teacher $q$，更新的是 student $\pi_\theta$。好处是便宜、可复用、稳定；坏处是 student 没有在自己的错误上下文里训练。
+
+**Offline** 比 off-policy 更严格：不只是数据来自别的策略，而且训练时不再新采样，只使用一份固定数据集。SFT、DPO、离线偏好训练通常都是 offline。可以这样记：
+
+| 概念       | 数据从哪里来            | 训练时还采新数据吗 | 例子                        |
+| ---------- | ----------------------- | ------------------ | --------------------------- |
+| offline    | 固定历史数据集          | 不采               | SFT、DPO、离线 SeqKD        |
+| off-policy | 不是当前 student 的策略 | 可以采，也可以不采 | teacher 轨迹、旧模型 replay |
+| on-policy  | 当前 student 自己生成   | 要采               | PPO、GRPO、OPD rollout      |
+
+所以，**offline 在 LLM 后训练里通常也是 off-policy，但 off-policy 不一定 offline**。如果你每一轮都让 teacher 重新生成数据，再训练 student，它不是 offline，但仍然是 off-policy，因为行为策略还是 teacher，不是 student。
+
+**On-policy** 指的是：用当前 student 自己生成的数据来更新当前 student。形式上是：
+
+$$
+y \sim \pi_\theta(\cdot \mid x),
+\quad
+\text{update } \pi_\theta
+$$
+
+它的优势是训练分布和推理分布一致。student 推理时会走到什么上下文，训练时就真的让它走过去，然后在那里给反馈。代价也很明显：每轮更新前都要重新 rollout，旧数据很快过期，样本效率低。
+
+把这几个概念合起来看，OPD 的位置就很清楚了：
+
+- 它是 **distillation**，因为反馈来自 teacher。
+- 它是 **on-policy**，因为轨迹来自 student 自己。
+- 它通常不是纯 **offline**，因为训练中要不断重新采 student rollout。
+- 它和普通 off-policy 蒸馏的区别，不在于有没有 teacher，而在于 teacher 是在谁的轨迹上给信号。
 
 ## 为什么普通蒸馏不够
 

@@ -100,7 +100,31 @@ $$
 
 这行公式的意思是：给定当前噪声状态 $x_t$、时间步 $t$ 和 prompt $c$，模型用参数 $\theta$ 定义一个概率分布，并从中采样下一步 $x_{t-1}$。
 
-如果只从生成模型角度看，这是一个采样公式。如果从 RL 角度看，它已经很像一个 policy。
+为什么说它像 policy？因为在 RL 里，policy 的定义就是：
+
+$$
+\pi_\theta(a\mid s)
+$$
+
+也就是“给定当前状态 $s$，选择动作 $a$ 的概率分布”。
+
+LLM 里我们很熟悉这个形式：
+
+$$
+\pi_\theta(y_t\mid y_{<t},c)
+$$
+
+给定前面的 token $y_{<t}$ 和上下文 $c$，模型选择下一个 token $y_t$。所以 token 是 action，文本上下文是 state。
+
+Diffusion 的去噪分布也有同样的形状：
+
+$$
+p_\theta(x_{t-1}\mid x_t,t,c)
+$$
+
+给定当前 noisy latent、时间步和 prompt，模型选择下一步 latent。于是可以把 $(x_t,t,c)$ 看成 state，把 $x_{t-1}$ 或等价的去噪方向看成 action。
+
+当然，这句话只是在说“形式上可以看成 policy”。它还不等于已经完成 RL。只有再定义最终图像的 reward，并用这个 reward 更新 $p_\theta$，这个采样过程才真正变成强化学习问题。
 
 ## 把 Diffusion 翻译成 MDP 语言
 
@@ -122,6 +146,10 @@ $$
 \tau=(x_T,x_{T-1},\ldots,x_0)
 $$
 
+在 RL 里，episode 指的是一次完整交互：从初始状态开始，智能体连续选择动作，环境连续给出下一个状态，直到任务终止为止。比如 CartPole 里，从小车和杆子被初始化，到杆子倒下或达到最大步数，是一个 episode。文本生成里，从开始 token 生成到结束 token，也可以看成一个 episode。
+
+episode 的意义，是给“结果”划出边界。它告诉我们：哪些状态和动作属于同一次尝试，最终的好坏应该回看哪一串决策。对图像生成来说，单独看某一个中间 latent 很难判断它是不是“好图”。真正能被人类偏好模型、CLIP score、审美模型或任务 reward 打分的，通常是最后得到的 $x_0$。所以我们把从纯噪声 $x_T$ 一步步去噪到 $x_0$ 的整条链路当成一个 episode，终止状态就是最终图像。
+
 episode 结束以后，reward model 才看到最终图像，并给出分数：
 
 $$
@@ -142,15 +170,21 @@ $$
 
 有了上面的 MDP 翻译，DDPO 就不神秘了。它本质上是在 Diffusion 采样轨迹上做策略梯度。
 
-先给这段推导一个论文坐标，读的时候会更稳：
+先给这段推导一个论文坐标。表里左边写的是我们马上要做的事情，右边写的是它来自哪条经典线索：
 
-| 本节写法                                      | 对应论文线索                           |
-| --------------------------------------------- | -------------------------------------- |
-| 把去噪链路看成 MDP                            | DDPO：Black et al., 2024[^ddpo]        |
-| 用 log-derivative trick 推策略梯度            | REINFORCE：Williams, 1992[^reinforce]  |
-| 用 old/new logprob ratio 和 clipping 稳定更新 | PPO：Schulman et al., 2017[^ppo]       |
-| 用 KL 约束限制偏离参考模型                    | DPOK：Fan et al., 2023[^dpok]          |
-| 偏好 reward model                             | Pick-a-Pic / HPS v2[^pickapic][^hpsv2] |
+| 我们要做的事情                                               | 对应论文线索                           |
+| ------------------------------------------------------------ | -------------------------------------- |
+| 把一次去噪生成看成一个 episode / MDP                         | DDPO：Black et al., 2024[^ddpo]        |
+| 高分样本提高概率，低分样本降低概率；数学上叫策略梯度         | REINFORCE：Williams, 1992[^reinforce]  |
+| 用 old/new logprob ratio 和 clipping，让每次更新不要迈太大步 | PPO：Schulman et al., 2017[^ppo]       |
+| 用 KL 约束限制模型不要偏离参考模型太远                       | DPOK：Fan et al., 2023[^dpok]          |
+| 用人类偏好或审美偏好训练 reward model                        | Pick-a-Pic / HPS v2[^pickapic][^hpsv2] |
+
+其中最容易被术语吓到的是第二行。它的普通话版本很简单：
+
+> 如果一条去噪轨迹最后生成了高分图像，就让模型以后更容易采到这条轨迹里的那些步骤；如果最后得分低，就让这些步骤以后不那么容易被采到。
+
+问题在于，训练模型不能只说“让它更容易发生”。我们需要一个可以计算的梯度方向。REINFORCE 里的 log-derivative trick，就是把这句话变成可训练公式的那一步。
 
 我们先把一条去噪轨迹的概率写出来。为了简化记号，下面默认 prompt $c$ 是给定的：
 
@@ -176,7 +210,23 @@ $$
 
 其中 $R(\tau,c)=r_\phi(x_0,c)$，也就是 reward model 对最终图像的打分。
 
-把期望写成积分，就是：
+先用一个离散版的小例子理解它。假设同一个 prompt 下，模型只可能采出三条去噪轨迹：
+
+| 轨迹     | 模型采到它的概率 | 最终 reward |
+| -------- | ---------------- | ----------- |
+| $\tau_1$ | $p_1$            | $R_1$       |
+| $\tau_2$ | $p_2$            | $R_2$       |
+| $\tau_3$ | $p_3$            | $R_3$       |
+
+那平均 reward 就是：
+
+$$
+J=p_1R_1+p_2R_2+p_3R_3
+$$
+
+如果 $\tau_2$ 的 reward 很高，我们当然希望 $p_2$ 变大。也就是说，RL 更新的直觉不是“直接把图片像素往某个方向推”，而是“改变模型的采样概率”：高分轨迹的概率往上调，低分轨迹的概率往下调。
+
+真实的 Diffusion 不只有三条轨迹，而是有连续、巨量的可能轨迹。把上面这个加权平均写成积分，就是：
 
 $$
 J(\theta)
@@ -192,13 +242,17 @@ $$
 \int \nabla_\theta p_\theta(\tau\mid c)R(\tau,c)\,d\tau
 $$
 
-这里用一个常见技巧，叫 **log-derivative trick** 或 **score-function trick**。它正是 REINFORCE 这类策略梯度方法的核心技巧[^reinforce]：
+现在问题来了：这个式子里有 $\nabla_\theta p_\theta(\tau\mid c)$，意思是“模型参数变化时，这条完整轨迹的概率怎么变化”。但训练时我们拿到的是模型采样出来的一批轨迹，不可能枚举所有轨迹。我们希望把梯度改写成一个“对采样轨迹求平均”的形式，这样就能用实际采样来估计。
+
+这里用到一个很小的等式，叫 **log-derivative trick**，也叫 **score-function trick**。它正是 REINFORCE 这类策略梯度方法的核心技巧[^reinforce]：
 
 $$
 \nabla_\theta p_\theta(\tau\mid c)
 =
 p_\theta(\tau\mid c)\nabla_\theta\log p_\theta(\tau\mid c)
 $$
+
+这个等式只是把 $\nabla p$ 改写成了 $p\nabla\log p$。因为 $\log p$ 的变化率等于 $p$ 的变化率除以 $p$，所以两边乘回 $p$，就得到上面这行。它听起来像技巧，本质上只是一次改写。
 
 代回去：
 
@@ -221,7 +275,13 @@ $$
 \right]
 $$
 
-这一步很关键。reward model 可以是不可微的，也可以是一个黑盒打分器；策略梯度不需要对 reward 本身求导，只需要知道“这条轨迹得了多少分”。DDPO 利用的就是这个性质：reward 可以来自美学模型、压缩率、VLM feedback 或其他不可直接反传的目标[^ddpo]。
+这一步很关键，因为它把一个难处理的问题变成了可以采样估计的问题。训练时只要做三件事：
+
+1. 用当前 Diffusion 模型采样一条轨迹 $\tau$；
+2. 用 reward model 给最终图像打分，得到 $R(\tau,c)$；
+3. 看这条轨迹在模型下的 log probability，也就是 $\log p_\theta(\tau\mid c)$，然后按 reward 的高低调大或调小它。
+
+所以，策略梯度不需要对 reward 本身求导。reward model 可以是不可微的，也可以是一个黑盒打分器；我们只需要知道“这条轨迹得了多少分”。DDPO 利用的正是这个性质：reward 可以来自美学模型、压缩率、VLM feedback 或其他不可直接反传的目标[^ddpo]。
 
 接下来展开轨迹的 log probability：
 
