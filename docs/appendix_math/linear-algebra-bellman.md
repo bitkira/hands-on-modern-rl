@@ -253,6 +253,132 @@ $$
 
 ---
 
+## Q 函数的矩阵形式
+
+前面只处理了状态价值 $V$。动作价值 $Q(s,a)$ 也可以写成矩阵形式，且与 $V$ 的矩阵形式之间存在清晰的代数联系。
+
+### 符号定义
+
+把所有 $(s,a)$ 对的 Q 值排成一个长向量：
+
+$$
+\boldsymbol{q} =
+\begin{bmatrix}
+Q(s_1, a_1) \\
+Q(s_1, a_2) \\
+\vdots \\
+Q(s_2, a_1) \\
+\vdots
+\end{bmatrix}
+\in \mathbb{R}^{|\mathcal{S}||\mathcal{A}|}.
+$$
+
+类似地，$\boldsymbol{r} \in \mathbb{R}^{|\mathcal{S}||\mathcal{A}|}$ 存放每个 $(s,a)$ 对的即时奖励。
+
+转移矩阵扩展为 $P \in \mathbb{R}^{|\mathcal{S}||\mathcal{A}| \times |\mathcal{S}|}$，每一行对应一个 $(s,a)$ 对，每一列对应一个下一状态 $s'$：
+
+$$
+P[(s,a),\, s'] = P(s' \mid s, a).
+$$
+
+策略矩阵 $\Pi_\pi \in \mathbb{R}^{|\mathcal{S}| \times |\mathcal{S}||\mathcal{A}|}$ 把 Q 向量"压缩"回 V 向量：
+
+$$
+\Pi_\pi[\,s,\, (s,a)\,] = \pi(a \mid s).
+$$
+
+### V-Q 关系
+
+$$
+\boldsymbol{v}_\pi = \Pi_\pi \boldsymbol{q}_\pi
+$$
+
+验证第 $i$ 行：$\sum_a \pi(a|s_i) Q(s_i, a) = V(s_i)$。这正是 $V(s) = \sum_a \pi(a|s) Q(s,a)$ 的矩阵写法。
+
+### Q 的贝尔曼期望方程
+
+$$
+Q^\pi(s,a) = R(s,a) + \gamma \sum_{s'} P(s'|s,a) V^\pi(s')
+$$
+
+写成矩阵形式：
+
+$$
+\boldsymbol{q}_\pi = \boldsymbol{r} + \gamma P \boldsymbol{v}_\pi.
+$$
+
+将 $\boldsymbol{v}_\pi = \Pi_\pi \boldsymbol{q}_\pi$ 代入，得到纯 Q 的递推：
+
+$$
+\boldsymbol{q}_\pi = \boldsymbol{r} + \gamma P \Pi_\pi \boldsymbol{q}_\pi.
+$$
+
+闭式解为 $\boldsymbol{q}_\pi = (I - \gamma P \Pi_\pi)^{-1} \boldsymbol{r}$。
+
+### Q 的贝尔曼最优方程
+
+$$
+Q^*(s,a) = R(s,a) + \gamma \sum_{s'} P(s'|s,a) \max_{a'} Q^*(s', a')
+$$
+
+矩阵形式：
+
+$$
+\boldsymbol{q}_* = \boldsymbol{r} + \gamma P \cdot \mathrm{rowmax}(\boldsymbol{q}_*)
+$$
+
+其中 $\mathrm{rowmax}(\boldsymbol{q}) \in \mathbb{R}^{|\mathcal{S}|}$ 对每个状态取出该状态所有动作中的最大 Q 值。由于 max 不是线性运算，最优方程没有闭式解，只能通过迭代（如 Q-Learning）逼近。
+
+### 从 Q 的矩阵形式推出 V 的矩阵形式
+
+将 $\boldsymbol{v}_\pi = \Pi_\pi \boldsymbol{q}_\pi$ 代入 $\boldsymbol{q}_\pi = \boldsymbol{r} + \gamma P \boldsymbol{v}_\pi$，两边左乘 $\Pi_\pi$：
+
+$$
+\Pi_\pi \boldsymbol{q}_\pi = \Pi_\pi \boldsymbol{r} + \gamma \Pi_\pi P \boldsymbol{v}_\pi
+\quad\Longrightarrow\quad
+\boldsymbol{v}_\pi = \underbrace{\Pi_\pi \boldsymbol{r}}_{\boldsymbol{r}_\pi} + \gamma \underbrace{\Pi_\pi P}_{P_\pi} \boldsymbol{v}_\pi.
+$$
+
+这就是前面推导过的 $\boldsymbol{v}_\pi = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_\pi$。V 的矩阵形式中 $\boldsymbol{r}_\pi$ 和 $P_\pi$ 已经把策略平均融进去了，而 Q 的矩阵形式保留了动作维度——策略平均由 $\Pi_\pi$ 单独完成。这正是"$Q$ 比 $V$ 携带更细粒度信息"的矩阵语言表达。
+
+---
+
+## DP 迭代的矩阵形式
+
+第 3 章介绍了 DP 策略评估的逐状态更新：
+
+$$
+V(s) \leftarrow \sum_a \pi(a|s)\left[R(s,a) + \gamma \sum_{s'} P(s'|s,a) V(s')\right].
+$$
+
+矩阵形式就是把贝尔曼期望方程拆成迭代：
+
+$$
+\boldsymbol{v}_{k+1} = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_k.
+$$
+
+每轮对所有状态同时做一次贝尔曼更新。前面用两状态例子演示过：从 $\boldsymbol{v}_0 = \boldsymbol{0}$ 开始，反复迭代会收敛到闭式解 $\boldsymbol{v} = (I - \gamma P_\pi)^{-1}\boldsymbol{r}_\pi$。
+
+策略改进 $\pi'(s) = \arg\max_a [R(s,a) + \gamma \sum_{s'} P(s'|s,a)V^\pi(s')]$ 在矩阵视角下等价于：对每个状态 $s$，比较 $\boldsymbol{r} + \gamma P\boldsymbol{v}_\pi$ 中属于该状态的那几行（每行对应一个动作），选出值最大的动作。
+
+---
+
+## 对照总表
+
+| 概念 | 逐状态形式（第 3 章） | 矩阵形式 |
+| --- | --- | --- |
+| 贝尔曼期望方程 | $V^\pi(s)=\sum_a\pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^\pi(s')\right]$ | $\boldsymbol{v}_\pi = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_\pi$ |
+| 贝尔曼最优方程 | $V^*(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^*(s')\right]$ | $\boldsymbol{v}_* = \boldsymbol{r}_* + \gamma P_* \boldsymbol{v}_*$（逐行取 max） |
+| 闭式解 | — | $\boldsymbol{v} = (I - \gamma P)^{-1}\boldsymbol{r}$ |
+| V-Q 关系 | $V^\pi(s)=\sum_a\pi(a\mid s)Q^\pi(s,a)$ | $\boldsymbol{v}_\pi = \Pi_\pi \boldsymbol{q}_\pi$ |
+| Q 贝尔曼期望 | $Q^\pi(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\sum_{a'}\pi(a'\mid s')Q^\pi(s',a')$ | $\boldsymbol{q}_\pi = \boldsymbol{r} + \gamma P \Pi_\pi \boldsymbol{q}_\pi$ |
+| Q 贝尔曼最优 | $Q^*(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\max_{a'}Q^*(s',a')$ | $\boldsymbol{q}_* = \boldsymbol{r} + \gamma P \cdot\mathrm{rowmax}(\boldsymbol{q}_*)$ |
+| DP 策略评估 | $V(s) \leftarrow \sum_a\pi(a\mid s)[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')]$ | $\boldsymbol{v}_{k+1} = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_k$ |
+
+MC 和 TD 方法基于采样更新单个状态，没有对应的矩阵形式。
+
+---
+
 ## 矩阵形式的局限性
 
 本篇将贝尔曼方程压缩为矩阵形式 $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$，并给出了闭式解 $\boldsymbol{v} = (I-\gamma P)^{-1}\boldsymbol{r}$。无论状态数多少，方程始终是一行。
