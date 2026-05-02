@@ -1,194 +1,303 @@
-# B.7 工业实战练习
+# B.5 工业岗位练习：后训练与强化学习
 
-> 以下练习模拟了后训练岗位面试和入职后常见的真实场景。每道题都需要你把多个章节的知识串联起来做出判断——这正是工业界考察的核心能力。
+> 这一页不再把练习写成抽象算法题，而是从公开岗位要求倒推：真实的后训练岗位、强化学习岗位每天在做什么，候选人应该拿什么项目证明自己会做。
 
-## 练习一：训练曲线诊断
+本页参考了 2026 年 5 月前后公开招聘页中的岗位描述。招聘信息会变化，所以不要背具体公司名称；要看清岗位背后的稳定能力：数据、训练、奖励、评测、系统、产品闭环。
 
-**场景**：你负责监控一个 7B 模型的 GRPO 训练任务（目标：提升 GSM8K 数学推理）。训练进行了 2000 步后，你观察到以下现象：
+## 一句话总结
 
-- Training Reward 从第 800 步开始加速上升
-- KL 散度从 0.02 飙升到 0.15
-- Policy Entropy 从 2.8 骤降到 0.3
-- 人工抽检发现：模型输出越来越长，但推理步骤在重复同一句话
-- GSM8K 测试集准确率从 72% 降到 65%
+工业界的后训练/RL 岗位通常不是让你“会 PPO 公式”就结束，而是让你交付这几类结果：
 
-**问题**：
+- 把业务问题改写成可训练、可评测的模型行为目标。
+- 构建 SFT、偏好、奖励、RLVR 或 Agent 轨迹数据。
+- 选择 SFT、DPO、RM、PPO、GRPO、RLOO、RLVR 等训练路线，并解释为什么。
+- 跑稳定的训练，监控 KL、entropy、reward、pass rate、长度、吞吐和回归指标。
+- 找出 reward hacking、能力退化、数据污染、评测失真、训练变慢等问题。
+- 把模型改进落到产品指标、用户体验、安全合规或真实环境任务上。
 
-1. 这是什么问题？用你学过的概念精确定义它。
-2. 根因是什么？列出至少 3 个可能的原因，并说明如何逐一排查。
-3. 给出修复方案，按优先级排列。
+## 岗位样本到能力地图
 
-**参考思路**（先自己想，再看这里）：
+| 地区 | 典型岗位名称                                                                        | 岗位更关心什么                                                                  | 你要能交付的东西                                                                |
+| ---- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| 中国 | 大模型后训练算法工程师、垂域大模型训练算法工程师、AI 搜索/元宝/混元后训练算法工程师 | SFT/RM/RL 全流程、数据合成、线上反馈数据飞轮、垂域应用效果、国产/混合算力训练栈 | 数据清洗和配比方案、SFT/DPO/RLHF 实验、评测报告、Badcase 归因、业务场景迭代方案 |
+| 中国 | 强化学习算法工程师、机器人/自动驾驶/推荐/营销 RL 工程师                             | 业务建模、仿真环境、离线 RL、PPO/SAC/GRPO 调优、sim-to-real 或在线效果          | MDP 建模、reward 设计、仿真训练、离线评估、上线风险控制、效果复盘               |
+| 美国 | Post-Training Research Engineer / Scientist                                         | 面向大规模产品模型做最终后训练，强调模型能力、安全、评测和产品落地              | 端到端训练实验、鲁棒 eval、模型行为诊断、训练代码调试、产品反馈闭环             |
+| 美国 | Agentic Post-Training / Synthetic RL / RL Engineering                               | Agent、工具调用、代码能力、合成环境、grader、RL 系统吞吐和可靠性                | Agent 任务环境、可复现 grader、轨迹存储、RLVR/GRPO 训练、训练 pipeline 性能优化 |
+| 美国 | Reward Models / Alignment Research                                                  | 人类偏好、奖励模型、LLM-as-Judge、rubric、reward hacking                        | 偏好数据方案、RM 训练与校准、judge 一致性评估、反作弊数据集                     |
+| 欧洲 | AI Scientist / Research Engineer / Research Platform                                | frontier 模型、企业定制、研究平台、HPC、评测、隐私合规                          | 训练/评测工具链、企业数据适配、可靠部署、实验管理和可复现报告                   |
+| 欧洲 | Robotics / Autonomous Systems / RL Research Engineer                                | 机器人、自动驾驶、防务、自主系统、仿真和现实环境对齐                            | 仿真环境、策略训练、场景库、安全评测、sim-to-real 误差分析                      |
 
-这典型是 **Reward Hacking + 策略坍缩** 的组合问题。Reward 加速上升但评测下降 = 模型在"骗取"奖励而非真正提升能力。KL 飙升说明策略偏离参考模型太远。Entropy 骤降说明策略已经坍缩到狭窄的输出空间。
+这个表的重点是：后训练岗位通常围绕“语言模型行为改进”，强化学习岗位通常围绕“策略在环境中做决策”。LLM 时代二者会重叠，特别是在 Agent、代码、数学、工具调用、机器人 VLA 和自动驾驶方向。
 
-排查顺序：
+## 地区差异怎么看
 
-1. **检查奖励函数**：是否只检查了"格式正确"而没检查"推理质量"？→ 可能需要加入逻辑一致性检查或步骤级奖励
-2. **检查 KL 惩罚系数**：β 是否太小？→ 尝试增大 KL 惩罚，把 KL 控制在 0.01-0.05 范围
-3. **检查数据**：训练集中是否包含过多简单题？模型可能在简单题上过拟合了"凑字数"策略
-4. **检查采样参数**：组大小 k 是否足够？k 太小导致组内归一化不稳定
+**中国岗位：更重业务落地和数据飞轮。**
 
-## 练习二：算法选型与方案设计
+公开岗位里常见关键词是“应用场景”“垂直领域”“数据合成”“线上反馈”“评测体系”“训练效率”“实际用户体验”。这意味着你不能只展示一个开源 benchmark 分数，还要说明：用户问题从哪里来，坏例怎么进数据池，SFT/偏好/RL 数据怎么配比，训练后如何证明业务体验变好了。
 
-**场景**：公司要做一个法律垂类大模型，目标让模型按照中国法律条文风格回答法律咨询问题。基座模型是 Qwen2.5-7B，你已经有一批律师写的优质法律问答数据（约 5000 条）和一批用户真实提问数据（约 20000 条，无标注）。
+**美国岗位：更重 frontier post-training 和大规模系统。**
 
-**问题**：
+OpenAI、Anthropic 这类岗位把 post-training 放在最终产品模型发布前的关键环节，常见任务包括 eval、grader、reward model、RL 系统、agentic model、工具使用、代码能力、训练 pipeline 稳定性。候选人要能在研究、工程、产品边界之间切换。
 
-1. 你选 SFT、DPO、PPO 还是 GRPO？说明理由。
-2. 数据怎么用？5000 条标注数据和 20000 条未标注数据分别怎么处理？
-3. 奖励函数怎么设计？法律场景的特殊考虑是什么？
-4. 评测怎么做？列出至少 5 个评测维度。
-5. 给出完整的多阶段训练方案。
+**欧洲岗位：更重研究平台、企业场景和具身/自主系统。**
 
-**参考思路**：
+欧洲的大模型公司会有企业定制、研究平台、HPC、评测和合规约束；同时机器人、自动驾驶、防务自主系统里的 RL 岗位更强调仿真、现实系统、安全边界和工程验证。练习时不要只做聊天模型，也要保留一个“环境交互型 RL”项目。
 
-**算法选择**：法律垂域的核心需求是"准确"和"风格统一"，不是开放式推理。
+## 真实工作拆解
 
-- 第一阶段 SFT：用 5000 条律师标注数据做 SFT，让模型学会法律问答的基本格式和专业用语
-- 第二阶段 DPO：从 20000 条用户提问中采样，让模型生成多个回答，由法律专家标注偏好对，做 DPO 精调
-- 不推荐直接上 PPO/GRPO：法律领域缺乏可靠的自动验证器（不像数学有"答案对不对"），奖励模型训练成本高且容易被 hack
-- 如果要做 RL：可以设计规则奖励（引用法条正确性 + 逻辑链完整性 + 格式规范度），用 GRPO 做 fine-tune
+### 1. 后训练算法工程师
 
-**奖励设计特殊考虑**：
+你具体要做：
 
-- 法条引用准确性：模型引用的法律条文是否真实存在、是否是最新的
-- 逻辑一致性：结论是否从前提出发合乎逻辑
-- 安全底线：不能给出"肯定没问题"的法律建议（免责声明）
-- 风格合规：使用法言法语而非口语化表达
+- 把产品问题翻译成训练目标，例如“回答更有帮助”要拆成事实性、覆盖度、结构、拒答边界、引用质量。
+- 构建 SFT 数据、偏好数据、reward 数据、RL prompt 池和回归评测集。
+- 选择 SFT、DPO、RM+PPO、GRPO、RLVR 或混合 loss，并解释算力、数据和风险取舍。
+- 跑训练并监控 loss、reward、KL、entropy、长度、重复率、拒答率、pass rate。
+- 分析 Badcase，判断问题来自数据、奖励、采样、训练超参、prompt 模板还是评测。
 
-**评测维度**：法条引用准确率、逻辑一致性、用户满意度、安全合规率、风格匹配度、幻觉率
+可以练：
 
-## 练习三：综合故障排查
+- 选一个垂域，比如法律、教育、金融研报、代码助手或企业客服，做 500 条 SFT 数据、200 条偏好对、100 条回归评测。
+- 用 1B/3B/7B 开源模型跑 LoRA SFT，再用 DPO 或 ORPO 做一轮偏好优化。
+- 写一份训练报告：数据来源、过滤规则、训练配置、指标变化、Badcase、下一轮数据计划。
 
-**场景**：你的团队用 PPO 对 70B 模型做 RLHF 训练。训练第 3 天，同事报告了以下情况：
+### 2. Reward Model / Judge / Grader 工程师
 
-- 训练集 reward 持续上升（从 0.3 升到 0.9）
-- 验证集上 Reward Model 给的分数也在上升（从 0.35 升到 0.85）
-- 但 MT-Bench 评分从 7.2 降到了 6.5
-- 人工评测：模型的回答变得"很礼貌但没什么信息量"，遇到难题就开始说"这是一个很好的问题，让我们从多个角度来看..."
-- 显存使用率从 85% 降到了 60%
+你具体要做：
 
-**问题**：
+- 定义什么叫“好回答”，把模糊偏好拆成 rubric。
+- 设计人工标注、合成偏好、LLM-as-Judge、规则 verifier 的混合打分方案。
+- 训练或校准 reward model，检查它是否偏爱啰嗦、套话、过度拒答或固定格式。
+- 给 RL 训练提供稳定奖励，并持续监控 reward hacking。
 
-1. 这是什么问题？和 Reward Hacking 有什么区别？
-2. 显存使用率下降说明了什么？
-3. 你如何验证你的假设？
-4. 给出完整的修复方案。
+可以练：
 
-**参考思路**：
+- 做一个数学或代码 verifier：答案正确给主奖励，格式、长度、执行安全给辅助奖励。
+- 做一个 LLM-as-Judge rubric：事实性、指令遵循、完整性、安全性各 1-5 分，抽样检查 judge 与人类标注一致率。
+- 构造 50 条“看起来很礼貌但没信息量”的反例，测试 reward model 是否被骗。
 
-**问题诊断**：这不是简单的 Reward Hacking，而是 **Reward Model 失效 + 模型能力退化** 的组合问题。
+### 3. RL / GRPO / RLVR 训练工程师
 
-- Reward Model 给的分数在上升，但实际质量在下降 → RM 的判断已经和人类判断脱钩了
-- 模型学会了对 RM "讨好"的策略（礼貌但空洞的回答），但 RM 没有识别出来
-- 这比 Reward Hacking 更隐蔽：Hacking 是 reward 异常上升但你知道有问题，这里是 reward "看起来正常"但实际已失效
+你具体要做：
 
-**显存下降的线索**：PPO 需要同时加载 Actor、Critic、Reference、RM 四个模型。显存从 85% 降到 60% 可能说明：
+- 为数学、代码、工具调用或 Agent 任务设计可验证奖励。
+- 控制 on-policy 数据、采样组大小、KL 惩罚、优势归一化、训练 batch 和 rollout batch。
+- 诊断 reward 上升但真实指标下降、KL 飙升、entropy 坍缩、输出变长或变短。
+- 在有限算力下做稳定训练，而不是只追求一次性高分。
 
-- 模型生成的回答变短了（Rollout 阶段显存需求降低）→ 进一步佐证"模型在偷懒"
-- 或者某个模型被意外卸载了
+可以练：
 
-**验证假设**：
+- 用 GSM8K、MATH 子集或 HumanEval 子集搭一个 RLVR 训练：每个 prompt 采样 4-8 个回答，用规则或执行结果给 reward。
+- 对比三组配置：低 KL、中 KL、高 KL，画出 reward、pass rate、KL、entropy、平均输出长度。
+- 写一页事故复盘：如果 reward 上升但 pass@1 下降，你如何定位和回滚。
 
-1. 绘制"回答长度 vs 训练步数"图：如果长度在缩短，模型确实在偷懒
-2. 用旧版 RM 对当前模型打分：如果旧 RM 给的分数更低，说明 RM 本身在训练过程中被"污染"了
-3. 检查 RM 训练数据：是否混入了当前策略模型生成的回答？如果有，RM 在"自己给自己打分"
+### 4. Agentic Post-Training 工程师
 
-**修复方案**：
+你具体要做：
 
-1. 回滚到 MT-Bench 最高分的 checkpoint
-2. 重新训练 Reward Model，确保 RM 训练数据不包含当前策略模型的输出
-3. 增加对抗性数据：在 RM 训练集中加入"礼貌但空洞"的反例
-4. 在 PPO 训练中加入回答信息量奖励（如信息熵、关键词覆盖率）
-5. 设置更频繁的评测（每 200 步跑一次 MT-Bench，一旦下降立即回滚）
+- 搭建工具调用环境，例如浏览器、代码执行器、文件系统、数据库、API。
+- 记录完整轨迹：observation、action、tool call、tool result、reward、失败原因。
+- 设计 grader，判断任务是否真的完成，而不是只看最终文本漂亮不漂亮。
+- 让模型学会多轮规划、函数调用、错误恢复和终止。
 
-## 练习四：数据配比与能力平衡
+可以练：
 
-**场景**：你在做模型的第三轮后训练迭代。评测结果如下：
+- 做一个小型 coding agent 训练环境：输入 issue，模型修改代码，运行测试，测试通过给 reward。
+- 做 30 个网页/文件操作任务，记录轨迹并写 grader，例如“找到价格并填入表格”“修复一个 failing test”。
+- 对每个失败轨迹标注失败类型：没读懂任务、工具调用参数错、不会恢复、提前停止、幻觉文件路径。
 
-| 能力维度 | 基线模型 | 第二轮后 | 目标 |
-| -------- | -------- | -------- | ---- |
-| 数学推理 | 65%      | 82%      | 85%  |
-| 代码生成 | 58%      | 75%      | 80%  |
-| 对话质量 | 7.5      | 6.8      | 7.5+ |
-| 安全合规 | 95%      | 91%      | 98%  |
-| 指令遵循 | 80%      | 78%      | 85%  |
+### 5. RL 系统 / 训练基础设施工程师
 
-**问题**：
+你具体要做：
 
-1. 第二轮训练出了什么问题？
-2. 第三轮你如何调整数据配比和训练策略？
-3. 你如何防止"按下葫芦浮起瓢"（修了一个能力但破坏了另一个）？
+- 优化 rollout、reward、training、buffer、weight sync 的吞吐。
+- 处理 policy version、staleness、长尾 completion、GPU 利用率、失败重试。
+- 建立训练健康检查，让错误在小集群先暴露，而不是几天后才发现大训练坏了。
+- 支持新算法接入，并保证稳定、快速、可复现。
 
-**参考思路**：
+可以练：
 
-**问题诊断**：第二轮过度优化了数学和代码（可能训练数据中这两类占比过高），导致对话、安全、指令遵循等能力退化。这是典型的 **能力不均衡问题**。
+- 写一个简化版 rollout buffer：记录 prompt、response、reward、old logprob、policy_version。
+- 模拟异步训练：让 rollout worker 使用旧策略生成数据，观察 staleness 对指标的影响。
+- 给训练脚本加 10 个监控指标：tokens/s、samples/s、reward latency、KL、entropy、OOM 次数、重试次数、队列长度、policy lag、eval 回归。
 
-**数据配比调整**：
+### 6. 机器人 / 自动驾驶 / 自主系统 RL 工程师
 
-- 第三轮数据中增加对话质量数据（占比从 10% 提升到 30%）
-- 增加安全合规数据（红队对抗样本）
-- 数学/代码数据减少但质量提升（只保留 hard 级别的题目）
-- 关键：在训练数据中混入 **保留数据**（来自基线模型擅长的任务），防止遗忘
+你具体要做：
 
-**防退化策略**：
+- 把任务建模成 MDP：状态、动作、奖励、终止条件、约束。
+- 在仿真中训练策略，再分析仿真和现实的差距。
+- 做安全评估：碰撞、越界、能耗、舒适性、鲁棒性、极端场景。
+- 和感知、控制、仿真、硬件团队一起调试。
 
-- **回归测试**：每次 checkpoint 都在全部 5 个维度上评测，任何一个维度退化超过 2% 就回滚
-- **混合训练**：在 RL loss 之外加入 SFT loss（保持基础能力）
-- **多目标奖励**：奖励函数不只是"答对数学题"，还要包含"对话质量"和"安全性"的维度
-- **课程学习**：先优化最弱的维度（安全 91%→98%），再逐步加入其他维度的数据
+可以练：
 
-## 练习五：从零设计后训练方案
+- 用 Gymnasium、MuJoCo、Isaac Gym 或 PyBullet 做一个连续控制任务，比较 PPO 和 SAC。
+- 对 reward 做三版设计：只奖励任务成功、加入能耗约束、加入安全约束，观察策略差异。
+- 写一份 sim-to-real 风险清单：传感器噪声、延迟、动力学误差、执行器限制、环境分布偏移。
 
-**场景**：创业公司要做一款"AI 编程助手"，核心能力是"根据自然语言描述生成代码并自主 debug"。你有以下资源：
+## 八个工业练习
 
-- 基座模型：Qwen2.5-Coder-7B
-- 算力：8×A100（80GB）
-- 数据：GitHub 上抓取的 10 万条 Python issue + fix 记录
-- 时间：4 周内出第一版
+### 练习一：岗位反推能力矩阵
 
-**问题**：给出完整的 4 周后训练方案，包括每周的具体任务、使用的算法、数据如何处理、评测如何安排。
+**目标**：训练你从岗位描述里读出真实工作。
 
-**参考思路**：
+**任务**：
 
-**第 1 周：数据准备 + SFT**
+1. 各找 3 个中国、美国、欧洲的后训练或 RL 岗位。
+2. 把每个岗位拆成 6 列：算法、数据、评测、系统、产品/业务、安全/合规。
+3. 标出你已经做过的证据项目，以及还缺的证据项目。
 
-- 从 10 万条 issue-fix 中筛选高质量数据（有完整 issue 描述 + 可运行的 fix 代码）
-- 构造 SFT 数据：将 issue 转为 instruction，fix 代码转为 response
-- 数据配比：代码生成 40% / bug 修复 30% / 代码解释 20% / 测试编写 10%
-- 用 LoRA 对 Qwen2.5-Coder-7B 做 SFT
-- 评测：HumanEval、MBPP、LiveCodeBench
+**交付物**：一张能力矩阵表，加一段 300 字总结：你要投哪类岗位，下一步最该补哪个项目。
 
-**第 2 周：RL 环境搭建 + 奖励设计**
+### 练习二：垂域后训练最小闭环
 
-- 搭建代码执行沙箱（Docker 容器 + 超时限制）
-- 设计奖励函数：
-  - 代码可执行且通过测试：+1.0
-  - 代码可执行但未通过测试：+0.2（鼓励至少能跑）
-  - 语法错误：0
-  - 安全风险代码：-0.5
-- 这就是 **RLVR**：奖励完全来自代码执行结果，不需要训练 Reward Model
-- 评测：增加 debug 场景的专项测试（给错误代码 + 报错信息，让模型修复）
+**场景**：你要做一个金融投研助手或法律问答助手，目标是回答更专业、更可靠。
 
-**第 3 周：GRPO 训练**
+**任务**：
 
-- 用 GRPO 而非 PPO：7B 模型 + 8 卡，PPO 的 Critic 太吃显存
-- 每个 prompt 采样 k=8 个代码候选，组内归一化比较
-- 训练 3-5 个 epoch，每 500 步评测一次
-- 重点监控：代码通过率、KL 散度、entropy
+1. 构造 500 条 SFT 数据，明确数据过滤规则。
+2. 构造 200 条偏好对，说明 chosen/rejected 的判定标准。
+3. 跑一轮 SFT，再跑一轮 DPO/ORPO。
+4. 建 100 条回归评测，至少包含事实性、指令遵循、安全拒答、格式稳定性。
+5. 做 20 条 Badcase 归因。
 
-**第 4 周：迭代优化 + Agent 能力**
+**交付物**：数据卡、训练配置、评测表、Badcase 表、下一轮数据配比方案。
 
-- 基于 Badcase 分析补充数据（哪些类型的 bug 修不好？针对性加数据）
-- 尝试多轮交互：模型生成代码 → 执行 → 看到报错 → 自主修复 → 再执行
-- 最终评测：构建内部 benchmark（100 道真实 GitHub issue），计算 pass@1 和 pass@5
+### 练习三：RLVR 数学或代码训练
 
-**算力分配**：
+**场景**：你要提升模型在数学或代码任务上的可验证正确率。
 
-| 阶段    | GPU 占用          | 时间   |
-| ------- | ----------------- | ------ |
-| SFT     | 4 卡（LoRA 很轻） | 2 天   |
-| RL 环境 | 1 卡 + CPU 沙箱   | 持续   |
-| GRPO    | 8 卡（全部用上）  | 5-7 天 |
-| 迭代    | 8 卡              | 3-5 天 |
+**任务**：
+
+1. 选择 GSM8K/MATH 子集或 HumanEval/MBPP 子集。
+2. 写 verifier：数学检查最终答案，代码运行单元测试。
+3. 每个 prompt 采样 4-8 个回答，用 GRPO/RLOO/RLVR 跑一轮小训练。
+4. 记录 reward、pass@1、pass@k、KL、entropy、平均长度。
+5. 构造 10 条 reward hacking 样例，解释如何修复 verifier。
+
+**交付物**：训练曲线、配置对比、verifier 代码、reward hacking 复盘。
+
+### 练习四：Reward Model 和 Judge 校准
+
+**场景**：你的 RM 分数持续上升，但人工评测说模型越来越空洞。
+
+**任务**：
+
+1. 设计一个 4 维 rubric：事实性、完整性、帮助性、安全性。
+2. 标注或合成 300 对偏好数据。
+3. 训练一个小 RM，或用 LLM-as-Judge 做打分。
+4. 检查长度偏置、套话偏置、过度拒答偏置。
+5. 加入 50 条反例重新评测。
+
+**交付物**：rubric、偏好数据样例、judge/RM 一致性报告、偏置分析、修复方案。
+
+### 练习五：Agent 任务环境
+
+**场景**：你要训练一个能修复小型代码仓库 bug 的 Agent。
+
+**任务**：
+
+1. 收集 20 个小 issue，每个 issue 都有可运行测试。
+2. 定义 action space：读文件、改文件、运行测试、提交答案。
+3. 记录每条轨迹的工具调用和测试结果。
+4. 设计 reward：测试通过、修改范围、失败恢复、安全约束。
+5. 分析 10 条失败轨迹。
+
+**交付物**：任务环境说明、grader、轨迹样例、失败类型统计、下一轮训练数据。
+
+### 练习六：训练系统健康检查
+
+**场景**：RL 训练跑到第 3 天突然变慢，模型指标也开始波动。
+
+**任务**：
+
+1. 画出 rollout、reward、buffer、trainer、weight sync 的数据流。
+2. 加入 policy_version 和队列长度监控。
+3. 设计 5 个自动报警：KL 异常、entropy 坍缩、reward latency 过高、eval 回归、policy lag 过大。
+4. 模拟一个长尾 completion 拖慢 batch 的例子。
+5. 写出回滚和重启策略。
+
+**交付物**：系统图、指标面板、报警规则、故障复盘。
+
+### 练习七：中国岗位模拟：产品数据飞轮
+
+**场景**：一个 AI 搜索或教育产品希望模型回答更准、更贴合用户。
+
+**任务**：
+
+1. 从用户日志抽样，定义“可用于训练”的过滤条件。
+2. 把日志分成 SFT、偏好、评测、红队四类。
+3. 设计数据合成方案，但说明如何防止合成数据污染评测。
+4. 给出每周迭代节奏：采样、标注、训练、评测、上线、回收反馈。
+5. 说明隐私、版权和安全边界。
+
+**交付物**：数据飞轮流程图、数据配比表、上线灰度指标、风险清单。
+
+### 练习八：欧美岗位模拟：大规模 Agent/RL 项目计划
+
+**场景**：你在做一个会使用工具的 frontier agent，目标提升代码、浏览器和多工具协作能力。
+
+**任务**：
+
+1. 定义 3 类任务环境：代码修复、网页信息查找、API 工具调用。
+2. 为每类任务写 grader，并说明哪些信号可以自动化，哪些必须人工抽检。
+3. 设计训练阶段：SFT 轨迹模仿、偏好优化、RLVR/GRPO、多轮 Badcase 数据回灌。
+4. 设计 eval gate：上线前哪些指标必须不退化。
+5. 写出 4 周项目排期和算力预算。
+
+**交付物**：项目计划、任务环境、grader 设计、eval gate、训练风险和缓解方案。
+
+## 面试时怎么展示
+
+一个有说服力的项目，不是“我跑过某框架”，而是能讲清楚这五件事：
+
+1. **目标**：你要改善哪种模型行为，为什么这个目标重要。
+2. **数据**：数据从哪里来，怎么清洗，怎么配比，怎么避免泄漏。
+3. **训练**：为什么选这个算法，关键超参是什么，如何保证稳定。
+4. **评测**：离线指标、人工评测、回归测试、产品指标怎么互相验证。
+5. **复盘**：失败在哪里，Badcase 如何归因，下一轮怎么改。
+
+如果你准备中国后训练岗位，优先展示“垂域数据 + 后训练 + 评测 + 产品闭环”。如果你准备美国 frontier post-training/RL 岗位，优先展示“训练系统 + eval/grader + agentic RL + 大规模实验习惯”。如果你准备欧洲岗位，优先展示“研究工程能力 + 企业/物理/机器人场景 + HPC/合规/安全验证”。
+
+## 参考岗位样本
+
+- OpenAI 的 Post-Training 岗位强调把预训练模型改进到 ChatGPT、API 等真实产品中，并要求构建 eval、调试研究栈和做产品驱动研究。[^openai-post-training]
+- OpenAI 的 Agentic Post-Training 岗位强调 factuality、instruction following、function calling、tool use、grading stack、user-data flywheel 和大规模 RL/post-training 基础设施。[^openai-agentic]
+- OpenAI 的 Synthetic RL 岗位强调 synthetic data、environment、feedback、self-play、simulator 和训练动态分析。[^openai-synthetic-rl]
+- Anthropic 的 Production Model Post-Training 岗位强调完整 post-training stack、Constitutional AI、RLHF、评测 pipeline、训练调试和可复现。[^anthropic-post-training]
+- Anthropic 的 RL Engineering 岗位强调 RLHF 训练系统的速度、可靠性、易用性、pipeline profiling、健康检查和新算法实现。[^anthropic-rl-engineering]
+- Anthropic 的 Reward Models 岗位强调偏好学习、LLM-based grading、rubric、reward hacking 和 reward model 泛化。[^anthropic-reward-models]
+- 上海人工智能实验室的大模型训练岗位强调 CPT、SFT、RLHF/DPO、数据清洗、Megatron-LM、veRL、LLaMA-Factory、训练监控、Badcase 分析和垂域效果。[^shlab-training]
+- 腾讯公开转载岗位样本显示，国内后训练岗位常强调 PostTraining、SFT/RM/RL、奖励系统、数据合成、线上反馈数据飞轮、个性化、长期记忆和全维度评测。[^tencent-yuanbao][^tencent-hunyuan]
+- Mistral AI 的 Forge 产品岗位把 fine-tuning、reinforcement learning 和 post-training workflow 做成企业可用产品；其 EMEA Applied Scientist/Research Engineer 岗位强调仿真数据、训练评测、agent/RAG 与工程场景结合。[^mistral-forge][^mistral-ai4engineering]
+- Helsing 的欧洲 RL 岗位和 Project Centaur 公开材料显示，具身/自主系统 RL 会强调仿真、现实系统、安全和任务环境中的策略能力。[^helsing-rl][^helsing-centaur]
+- Google DeepMind 的 Careers 页面把 Research Engineer 描述为连接理论和实现、构建可扩展系统、测试和评估新想法的角色，这类能力也对应欧洲/英国研究工程岗位。[^deepmind-careers]
+
+[^openai-post-training]: OpenAI, "Research Engineer / Research Scientist, Post-Training", <https://openai.com/careers/research-engineer-research-scientist-post-training-san-francisco/>
+
+[^openai-agentic]: OpenAI, "Researcher, Agentic Post-Training", <https://openai.com/careers/researcher-agentic-post-training-san-francisco/>
+
+[^openai-synthetic-rl]: OpenAI, "Researcher, Synthetic RL", <https://openai.com/careers/researcher-synthetic-rl-san-francisco/>
+
+[^anthropic-post-training]: Anthropic, "Research Engineer, Production Model Post-Training", <https://www.anthropic.com/careers/jobs/4613592008>
+
+[^anthropic-rl-engineering]: Anthropic, "Machine Learning Systems Engineer, RL Engineering", <https://www.anthropic.com/careers/jobs/4952051008>
+
+[^anthropic-reward-models]: Anthropic, "Senior Research Scientist, Reward Models", <https://www.anthropic.com/careers/jobs/5024835008>
+
+[^shlab-training]: 上海人工智能实验室, "大模型训练算法工程师", <https://www.shlab.org.cn/joinus/detail/7615234376275773734?mode=social>
+
+[^tencent-yuanbao]: 牛企直聘转载腾讯官网岗位, "元宝-大模型后训练算法工程师", <https://jobs.niuqizp.com/job-vyU55n5n5.html>
+
+[^tencent-hunyuan]: 牛企直聘转载腾讯官网岗位, "混元大语言模型后训练算法工程师", <https://jobs.niuqizp.com/job-vmU55NnaZ.html>
+
+[^mistral-forge]: Mistral AI, "Product Manager, Forge", <https://jobs.lever.co/mistral/11087966-f183-44b1-adc9-3a400c1f52ad>
+
+[^mistral-ai4engineering]: Mistral AI, "Applied Scientist / Research Engineer, AI4Engineering - EMEA", <https://jobs.lever.co/mistral/249d0ec9-1824-41cb-8c4f-cb17a1d5d111>
+
+[^helsing-rl]: Helsing, "AI Research Engineer - Reinforcement Learning", <https://helsing.ai/jobs/4676357101>
+
+[^helsing-centaur]: Helsing, "Helsing Announces Project Centaur: Autonomy for Air Combat", <https://helsing.ai/newsroom/helsing-announces-project-centaur-autonomy-for-air-combat>
+
+[^deepmind-careers]: Google DeepMind, "Careers", <https://deepmind.google/careers/>

@@ -76,9 +76,23 @@ flowchart TD
 └── Tester：运行测试，验证修复是否有效
 ```
 
-这种架构和上面提到的 CTDE 思路一致，但关键区别在于**RL 训练方式**。传统 MARL 用全局 Critic 评估每个智能体的贡献，但 LLM Agent 的"动作"是一段完整的文本（可能是几百个 token），用传统 Q 值难以评估"这段代码的质量"。
+这种架构和上面提到的 CTDE 思路一致，但在 LLM 场景下有几个独特的 RL 训练挑战。
 
-实践中更常用的方案是**结果驱动的 reward**——只看最终结果（Issue 是否修复？测试是否通过？），然后用 9.1 节讨论的信用分配方法（ORM vs PRM）来分配 reward 到各个角色。另一个代表作是 **MetaGPT**，它将标准化操作程序（SOP）编码进 Prompt，让 LLM 严格按照人类产品经理的流程工作。
+**动作粒度不匹配。** 传统 MARL 的动作是低维向量，而 LLM Agent 的"动作"是一段完整文本（几百个 token）。传统 Q 值难以评估"这段代码的质量"。解决方案是**将整个多轮对话轨迹（rollout）作为一次策略更新单元**，用最终任务结果作为 reward 信号。
+
+**Reward 设计。** 实践中最有效的方案是**结果驱动 + 过程辅助**的混合 reward：
+
+$$R_i = \alpha \cdot R^{\text{outcome}} + (1-\alpha) \cdot R_i^{\text{process}}$$
+
+其中 $R^{\text{outcome}}$ 是共享的任务结果 reward（测试是否通过？Issue 是否修复？），$R_i^{\text{process}}$ 是角色 $i$ 的过程 reward（代码质量分、审查准确率等）。$\alpha$ 通常取 0.5-0.7，更多权重放在可测量的结果上。这与第 9 章讨论的 ORM vs PRM 信用分配直接对应——只是从单智能体多轮交互扩展到多智能体协作。
+
+另一个代表作 **MetaGPT** 将标准化操作程序（SOP）编码进系统 Prompt。从 RL 视角看，SOP 相当于一种**强先验约束**——限制策略空间，大幅降低搜索难度，提高训练稳定性，类似于 PPO 中 reference model 的 KL 约束（第 7 章）。
+
+![MetaGPT Pipeline](./images/metagpt.png)
+
+<div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
+  <em>图 2：MetaGPT 架构。不仅将不同角色的 Agent 封装，更引入了 Standardized Operating Procedures (SOPs) 约束 Agent 的工作流和通信协议，从而极大地缓解了多智能体交流时的"信息幻觉"问题。来源：<a href="https://arxiv.org/abs/2308.01432" target="_blank" rel="noopener noreferrer">MetaGPT Paper</a></em>
+</div>
 
 ### 架构二：辩论对抗 (Debate and Competition)
 
@@ -104,19 +118,17 @@ flowchart TD
     style B fill:#fce4ec,stroke:#c62828,color:#000
 ```
 
-### 架构三：多智能体社会模拟 (Social Simulation)
+### 架构三：开放式多智能体环境 (Open-Ended Multi-Agent Environments)
 
-除了工具协作和对抗，多智能体还有一个极具科幻色彩的分支：**社会模拟（Social Simulation）**。这不完全是为了完成某个具体的代码修复任务，而是为了研究 LLM 在交互中涌现出的复杂社会学行为。
+前两种架构有明确的任务目标和胜负条件，但多智能体 RL 还有一类更自由的形式：**开放式环境（Open-Ended Environment）**，智能体没有固定目标，在持续交互中涌现出复杂行为。斯坦福大学的 **Generative Agents（斯坦福小镇）** 就是代表——25 个 LLM 驱动的 Agent 在虚拟小镇中生活，自发组织出复杂的社会行为。
 
-![MetaGPT Pipeline](./images/metagpt.png)
+从 RL 视角看，这带来几个独特的挑战：
 
-<div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>图 2：MetaGPT 架构。不仅将不同角色的 Agent 封装，更引入了 Standardized Operating Procedures (SOPs) 约束 Agent 的工作流和通信协议，从而极大地缓解了多智能体交流时的“信息幻觉”问题。来源：<a href="https://arxiv.org/abs/2308.01432" target="_blank" rel="noopener noreferrer">MetaGPT Paper</a></em>
-</div>
+- **多目标 Reward 设计**：不是单一”得分”，而是多目标的组合——行为连贯度、社会合理性、目标达成度等，类似多目标 RL（Multi-Objective RL）：$$R_t = \sum_{m=1}^{M} w_m \cdot r_m(s_t, a_t)$$ 各目标的权重 $w_m$ 决定了涌现行为的方向。
+- **探索是社交策略的探索**：智能体探索的是社交行为空间（”和谁交互”、”聊什么”），而非物理动作空间。这与第 4 章 DQN 的 ε-greedy 探索类似，但探索的是高维社交策略。
+- **评估问题**：没有标准答案，如何判断一种社交策略是否”更好”？目前主要靠**人类评估 + LLM-as-Judge**，但会引入 12.3 节讨论的”自循环退化”风险。
 
-最具代表性的是斯坦福大学的 **Generative Agents (斯坦福小镇)** 工作。在这个虚拟小镇中，25 个由大语言模型驱动的 Agent 有自己的工作、家庭、记忆和性格。它们通过互相聊天、观察、反思（Reflection）来决定每天的行程——甚至能够自发地组织一场情人节派对。
-
-在强化学习的视角下，这可以被视为一个**极高自由度的开放式环境（Open-ended Environment）**。这里的 Reward 不是单一的“得分”，而是保持“行为连贯度（Coherence）”和“社会合理性（Social Plausibility）”。
+开放式环境的核心 RL 价值在于：它测试了智能体在**没有明确 reward shaping** 的情况下，能否通过交互涌现出有意义的协作行为——这正是通往通用智能的重要测试场。
 
 ## LLM 多智能体 RL 的核心挑战
 
@@ -400,9 +412,7 @@ flowchart TD
 
 ## 基于模型的 RL：从盲目试错到脑内推演
 
-前面讨论的多智能体方案都是 **Model-Free**——智能体不知道环境内部如何运作，只能通过不断试错来积累经验。本书覆盖的 Q-Learning、DQN、PPO、DPO、GRPO，全都是 Model-Free 的。
-
-但还有另一条路线：**Model-Based RL（MBRL）先学习一个"世界模型"，然后在这个虚拟世界中"想象"和"规划"**。
+前面的多智能体方案都是 **Model-Free**——智能体不知道环境如何运作，只能通过试错积累经验。本书覆盖的 Q-Learning、DQN、PPO、DPO、GRPO，全都是 Model-Free。但还有另一条路线：**Model-Based RL（MBRL）先学习一个"世界模型"，然后在这个虚拟世界中"想象"和"规划"**。
 
 |                  | Model-Free（本书主线）   | Model-Based                      |
 | ---------------- | ------------------------ | -------------------------------- |
@@ -429,11 +439,13 @@ $$\text{CoT 推理} \approx \text{在世界模型中规划}$$
 
 这也是为什么第 8 章的 GRPO 和 DeepSeek-R1 能通过 RL 激发出推理能力——大模型本身就是一个强大的世界模型，RL 教会了它如何更好地利用这个世界模型来规划推理路径。
 
-### 代表性工作
+### 多智能体 + MBRL：协作中的"脑内推演"
 
-**AlphaZero / MuZero**。AlphaGo 的继任者。AlphaGo 需要人类告诉它围棋规则，但 MuZero 完全从零开始——自己学会环境的动态规律，然后在脑内用 MCTS 规划。MuZero 不仅学会了围棋、国际象棋、将棋，还学会了 Atari 游戏——全部从零开始，不需要任何先验知识。
+MBRL 在多智能体场景中有独特价值：**世界模型可以预测其他智能体的行为**。传统的 Model-Free MARL 只能被动观察队友行为，而 Model-Based MARL 可以主动预测"如果我做 A，队友会怎么反应？"
 
-**Dreamer 系列**。Dreamer 在潜空间（Latent Space）中构建世界模型，把高维观测压缩到低维隐空间，在隐空间中学习动态规律并做规划。Dreamer 的样本效率比 Model-Free 方法高一个数量级——同样的任务，Dreamer 需要的交互量只有 Model-Free 方法的十分之一。
+这就把多智能体的非平稳性问题转化为了一个规划问题：如果世界模型足够准确地预测了其他智能体的行为，那么即使队友策略在变，当前智能体也能通过规划来适应。当然，世界模型的准确性本身就是一个挑战——如果队友策略突然大变，世界模型可能预测不准。
+
+**AlphaZero / MuZero** 是 MBRL 的经典范例。AlphaGo 需要人类告诉它围棋规则，但 MuZero 完全从零开始——自己学会环境的动态规律，然后在脑内用 MCTS 规划。**Dreamer 系列**在潜空间中构建世界模型，样本效率比 Model-Free 方法高一个数量级。
 
 MARL 和 MBRL 的交汇点是**多机器人协作**：多个机器人需要协作完成任务，同时每个机器人的策略需要基于世界模型来做规划（预测"如果我推这边，物体会怎么动？其他机器人会怎么反应？"）。这把多智能体的非平稳性、世界模型的模型偏差、物理世界的安全约束叠加在一起，目前还在早期探索阶段。
 
@@ -595,6 +607,8 @@ PettingZoo 中的多智能体是"同一环境中多个 RL 智能体"。而第 9 
 [^marti]: Zhang K, Tian K, et al. "[MARTI: A Framework for Multi-Agent LLM Systems Reinforced Training and Inference](https://openreview.net/forum?id=E7jZqo0A50)." ICLR 2026. —— 多智能体 RL 训练与推理框架。[GitHub](https://github.com/TsinghuaC3I/MARTI)
 
 - Zhang G, et al. "[The Landscape of Agentic Reinforcement Learning for LLMs: A Survey](https://arxiv.org/abs/2509.02547)." 2025. —— Agentic RL 综述，包含多智能体协作板块。
+- Tran K-T, et al. "[Multi-Agent Collaboration Mechanisms: A Survey of LLMs](https://arxiv.org/abs/2501.06322)." 2025. —— LLM 多智能体协作综述，覆盖合作/竞争/竞合分类、通信协议和评估方法。
+- Jin W, et al. "[A Comprehensive Survey on Multi-Agent Cooperative Decision-Making](https://arxiv.org/abs/2503.13415)." 2025. —— 从传统 MARL 到 LLM 驱动多智能体协作的全景综述。
 - Li J, et al. "[FlexMARL: Rollout-Training Co-Design for Efficient LLM-Based Multi-Agent Reinforcement Learning](https://arxiv.org/abs/2602.09578)." 2026. —— 首个联合优化采样、训练及编排的端到端多智能体框架。
 - Pavel M I, Hu S, Masum M A, Pratama M, Kowalczyk R, Cao Z J. "[KD-MARL: Resource-Aware Knowledge Distillation in Multi-Agent Reinforcement Learning](https://arxiv.org/abs/2604.06691)." 2026. —— 通过知识蒸馏将集中式协调行为迁移到轻量级去中心化智能体。
 

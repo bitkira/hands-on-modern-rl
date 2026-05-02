@@ -14,13 +14,31 @@ $$
 \mathbb{E}[R_a] = p_a \cdot (+1) + (1-p_a)\cdot(-1) = 2p_a - 1 \quad \text{（单臂期望奖励：计算单次平均收益）}
 $$
 
+> **单臂期望奖励 (Expected Reward of an Action)：**
+>
+> - $\mathbb{E}$：期望（Expectation），表示多次尝试后的平均结果。
+> - $R_a$：选择动作 $a$（比如拉动某根摇杆）后得到的真实奖励。
+> - $p_a$：动作 $a$ 带来正收益（赢钱）的真实概率。
+
 $$
 \mathbb{E}[R_T] = \sum_{t=1}^{T} \mathbb{E}[R_{a_t}] \quad \text{（T 轮期望总回报：衡量策略整体表现）}
 $$
 
+> **T 轮期望总回报 (Expected Total Return over T steps)：**
+>
+> - $T$：总共尝试的轮数。
+> - $a_t$：在第 $t$ 轮选择的具体动作。
+> - $R_T$：玩了 $T$ 轮之后累积的总奖励。
+
 $$
 \mathrm{Regret}(T) = T\mu^* - \sum_{t=1}^{T}\mu_{a_t} \quad \text{（Regret：衡量探索损失）}
 $$
+
+> **遗憾值 (Regret)：**
+>
+> - $\mathrm{Regret}(T)$：遗憾值，玩了 $T$ 轮后，你比“上帝视角”少赚了多少钱。
+> - $\mu^*$：理论上最好那台机器的单步期望收益。
+> - $\mu_{a_t}$：你第 $t$ 轮选的那台机器的单步期望收益。
 
 **为什么需要这些公式**
 

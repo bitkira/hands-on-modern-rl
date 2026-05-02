@@ -365,15 +365,15 @@ $$
 
 ## 对照总表
 
-| 概念 | 逐状态形式（第 3 章） | 矩阵形式 |
-| --- | --- | --- |
-| 贝尔曼期望方程 | $V^\pi(s)=\sum_a\pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^\pi(s')\right]$ | $\boldsymbol{v}_\pi = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_\pi$ |
-| 贝尔曼最优方程 | $V^*(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^*(s')\right]$ | $\boldsymbol{v}_* = \boldsymbol{r}_* + \gamma P_* \boldsymbol{v}_*$（逐行取 max） |
-| 闭式解 | — | $\boldsymbol{v} = (I - \gamma P)^{-1}\boldsymbol{r}$ |
-| V-Q 关系 | $V^\pi(s)=\sum_a\pi(a\mid s)Q^\pi(s,a)$ | $\boldsymbol{v}_\pi = \Pi_\pi \boldsymbol{q}_\pi$ |
-| Q 贝尔曼期望 | $Q^\pi(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\sum_{a'}\pi(a'\mid s')Q^\pi(s',a')$ | $\boldsymbol{q}_\pi = \boldsymbol{r} + \gamma P \Pi_\pi \boldsymbol{q}_\pi$ |
-| Q 贝尔曼最优 | $Q^*(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\max_{a'}Q^*(s',a')$ | $\boldsymbol{q}_* = \boldsymbol{r} + \gamma P \cdot\mathrm{rowmax}(\boldsymbol{q}_*)$ |
-| DP 策略评估 | $V(s) \leftarrow \sum_a\pi(a\mid s)[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')]$ | $\boldsymbol{v}_{k+1} = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_k$ |
+| 概念           | 逐状态形式（第 3 章）                                                                  | 矩阵形式                                                                              |
+| -------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| 贝尔曼期望方程 | $V^\pi(s)=\sum_a\pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^\pi(s')\right]$ | $\boldsymbol{v}_\pi = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_\pi$           |
+| 贝尔曼最优方程 | $V^*(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^*(s')\right]$                 | $\boldsymbol{v}_* = \boldsymbol{r}_* + \gamma P_* \boldsymbol{v}_*$（逐行取 max）     |
+| 闭式解         | —                                                                                      | $\boldsymbol{v} = (I - \gamma P)^{-1}\boldsymbol{r}$                                  |
+| V-Q 关系       | $V^\pi(s)=\sum_a\pi(a\mid s)Q^\pi(s,a)$                                                | $\boldsymbol{v}_\pi = \Pi_\pi \boldsymbol{q}_\pi$                                     |
+| Q 贝尔曼期望   | $Q^\pi(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\sum_{a'}\pi(a'\mid s')Q^\pi(s',a')$    | $\boldsymbol{q}_\pi = \boldsymbol{r} + \gamma P \Pi_\pi \boldsymbol{q}_\pi$           |
+| Q 贝尔曼最优   | $Q^*(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\max_{a'}Q^*(s',a')$                      | $\boldsymbol{q}_* = \boldsymbol{r} + \gamma P \cdot\mathrm{rowmax}(\boldsymbol{q}_*)$ |
+| DP 策略评估    | $V(s) \leftarrow \sum_a\pi(a\mid s)[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')]$         | $\boldsymbol{v}_{k+1} = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_k$           |
 
 MC 和 TD 方法基于采样更新单个状态，没有对应的矩阵形式。
 

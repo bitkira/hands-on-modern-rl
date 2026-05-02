@@ -24,7 +24,7 @@
 
 - [GRPO 算法](../chapter09_grpo_rlvr/intro)——不用 Critic 的组内相对优化
 - [奖励函数设计](../chapter08_rlhf/reward-function-design)——规则奖励、模型奖励与 reward hacking
-- [训练稳定性控制](../chapter08_rlhf/training-stability-hacking)——KL 惩罚、梯度裁剪与参考模型
+- [PPO-RLHF 训练循环](../chapter08_rlhf/ppo-rlhf-loop)——KL 惩罚、梯度裁剪与参考模型
   :::
 
 ## VLM RL 和纯文本 RL 有什么不同？

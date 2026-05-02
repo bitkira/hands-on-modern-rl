@@ -2,9 +2,9 @@
 
 ## 内容概述
 
-本章围绕强化学习中的序列决策建模、回报定义、价值函数、贝尔曼方程、价值估计、策略优化和奖励设计展开。作为章末总结，本节汇总第 3.1 到 3.7 节的核心公式，并给出它们在本章理论结构中的位置。
+本章围绕强化学习中的序列决策建模、回报定义、价值函数、贝尔曼方程、价值估计、策略优化和奖励设计展开。作为章末总结，本节汇总第 3.1 到 3.8 节的核心公式，并给出它们在本章理论结构中的位置。
 
-本章的主要结论可以概括为七点：
+本章的主要结论可以概括为八点：
 
 1. 强化学习问题可以用 MDP 五元组形式化描述。
 2. 智能体优化的是折扣累积回报，而不是单步即时奖励。
@@ -12,15 +12,16 @@
 4. 贝尔曼方程给出了价值函数的递归结构。
 5. DP、MC、TD 是三类基本的价值估计方法。
 6. 参数化策略可以通过策略目标函数直接优化。
-7. 奖励函数决定学习问题本身，奖励设计会影响算法最终行为。
+7. 算法根据数据来源分为 On-policy/Off-policy 和 Online/Offline。
+8. 奖励函数决定学习问题本身，奖励设计会影响算法最终行为。
 
 这些内容构成后续 DQN、策略梯度、Actor-Critic、PPO 以及大模型强化学习方法的共同理论基础。
 
-## 核心公式索引（3.1-3.7）
+## 核心公式索引（3.1-3.8）
 
-下面集中列出第 3.1 到 3.7 节的核心公式。每条公式都标注名称、作用和对应讲解位置。
+下面集中列出第 3.1 到 3.8 节的核心公式。每条公式都标注名称、作用和对应讲解位置。
 
-### 3.1 两台老虎机：探索与利用
+### 3.1 两台老虎机：RL 的最小问题
 
 $$
 \mathbb{E}[R_a] = p_a \cdot (+1) + (1-p_a)\cdot(-1) = 2p_a - 1
@@ -159,7 +160,7 @@ $$
 \quad \text{（策略梯度估计式；作用：提高高回报动作的概率；详见 3.6）}
 $$
 
-### 3.7 Reward Shaping
+### 3.8 Reward Shaping
 
 $$
 R(s,a)=
@@ -168,32 +169,32 @@ R(s,a)=
 0 & \text{其他}\\
 -1 & \text{失败}
 \end{cases}
-\quad \text{（稀疏奖励函数；作用：只在成败时给学习信号；详见 3.7）}
+\quad \text{（稀疏奖励函数；作用：只在成败时给学习信号；详见 3.8）}
 $$
 
 $$
 R_{\text{shaping}}(s,a,s')=-\left(\text{dist}(s',\text{goal})-\text{dist}(s,\text{goal})\right)
-\quad \text{（距离奖励塑形；作用：根据到目标距离的变化提供中间奖励；详见 3.7）}
+\quad \text{（距离奖励塑形；作用：根据到目标距离的变化提供中间奖励；详见 3.8）}
 $$
 
 $$
 F(s,a,s')=\gamma\Phi(s')-\Phi(s)
-\quad \text{（势函数奖励塑形；作用：增强中间信号且不改变最优策略；详见 3.7）}
+\quad \text{（势函数奖励塑形；作用：增强中间信号且不改变最优策略；详见 3.8）}
 $$
 
 $$
 r_t^{\text{intrinsic}}=\left\|f(s_t,a_t)-s_{t+1}\right\|^2
-\quad \text{（预测误差内在奖励；作用：鼓励探索模型还预测不准的状态；详见 3.7）}
+\quad \text{（预测误差内在奖励；作用：鼓励探索模型还预测不准的状态；详见 3.8）}
 $$
 
 $$
 r_t^{\text{RND}}=\left\|\hat{\phi}(s_t)-\phi(s_t)\right\|^2
-\quad \text{（RND 内在奖励；作用：用随机网络蒸馏衡量状态新颖性；详见 3.7）}
+\quad \text{（RND 内在奖励；作用：用随机网络蒸馏衡量状态新颖性；详见 3.8）}
 $$
 
 $$
 r_t^{\text{total}}=r_t^{\text{extrinsic}}+\beta r_t^{\text{intrinsic}}
-\quad \text{（总奖励组合式；作用：合并任务奖励和探索奖励；详见 3.7）}
+\quad \text{（总奖励组合式；作用：合并任务奖励和探索奖励；详见 3.8）}
 $$
 
 ## 标量形式与矩阵形式对照
@@ -202,26 +203,26 @@ $$
 
 ### 符号约定
 
-| 符号 | 维度 | 含义 |
-| --- | --- | --- |
-| $\boldsymbol{v}_\pi$ | $n \times 1$ | 所有状态的价值 |
-| $\boldsymbol{r}_\pi$ | $n \times 1$ | 每个状态的期望即时奖励 |
-| $P_\pi$ | $n \times n$ | 策略诱导的转移矩阵，$P_\pi[i,j]=\sum_a \pi(a\mid s_i)p(s_j\mid s_i,a)$ |
-| $\boldsymbol{q}_\pi$ | $n|\mathcal{A}| \times 1$ | 所有 $(s,a)$ 对的 Q 值 |
-| $P$ | $n|\mathcal{A}| \times n$ | 转移矩阵，$P[(s,a),s']=P(s'\mid s,a)$ |
-| $\Pi_\pi$ | $n \times n|\mathcal{A}|$ | 策略矩阵，$\Pi_\pi[s,(s,a)]=\pi(a\mid s)$ |
+| 符号                 | 维度         | 含义                                                                   |
+| -------------------- | ------------ | ---------------------------------------------------------------------- | --------- | ----------------------------------------- |
+| $\boldsymbol{v}_\pi$ | $n \times 1$ | 所有状态的价值                                                         |
+| $\boldsymbol{r}_\pi$ | $n \times 1$ | 每个状态的期望即时奖励                                                 |
+| $P_\pi$              | $n \times n$ | 策略诱导的转移矩阵，$P_\pi[i,j]=\sum_a \pi(a\mid s_i)p(s_j\mid s_i,a)$ |
+| $\boldsymbol{q}_\pi$ | $n           | \mathcal{A}                                                            | \times 1$ | 所有 $(s,a)$ 对的 Q 值                    |
+| $P$                  | $n           | \mathcal{A}                                                            | \times n$ | 转移矩阵，$P[(s,a),s']=P(s'\mid s,a)$     |
+| $\Pi_\pi$            | $n \times n  | \mathcal{A}                                                            | $         | 策略矩阵，$\Pi_\pi[s,(s,a)]=\pi(a\mid s)$ |
 
 ### 对照总表
 
-| 概念 | 逐状态形式（本章正文） | 矩阵形式 |
-| --- | --- | --- |
-| 贝尔曼期望方程 | $V^\pi(s)=\sum_a\pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^\pi(s')\right]$ | $\boldsymbol{v}_\pi = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_\pi$ |
-| 贝尔曼最优方程 | $V^*(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^*(s')\right]$ | $\boldsymbol{v}_* = \boldsymbol{r}_* + \gamma P_* \boldsymbol{v}_*$（逐行取 max） |
-| 闭式解 | — | $\boldsymbol{v} = (I - \gamma P)^{-1}\boldsymbol{r}$ |
-| V-Q 关系 | $V^\pi(s)=\sum_a\pi(a\mid s)Q^\pi(s,a)$ | $\boldsymbol{v}_\pi = \Pi_\pi \boldsymbol{q}_\pi$ |
-| Q 贝尔曼期望 | $Q^\pi(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\sum_{a'}\pi(a'\mid s')Q^\pi(s',a')$ | $\boldsymbol{q}_\pi = \boldsymbol{r} + \gamma P \Pi_\pi \boldsymbol{q}_\pi$ |
-| Q 贝尔曼最优 | $Q^*(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\max_{a'}Q^*(s',a')$ | $\boldsymbol{q}_* = \boldsymbol{r} + \gamma P \cdot\mathrm{rowmax}(\boldsymbol{q}_*)$ |
-| DP 策略评估 | $V(s) \leftarrow \sum_a\pi(a\mid s)[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')]$ | $\boldsymbol{v}_{k+1} = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_k$ |
+| 概念           | 逐状态形式（本章正文）                                                                 | 矩阵形式                                                                              |
+| -------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| 贝尔曼期望方程 | $V^\pi(s)=\sum_a\pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^\pi(s')\right]$ | $\boldsymbol{v}_\pi = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_\pi$           |
+| 贝尔曼最优方程 | $V^*(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^*(s')\right]$                 | $\boldsymbol{v}_* = \boldsymbol{r}_* + \gamma P_* \boldsymbol{v}_*$（逐行取 max）     |
+| 闭式解         | —                                                                                      | $\boldsymbol{v} = (I - \gamma P)^{-1}\boldsymbol{r}$                                  |
+| V-Q 关系       | $V^\pi(s)=\sum_a\pi(a\mid s)Q^\pi(s,a)$                                                | $\boldsymbol{v}_\pi = \Pi_\pi \boldsymbol{q}_\pi$                                     |
+| Q 贝尔曼期望   | $Q^\pi(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\sum_{a'}\pi(a'\mid s')Q^\pi(s',a')$    | $\boldsymbol{q}_\pi = \boldsymbol{r} + \gamma P \Pi_\pi \boldsymbol{q}_\pi$           |
+| Q 贝尔曼最优   | $Q^*(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\max_{a'}Q^*(s',a')$                      | $\boldsymbol{q}_* = \boldsymbol{r} + \gamma P \cdot\mathrm{rowmax}(\boldsymbol{q}_*)$ |
+| DP 策略评估    | $V(s) \leftarrow \sum_a\pi(a\mid s)[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')]$         | $\boldsymbol{v}_{k+1} = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_k$           |
 
 MC 和 TD 基于采样更新单个状态，没有对应的矩阵形式。
 
@@ -305,7 +306,7 @@ $$
 
 ### 5. 奖励函数决定优化问题本身
 
-所有价值函数、策略目标和更新规则最终都依赖于奖励的累积和。奖励过于稀疏会导致学习信号不足；奖励设计不当则可能使智能体优化偏离任务意图。第 3.7 节讨论的奖励塑形与内在奖励，均用于在增强学习信号的同时尽量保持任务目标不变。
+所有价值函数、策略目标和更新规则最终都依赖于奖励的累积和。奖励过于稀疏会导致学习信号不足；奖励设计不当则可能使智能体优化偏离任务意图。第 3.8 节讨论的奖励塑形与内在奖励，均用于在增强学习信号的同时尽量保持任务目标不变。
 
 ## 本章复习问题
 
@@ -432,5 +433,6 @@ $$
 5. 用 DP、MC、TD 说明价值可以如何被计算或估计。
 6. 用 $J(\theta)$ 将参数化策略学习表述为优化问题。
 7. 用奖励设计说明优化目标从何而来，以及为什么目标定义本身会影响学习结果。
+8. 掌握从数据获取维度区分算法（On/Off-policy, Online/Offline）。
 
 下一章将从 $Q(s,a)$ 出发，进入第一个完整算法族：[第 4 章：Q-Learning 到 DQN](../chapter04_dqn/intro)。

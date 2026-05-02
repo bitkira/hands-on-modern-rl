@@ -9,8 +9,8 @@
   --vp-c-brand-2: #3949ab;
   --vp-c-brand-3: #303f9f;
   --vp-c-brand-soft: rgba(63, 81, 181, 0.14);
-  --ct-doc-font-size: 14px;
-  --ct-doc-line-height: 1.7;
+  --ct-doc-font-size: 15.5px;
+  --ct-doc-line-height: 1.82;
 
   /* d2l-zh font stack */
   --d2l-font-sans:
@@ -237,6 +237,15 @@
   gap: 0.2rem;
 }
 
+.vp-doc ol {
+  padding-left: 1.35rem;
+}
+
+.vp-doc ol > li::marker {
+  color: var(--vp-c-brand-1);
+  font-weight: 700;
+}
+
 .vp-doc a {
   text-underline-offset: 0.2em;
 }
@@ -248,7 +257,7 @@
 .vp-doc h4 {
   font-family: var(--d2l-font-sans);
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   color: #212121;
 }
 
@@ -608,7 +617,20 @@
 }
 
 .katex-display {
-  margin: 1em 0;
+  display: block;
+  max-width: 100%;
+  margin: 1.15em auto;
+  padding: 0.2rem 0.25rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  text-align: center;
+  scrollbar-width: thin;
+}
+
+.katex-display > .katex {
+  display: inline-block;
+  max-width: 100%;
+  text-align: initial;
 }
 
 .katex-html {

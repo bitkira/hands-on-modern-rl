@@ -1,4 +1,4 @@
-# 12.4 动手：多工具 Agentic RL——搜索文档、写代码、跑测试，模型自己学会什么时候用什么工具
+# 10.4 项目一：多工具 Agentic RL——搜索文档、写代码、跑测试
 
 前面的实验用模拟数据对比了 ORM 和 PRM。但那些轨迹是假的。这一节我们做一件更硬核的事：**给模型 3 个工具（搜索文档、执行代码、跑测试），让模型自己学会什么时候搜索、什么时候写代码、什么时候跑测试。用 GRPO 训练后，模型在代码生成 benchmark 上获得真实提升。**
 
@@ -830,4 +830,6 @@ print("Saved: multi_tool_agentic_rl.png")
 - 多工具 pass@1 应该显著高于单工具和 no-tool baseline
 - 右图 "Tool Selection Strategy" 应该展示模型确实学会了何时搜索
 
-下一节我们聚焦 Agentic RL 的工程挑战——[怎么把这些想法变成一个真正能跑的训练系统](./agentic-engineering)。
+相关工程细节可以回看 [10.2 工具调用、轨迹合成与 Agentic 工程](./tool-use-and-trajectory)，尤其是沙箱、异步 rollout 和工具返回 token mask 的部分。
+
+---

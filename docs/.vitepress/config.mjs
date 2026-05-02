@@ -124,7 +124,7 @@ function slugifySearchHeading(value) {
   return value
     .normalize('NFKD')
     .replace(/[\u0300-\u036F]/g, '')
-    .replace(/[\u0000-\u001f]/g, '')
+    .replace(/[\x00-\x1f]/g, '')
     .replace(/[\s~`!@#$%^&*()\-_+=[\]{}|\\;:"'“”‘’<>,.?/]+/g, '-')
     .replace(/-{2,}/g, '-')
     .replace(/^-+|-+$/g, '')
@@ -471,20 +471,23 @@ const zhSidebar = {
           collapsed: false,
           items: [
             { text: '3.1 两台老虎机：RL 的最小问题', link: '/chapter03_mdp/bandit' },
-            { text: '3.2 探索策略进阶', link: '/chapter03_mdp/exploration' },
-            { text: '3.3 MDP：RL 的形式化框架', link: '/chapter03_mdp/mdp' },
+            { text: '3.2 MDP：RL 的形式化框架', link: '/chapter03_mdp/mdp' },
             {
-              text: '3.4 V(s) 与贝尔曼方程',
+              text: '3.3 V(s) 与贝尔曼方程',
               link: '/chapter03_mdp/value-bellman'
             },
             {
-              text: '3.5 DP、MC、TD',
+              text: '3.4 DP、MC、TD',
               link: '/chapter03_mdp/dp-mc-td'
             },
-            { text: '3.6 Q(s, a)', link: '/chapter03_mdp/value-q' },
+            { text: '3.5 Q(s, a)', link: '/chapter03_mdp/value-q' },
             {
-              text: '3.7 策略目标 J(theta)',
+              text: '3.6 策略目标 J(theta)',
               link: '/chapter03_mdp/policy-objective'
+            },
+            {
+              text: '3.7 算法数据来源',
+              link: '/chapter03_mdp/algorithm-taxonomy'
             },
             { text: '3.8 Reward Shaping', link: '/chapter03_mdp/reward-design' },
             { text: '3.9 本章总结', link: '/chapter03_mdp/panorama' }
@@ -591,34 +594,46 @@ const zhSidebar = {
       text: '大模型 RL',
       items: [
         {
-          text: '8. RLHF',
+          text: '8. RLHF 全流程',
           link: '/chapter08_rlhf/intro',
           collapsed: false,
           items: [
             {
-              text: '8.1 SFT 与偏好数据',
+              text: '8.1 为什么 base model 还不是 assistant',
+              link: '/chapter08_rlhf/base-model-to-assistant'
+            },
+            {
+              text: '8.2 标准 RLHF 流水线',
+              link: '/chapter08_rlhf/standard-rlhf-pipeline'
+            },
+            {
+              text: '8.3 SFT：教模型按指令回答',
               link: '/chapter08_rlhf/imitation-learning-pipeline'
             },
             {
-              text: '8.2 奖励函数设计',
+              text: '8.4 Reward Model：教一个裁判',
               link: '/chapter08_rlhf/reward-function-design'
             },
             {
-              text: '8.3 KL、崩溃与稳定性',
-              link: '/chapter08_rlhf/training-stability-hacking'
+              text: '8.5 PPO-RLHF：按奖励练习',
+              link: '/chapter08_rlhf/ppo-rlhf-loop'
             },
             {
-              text: '8.4 自我博弈与数据飞轮',
-              link: '/chapter08_rlhf/rlaif-and-data-cycle'
+              text: '8.6 评估：RLHF 到底有没有变好',
+              link: '/chapter08_rlhf/evaluation'
             },
             {
-              text: '8.5 动手：奖励黑客实战',
-              link: '/chapter08_rlhf/reward-hacking-hands-on'
+              text: '8.7 从小参数到大参数',
+              link: '/chapter08_rlhf/scaling-to-large-models'
+            },
+            {
+              text: '8.8 旧稿补充与实战材料',
+              link: '/chapter08_rlhf/legacy-materials'
             }
           ]
         },
         {
-          text: '9. 推理强化',
+          text: '9. 后训练对齐',
           link: '/chapter09_alignment/intro',
           collapsed: false,
           items: [
@@ -635,11 +650,15 @@ const zhSidebar = {
               link: '/chapter09_grpo_rlvr/grpo-practice-and-mechanism'
             },
             {
-              text: '9.4 DeepSeek、DAPO 与 RLVR',
-              link: '/chapter09_grpo_rlvr/deepseek-dapo-rlvr'
+              text: '9.4 DeepSeek-R1 与 DAPO',
+              link: '/chapter09_grpo_rlvr/deepseek-dapo'
             },
             {
-              text: '9.5 On-Policy Distillation',
+              text: '9.5 RLVR：可验证奖励',
+              link: '/chapter09_grpo_rlvr/rlvr'
+            },
+            {
+              text: '9.6 On-Policy Distillation',
               link: '/chapter09_grpo_rlvr/on-policy-distillation'
             }
           ]
@@ -650,43 +669,27 @@ const zhSidebar = {
           collapsed: false,
           items: [
             {
-              text: '10.1 多轮交互与信用分配',
+              text: '10.1 多轮交互与信用分配（含 ORM vs PRM 实验）',
               link: '/chapter10_agentic_rl/multi-turn-rl'
             },
             {
-              text: '10.2 轨迹合成与数据工程',
-              link: '/chapter10_agentic_rl/trajectory-synthesis'
+              text: '10.2 工具调用、轨迹合成与 Agentic 工程',
+              link: '/chapter10_agentic_rl/tool-use-and-trajectory'
             },
             {
-              text: '10.3 工具调用 RL',
-              link: '/chapter10_agentic_rl/tool-use-agents'
+              text: '10.3 工业实践、评测与 Badcase',
+              link: '/chapter10_agentic_rl/industrial-evaluation'
             },
             {
-              text: '10.4 Agentic 工程',
-              link: '/chapter10_agentic_rl/agentic-engineering'
+              text: '10.4 项目一：多工具 Code Agent',
+              link: '/chapter10_agentic_rl/multi-tool-code-agent'
             },
             {
-              text: '10.5 工业实践',
-              link: '/chapter10_agentic_rl/industrial-practice'
-            },
-            {
-              text: '10.6 Benchmark 与评测',
-              link: '/chapter10_agentic_rl/evaluation-benchmarks'
-            },
-            {
-              text: '10.7 动手：ORM 与 PRM 对比',
-              link: '/chapter10_agentic_rl/agent-loop-hands-on'
-            },
-            {
-              text: '10.8 项目：端到端 Agentic 训练',
-              link: '/chapter10_agentic_rl/agentic-training-hands-on'
-            },
-            {
-              text: '10.9 项目：Deep Research Agent',
+              text: '10.5 项目二：Deep Research Agent',
               link: '/chapter10_agentic_rl/deep-research-agent'
             },
             {
-              text: '10.10 延伸阅读',
+              text: '10.6 延伸阅读',
               link: '/chapter10_agentic_rl/extended-readings'
             }
           ]
@@ -759,18 +762,7 @@ const zhSidebar = {
       items: [
         {
           text: 'A. 训练调试指南',
-          link: '/appendix_common_pitfalls/intro',
-          collapsed: false,
-          items: [
-            {
-              text: 'A.1 策略崩溃与奖励投机',
-              link: '/appendix_common_pitfalls/policy-collapse-reward-hacking'
-            },
-            {
-              text: 'A.2 资源溢出与收敛失效',
-              link: '/appendix_common_pitfalls/oom-nonconvergence'
-            }
-          ]
+          link: '/appendix_common_pitfalls/intro'
         },
         {
           text: 'B. RL 工程实践',
@@ -778,61 +770,30 @@ const zhSidebar = {
           collapsed: false,
           items: [
             {
-              text: 'B.1 采样基础设施',
+              text: 'B.1 训练系统底座',
               link: '/appendix_industrial_training/rl-infrastructure'
             },
             {
-              text: 'B.2 异步训练架构',
-              link: '/appendix_industrial_training/async-training'
-            },
-            {
-              text: 'B.3 分布式并行策略',
-              link: '/appendix_industrial_training/parallelism'
-            },
-            {
-              text: 'B.4 Agentic RL 基础设施',
+              text: 'B.2 Agent 沙箱与工具调度',
               link: '/appendix_industrial_training/agentic-rl-infra'
             },
             {
-              text: 'B.5 评测与 Badcase',
+              text: 'B.3 RL 与 Agent Benchmark',
               link: '/appendix_industrial_training/evaluation-badcase'
             },
             {
-              text: 'B.6 训练监控与故障排查',
-              link: '/appendix_industrial_training/monitoring'
-            },
-            {
-              text: 'B.7 工业实战练习',
-              link: '/appendix_industrial_training/industrial-exercises'
-            },
-            {
-              text: 'B.8 训练指标词典',
+              text: 'B.4 训练指标词典',
               link: '/appendix_industrial_training/metrics-glossary'
-            }
-          ]
-        },
-        {
-          text: 'C. 算法选型与工程框架',
-          link: '/appendix_algorithm_guide/intro',
-          collapsed: false,
-          items: [
-            {
-              text: 'C.1 算法选型',
-              link: '/appendix_algorithm_guide/algorithm-selection'
             },
             {
-              text: 'C.2 训练框架',
-              link: '/appendix_algorithm_guide/framework-mbrl'
+              text: 'B.5 工业实战练习',
+              link: '/appendix_industrial_training/industrial-exercises'
             }
           ]
         },
         {
-          text: 'D. 强化学习经典项目',
+          text: 'D. 学习资料与复现项目推荐',
           link: '/appendix_game_projects/intro'
-        },
-        {
-          text: 'F. 强化学习学习资源推荐',
-          link: '/appendix_resources/intro'
         },
         {
           text: 'E. 强化学习的数学基础',
@@ -973,7 +934,7 @@ const enSidebar = {
 export default defineConfig({
     lang: 'zh-CN',
     title: 'Hands-on Modern RL',
-    description: '现代强化学习实战——从代码到原理',
+    description: '现代强化学习实战指南：涵盖经典控制、LLM 后训练、RLVR 与多模态智能体',
     base,
     cleanUrls: true,
     lastUpdated: true,
@@ -1035,7 +996,7 @@ export default defineConfig({
         'meta',
         {
           property: 'og:description',
-          content: '现代强化学习实战——从代码到原理'
+          content: '现代强化学习实战指南：涵盖经典控制、LLM 后训练、RLVR 与多模态智能体'
         }
       ],
       ['meta', { property: 'og:type', content: 'website' }],
