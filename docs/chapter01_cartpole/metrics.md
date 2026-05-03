@@ -510,7 +510,7 @@ PPO 的设计目标就是将该值控制在很小的范围内，
 ![Approx KL 曲线](./images/approx_kl.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>图 1-13：SB3 PPO（蓝色）和自研 PyTorch PPO（橙色）的 Approx KL 始终压在 0.015 以下，说明每次策略更新幅度都很小，符合 PPO"微调"的设计。</em>
+  <em>图 1-13：SB3 PPO（蓝色）和自研 PyTorch PPO（橙色）的 Approx KL 整体保持在 0.02 以下，并远低于 0.03 警戒线，说明每次策略更新幅度都很小，符合 PPO"微调"的设计。</em>
 </div>
 
 **Clip Fraction** 表示在这一轮更新中，

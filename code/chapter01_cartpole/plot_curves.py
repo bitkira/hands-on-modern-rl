@@ -12,6 +12,19 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
 
+EXPECTED_METRICS = [
+    "rollout/ep_rew_mean",
+    "rollout/ep_len_mean",
+    "train/value_loss",
+    "train/entropy_loss",
+    "train/policy_gradient_loss",
+    "train/approx_kl",
+    "train/clip_fraction",
+    "train/explained_variance",
+    "train/learning_rate",
+]
+
+
 def parse_swanlab_backup(path):
     with open(path, "rb") as f:
         raw = f.read()
@@ -63,6 +76,69 @@ def parse_swanlab_backup(path):
     return metrics
 
 
+def read_json(path):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def classify_run(run_dir, metrics):
+    metadata_path = os.path.join(run_dir, "files", "swanlab-metadata.json")
+    command = os.path.basename(str(read_json(metadata_path).get("command", "")))
+
+    if command == "1-ppo_cartpole.py":
+        return "SB3 PPO"
+    if command == "2-pytorch_ppo.py":
+        return "PyTorch PPO"
+
+    config_path = os.path.join(run_dir, "files", "config.yaml")
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = f.read().lower()
+    except OSError:
+        config = ""
+
+    if "stable_baselines3" in config:
+        return "SB3 PPO"
+    if "total_iterations" in config or "steps_per_rollout" in config:
+        return "PyTorch PPO"
+
+    # Fallback for older local logs: SB3 usually logs real timesteps,
+    # while the custom PyTorch script logs iteration indices.
+    reward_steps = metrics.get("rollout/ep_rew_mean", [])
+    if reward_steps and reward_steps[0][0] >= 1000:
+        return "SB3 PPO"
+    return "PyTorch PPO"
+
+
+def metric_coverage(metrics):
+    return sum(1 for key in EXPECTED_METRICS if metrics.get(key))
+
+
+def latest_recorded_step(metrics):
+    last_steps = [values[-1][0] for values in metrics.values() if values]
+    return max(last_steps) if last_steps else -1
+
+
+def select_best_runs(run_records):
+    selected = {}
+    for record in run_records:
+        metrics = record["metrics"]
+        score = (
+            metric_coverage(metrics),
+            latest_recorded_step(metrics),
+            record["run_dir"],
+        )
+        previous = selected.get(record["name"])
+        if previous is None or score > previous["score"]:
+            selected[record["name"]] = {**record, "score": score}
+
+    order = {"SB3 PPO": 0, "PyTorch PPO": 1}
+    return sorted(selected.values(), key=lambda r: order.get(r["name"], 99))
+
+
 def smooth(data, window=3):
     """移动平均平滑"""
     if len(data) < window:
@@ -82,17 +158,22 @@ def main():
     output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
     os.makedirs(output_dir, exist_ok=True)
 
-    runs = []
+    run_records = []
     for d in sorted(os.listdir(swanlog_dir)):
         if not d.startswith("run-"):
             continue
-        backup = os.path.join(swanlog_dir, d, "backup.swanlab")
+        run_dir = os.path.join(swanlog_dir, d)
+        backup = os.path.join(run_dir, "backup.swanlab")
         if not os.path.exists(backup):
             continue
         metrics = parse_swanlab_backup(backup)
-        has_kl = "train/approx_kl" in metrics
-        name = "PyTorch PPO" if has_kl else "SB3 PPO"
-        runs.append((name, metrics))
+        name = classify_run(run_dir, metrics)
+        run_records.append({"name": name, "metrics": metrics, "run_dir": d})
+
+    selected_runs = select_best_runs(run_records)
+    for run in selected_runs:
+        print(f"Using {run['name']}: {run['run_dir']}")
+    runs = [(run["name"], run["metrics"]) for run in selected_runs]
 
     # ---- 全局样式 ----
     plt.style.use("seaborn-v0_8-whitegrid")
