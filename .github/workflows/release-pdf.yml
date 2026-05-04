@@ -101,17 +101,13 @@ jobs:
           **Full Changelog**: https://github.com/${GITHUB_REPOSITORY}/commits/${TAG_NAME}
           EOF
 
-      - name: Create or update release
+      - name: Publish PDF release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release.outputs.tag }}
+          name: Hands-on Modern RL PDF ${{ steps.release.outputs.tag }}
+          body_path: release-notes.md
+          files: ${{ env.PDF_PATH }}
+          fail_on_unmatched_files: true
         env:
-          GH_TOKEN: ${{ github.token }}
-          TAG_NAME: ${{ steps.release.outputs.tag }}
-        run: |
-          gh release view "$TAG_NAME" >/dev/null 2>&1 || \
-            gh release create "$TAG_NAME" --title "Hands-on Modern RL PDF ${TAG_NAME}" --notes-file release-notes.md
-          gh release edit "$TAG_NAME" --title "Hands-on Modern RL PDF ${TAG_NAME}" --notes-file release-notes.md
-
-      - name: Upload PDF release asset
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG_NAME: ${{ steps.release.outputs.tag }}
-        run: gh release upload "$TAG_NAME" "$PDF_PATH#Hands-on Modern RL PDF" --clobber
+          GITHUB_TOKEN: ${{ github.token }}
