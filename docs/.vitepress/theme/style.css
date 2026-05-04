@@ -567,6 +567,10 @@
   height: auto;
 }
 
+.vp-doc .preface-structure-map .mermaid-static img {
+  max-height: none;
+}
+
 /* ---- Dark mode: Feature cards ---- */
 .dark .VPFeature {
   border-color: rgba(148, 163, 184, 0.18);

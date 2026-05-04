@@ -258,26 +258,58 @@ graph TD
 
 全书大致可分为四个部分，在下图的核心脉络中用不同的颜色呈现：
 
-<div align="center" style="margin: 2.5rem 0;">
+<div class="preface-structure-map" align="center" style="margin: 2.5rem 0;">
 
 ```mermaid
 graph TD
-    A["RL 的核心问题<br/>序列决策与长期回报"] --> B["Value-Based<br/>先学动作价值"]
-    A --> C["Policy-Based<br/>直接学策略"]
-    B --> D["Q-Learning → DQN<br/>（第 4 章）"]
-    C --> E["REINFORCE<br/>（第 5 章）"]
-    D --> F["Actor-Critic 汇合<br/>（第 6 章）"]
-    E --> F
-    F --> G["PPO（第 7 章）"]
+    subgraph P1["第一部分：快速入门（第 1-2 章）"]
+        Q["先动手跑起来<br/>CartPole 与 DPO"]
+    end
 
-    G --> H["大模型与智能体 RL"]
-    H --> I["RLHF 与 DPO<br/>（第 8-9 章）"]
-    H --> J["GRPO 与 RLVR (推理涌现)<br/>（第 9 章）"]
-    H --> K["Agentic RL (多轮交互)<br/>（第 10 章）"]
+    subgraph P2["第二部分：核心理论与方法（第 3-7 章）"]
+        A["RL 的核心问题<br/>序列决策与长期回报"] --> B["Value-Based<br/>先学动作价值"]
+        A --> C["Policy-Based<br/>直接学策略"]
+        B --> D["Q-Learning → DQN<br/>（第 4 章）"]
+        C --> E["REINFORCE<br/>（第 5 章）"]
+        D --> F["Actor-Critic 汇合<br/>（第 6 章）"]
+        E --> F
+        F --> G["PPO（第 7 章）"]
+    end
 
-    H --> L["前沿与未来趋势"]
-    L --> M["VLM 多模态 RL<br/>（第 11 章）"]
-    L --> N["具身智能与 Self-Play 等<br/>（第 12 章）"]
+    subgraph P3["第三部分：大模型强化学习（第 8-10 章）"]
+        H["大模型与智能体 RL"] --> I["RLHF 与 DPO<br/>（第 8-9 章）"]
+        H --> J["GRPO 与 RLVR (推理涌现)<br/>（第 9 章）"]
+        H --> K["Agentic RL (多轮交互)<br/>（第 10 章）"]
+    end
+
+    subgraph P4["第四部分：前沿与未来专题（第 11-12 章）"]
+        L["前沿与未来趋势"] --> M["VLM 多模态 RL<br/>（第 11 章）"]
+        L --> N["具身智能与 Self-Play 等<br/>（第 12 章）"]
+    end
+
+    Q --> A
+    G --> H
+    H --> L
+
+    style P1 fill:#f8f9fa,stroke:#616161,color:#000
+    style P2 fill:#eef6ff,stroke:#1976d2,color:#000
+    style P3 fill:#edf7ed,stroke:#2e7d32,color:#000
+    style P4 fill:#f5eef8,stroke:#7b1fa2,color:#000
+    style Q fill:#f8f9fa,stroke:#616161,color:#000
+    style A fill:#eef6ff,stroke:#1976d2,color:#000
+    style B fill:#e3f2fd,stroke:#1976d2,color:#000
+    style D fill:#e3f2fd,stroke:#1976d2,color:#000
+    style C fill:#fff3e0,stroke:#f57c00,color:#000
+    style E fill:#fff3e0,stroke:#f57c00,color:#000
+    style F fill:#e8f5e9,stroke:#388e3c,color:#000
+    style G fill:#e8f5e9,stroke:#388e3c,stroke-width:3px,color:#000
+    style H fill:#edf7ed,stroke:#2e7d32,color:#000
+    style I fill:#edf7ed,stroke:#2e7d32,color:#000
+    style J fill:#edf7ed,stroke:#2e7d32,color:#000
+    style K fill:#edf7ed,stroke:#2e7d32,color:#000
+    style L fill:#f5eef8,stroke:#7b1fa2,color:#000
+    style M fill:#f5eef8,stroke:#7b1fa2,color:#000
+    style N fill:#f5eef8,stroke:#7b1fa2,color:#000
 
 ```
 
