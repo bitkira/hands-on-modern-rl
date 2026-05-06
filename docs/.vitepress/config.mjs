@@ -620,7 +620,7 @@ const zhSidebar = {
               link: '/chapter04_dqn/q-learning'
             },
             {
-              text: '4.2 从表格 Q 到 DQN',
+              text: '4.2 为什么需要 DQN',
               link: '/chapter04_dqn/from-q-to-dqn'
             },
             { text: '4.3 Replay、Target 与 CNN', link: '/chapter04_dqn/dqn-components' },

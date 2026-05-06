@@ -176,7 +176,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_math/linear-algebra-formulas-exercises/</loc>
-    <lastmod>2026-05-01T06:46:41.826Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.582Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -188,7 +188,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_math/linear-algebra/</loc>
-    <lastmod>2026-05-01T06:46:41.831Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.585Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -242,61 +242,61 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter01_cartpole/metrics/</loc>
-    <lastmod>2026-05-03T03:06:26.729Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.389Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter01_cartpole/principles/</loc>
-    <lastmod>2026-05-01T06:46:41.648Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.392Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter02_dpo/intro/</loc>
-    <lastmod>2026-05-06T02:27:57.295Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.586Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter02_dpo/metrics/</loc>
-    <lastmod>2026-05-01T06:46:41.711Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.397Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter02_dpo/principles/</loc>
-    <lastmod>2026-05-06T02:27:57.294Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.586Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/algorithm-taxonomy/</loc>
-    <lastmod>2026-05-06T02:27:57.278Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.587Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/bandit/</loc>
-    <lastmod>2026-05-02T00:53:12.530Z</lastmod>
+    <lastmod>2026-05-06T09:08:42.440Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/bellman-equation/</loc>
-    <lastmod>2026-05-01T06:46:41.644Z</lastmod>
+    <lastmod>2026-05-06T07:08:18.689Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/classic-methods/</loc>
-    <lastmod>2026-05-06T02:27:57.277Z</lastmod>
+    <lastmod>2026-05-06T07:09:45.816Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/dp-mc-td/</loc>
-    <lastmod>2026-05-06T02:27:57.280Z</lastmod>
+    <lastmod>2026-05-06T07:08:16.178Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -308,7 +308,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/intro/</loc>
-    <lastmod>2026-05-02T03:13:03.581Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.590Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -320,13 +320,13 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/panorama/</loc>
-    <lastmod>2026-05-02T01:53:01.330Z</lastmod>
+    <lastmod>2026-05-06T06:39:28.040Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/policy-objective/</loc>
-    <lastmod>2026-05-02T03:12:56.454Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.433Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -338,13 +338,13 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/value-bellman/</loc>
-    <lastmod>2026-05-06T02:27:57.281Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.590Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/value-q/</loc>
-    <lastmod>2026-05-06T02:27:57.281Z</lastmod>
+    <lastmod>2026-05-06T07:10:43.031Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -356,55 +356,55 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter04_dqn/cartpole-dqn/</loc>
-    <lastmod>2026-05-01T06:46:41.726Z</lastmod>
+    <lastmod>2026-05-06T06:39:28.042Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter04_dqn/dqn-components/</loc>
-    <lastmod>2026-05-01T06:46:41.741Z</lastmod>
+    <lastmod>2026-05-06T06:39:28.042Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter04_dqn/dqn-family/</loc>
-    <lastmod>2026-05-06T02:27:57.298Z</lastmod>
+    <lastmod>2026-05-06T06:39:28.043Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter04_dqn/from-q-to-dqn/</loc>
-    <lastmod>2026-05-01T06:46:41.735Z</lastmod>
+    <lastmod>2026-05-06T06:40:36.311Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter04_dqn/intro/</loc>
-    <lastmod>2026-05-01T06:46:41.732Z</lastmod>
+    <lastmod>2026-05-06T06:39:28.043Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter04_dqn/mountain-car/</loc>
-    <lastmod>2026-05-01T15:04:08.680Z</lastmod>
+    <lastmod>2026-05-06T06:39:28.045Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter04_dqn/q-learning/</loc>
-    <lastmod>2026-05-01T15:04:08.681Z</lastmod>
+    <lastmod>2026-05-06T08:59:32.331Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter04_dqn/training-analysis/</loc>
-    <lastmod>2026-05-01T06:46:41.733Z</lastmod>
+    <lastmod>2026-05-06T06:39:28.046Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter04_dqn/visual-game-projects/</loc>
-    <lastmod>2026-05-01T06:46:41.729Z</lastmod>
+    <lastmod>2026-05-06T06:39:28.050Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -446,7 +446,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter06_actor_critic/actor-critic/</loc>
-    <lastmod>2026-05-01T06:46:41.724Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.443Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -458,19 +458,19 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter06_actor_critic/advantage-function/</loc>
-    <lastmod>2026-05-01T06:46:41.721Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.446Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter06_actor_critic/alphago/</loc>
-    <lastmod>2026-05-01T06:46:41.722Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.450Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter06_actor_critic/critic-training/</loc>
-    <lastmod>2026-05-01T06:46:41.716Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.467Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -500,7 +500,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter07_ppo/ppo-math/</loc>
-    <lastmod>2026-05-06T02:27:57.309Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.598Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -530,7 +530,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter08_rlhf/imitation-learning-pipeline/</loc>
-    <lastmod>2026-05-06T02:27:57.276Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.601Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -566,13 +566,13 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter09_alignment/dpo-hands-on/</loc>
-    <lastmod>2026-05-01T06:46:41.715Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.473Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter09_alignment/dpo-theory-and-family/</loc>
-    <lastmod>2026-05-01T06:46:41.713Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.474Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -584,7 +584,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter09_alignment/industrial-post-training/</loc>
-    <lastmod>2026-05-05T11:07:53.864Z</lastmod>
+    <lastmod>2026-05-06T07:19:57.573Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -596,19 +596,19 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter09_grpo_rlvr/deepseek-dapo/</loc>
-    <lastmod>2026-05-01T14:57:51.568Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.603Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter09_grpo_rlvr/grpo-practice-and-mechanism/</loc>
-    <lastmod>2026-05-01T15:04:08.683Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.476Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter09_grpo_rlvr/on-policy-distillation/</loc>
-    <lastmod>2026-05-03T06:10:40.426Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.477Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -620,7 +620,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter10_agentic_rl/deep-research-agent/</loc>
-    <lastmod>2026-05-06T02:27:57.283Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.606Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -632,7 +632,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter10_agentic_rl/extended-readings/</loc>
-    <lastmod>2026-05-01T06:46:41.667Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.478Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -650,7 +650,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter10_agentic_rl/intro/</loc>
-    <lastmod>2026-05-06T02:27:57.284Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.607Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -662,25 +662,25 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter10_agentic_rl/multi-turn-rl/</loc>
-    <lastmod>2026-05-02T09:12:53.895Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.608Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter10_agentic_rl/projects/</loc>
-    <lastmod>2026-05-06T02:27:57.285Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.610Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter10_agentic_rl/tool-use-agents/</loc>
-    <lastmod>2026-05-02T09:07:42.239Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.611Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter10_agentic_rl/tool-use-and-trajectory/</loc>
-    <lastmod>2026-05-02T09:11:51.044Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.612Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -722,7 +722,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter12_future_trends/embodied-intelligence/</loc>
-    <lastmod>2026-05-06T02:27:57.293Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.627Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -758,7 +758,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter12_future_trends/self-play-outlook/</loc>
-    <lastmod>2026-05-06T02:27:57.294Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.638Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -770,7 +770,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/preface/brief-history/</loc>
-    <lastmod>2026-05-06T02:27:57.291Z</lastmod>
+    <lastmod>2026-05-06T06:39:21.639Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -782,7 +782,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/preface/intro/</loc>
-    <lastmod>2026-05-06T02:54:27.999Z</lastmod>
+    <lastmod>2026-05-06T06:39:28.055Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
