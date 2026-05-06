@@ -2,13 +2,20 @@
 
 第 5 章末尾我们发现：减掉基线 $V(s)$ 可以降低策略梯度的方差，而不改变梯度的方向。本节将深入这个关键洞察，引出优势函数——它是连接 Actor 和 Critic 的桥梁。
 
+::: tip 本节会用到的前置知识
+- [REINFORCE 策略梯度](../chapter05_policy_gradient/policy-gradient) $\nabla_\theta J \approx \nabla_\theta \log \pi(a|s) \cdot G_t$——基线要加在哪里
+- [状态价值 $V(s)$](../chapter03_mdp/bellman-equation)——最好的基线是什么
+- [动作价值 $Q(s,a)$](../chapter03_mdp/value-q)——优势函数的定义依赖 $Q$ 和 $V$ 的差
+- [TD Error](../chapter03_mdp/dp-mc-td) $\delta = r + \gamma V(s') - V(s)$——优势函数的实用估计方法
+:::
+
 ## 从基线到优势函数
 
-回忆 REINFORCE 的策略梯度：
+回忆第 5 章 REINFORCE 的[策略梯度](../chapter05_policy_gradient/policy-gradient)：
 
 $$\nabla_\theta J \approx \nabla_\theta \log \pi(a|s) \cdot G_t$$
 
-$G_t$ 是从当前步到 episode 结束的总回报。问题在于 $G_t$ 波动巨大——同一个策略、同一个状态，跑两次可能拿到完全不同的 $G_t$。
+$G_t$ 是从当前步到 episode 结束的总回报（回顾：[折扣累积回报](../chapter03_mdp/mdp)）。问题在于 $G_t$ 波动巨大——同一个策略、同一个状态，跑两次可能拿到完全不同的 $G_t$。
 
 减掉基线 $V(s)$ 后：
 
@@ -18,7 +25,9 @@ $$\nabla_\theta J \approx \nabla_\theta \log \pi(a|s) \cdot (G_t - V(s))$$
 
 $$A^\pi(s,a) = Q^\pi(s,a) - V^\pi(s) \tag{6.1}$$
 
-它的含义是：**做了这个动作，比"平均能拿多少分"好了多少。**
+其中 $Q^\pi(s,a)$ 是[动作价值函数](../chapter03_mdp/value-q)（"在状态 $s$ 先做动作 $a$，之后按策略行动的期望回报"），$V^\pi(s)$ 是[状态价值函数](../chapter03_mdp/bellman-equation)（"在状态 $s$ 按策略行动的期望回报"）。两者的差恰好是"因为做了动作 $a$，多拿了多少分"。
+
+优势函数的含义是：**做了这个动作，比"平均能拿多少分"好了多少。**
 
 - $A > 0$：这个动作比预期好，应该多选
 - $A < 0$：这个动作比预期差，应该少选
@@ -41,13 +50,13 @@ $$A^\pi(s,a) = Q^\pi(s,a) - V^\pi(s) \tag{6.1}$$
 
 ## 用 TD Error 估计优势
 
-优势函数的理论定义是 $A = Q - V$，但实际中我们通常不直接计算 $Q$。利用 TD Error，可以用一种更高效的方式来估计 $A$：
+优势函数的理论定义是 $A = Q - V$，但实际中我们通常不直接计算 $Q$。利用[TD Error](../chapter03_mdp/dp-mc-td)，可以用一种更高效的方式来估计 $A$：
 
 $$A(s,a) \approx r + \gamma V(s') - V(s) = \delta \tag{6.2}$$
 
-这就是第 3 章介绍的 TD Error。用 TD Error 替代 $G_t$ 作为策略梯度的信号，有两个好处：
+这就是第 3 章介绍的 TD Error——它衡量"走了一步之后，实际结果比预测好了多少"。用 TD Error 替代 $G_t$ 作为策略梯度的信号，有两个好处：
 
-1. **不需要等 episode 结束**——每走一步就能更新（$G_t$ 需要跑完一整局）
+1. **不需要等 episode 结束**——每走一步就能更新（$G_t$ 需要跑完一整局，这是[MC 方法](../chapter03_mdp/dp-mc-td)的限制）
 2. **方差更低**——$\delta$ 只涉及一步的随机性（$G_t$ 涉及整条轨迹的随机性）
 
 这是 MC → TD 的演进在策略空间的再现：REINFORCE 用 $G_t$（MC），Actor-Critic 用 $\delta$（TD）。
@@ -73,4 +82,4 @@ Actor（策略网络）           Critic（价值网络）
 
 Actor 和 Critic 共享输入（状态 $s$），但输出不同：Actor 输出动作概率分布，Critic 输出价值标量。它们通过优势函数 $A \approx \delta$ 协作：Critic 给出评估，Actor 根据评估调整行为。
 
-但 Critic 怎么训练？它怎么学会准确估计 $V(s)$？下一节将展开第 3 章速览过的 DP、MC、TD 三种方法在 Critic 训练中的具体应用。[Critic 训练方法](./critic-training)
+但 Critic 怎么训练？它怎么学会准确估计 $V(s)$？下一节将展开第 3 章速览过的 [DP、MC、TD](../chapter03_mdp/dp-mc-td) 三种方法在 Critic 训练中的具体应用。[Critic 训练方法](./critic-training)
