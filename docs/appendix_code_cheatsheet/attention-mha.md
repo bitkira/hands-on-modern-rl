@@ -24,6 +24,7 @@ output = attn_weights @ V
 ### 记忆方法
 
 三步走：
+
 1. **打分**：Q 和 K 的点积衡量相似度，除 $\sqrt{d_k}$ 防止点积过大导致 softmax 饱和
 2. **遮掩**：causal mask 把"未来"位置设为 $-\infty$（语言模型只能看左边）
 3. **加权**：softmax 后的权重乘 V，得到加权表示
@@ -153,11 +154,11 @@ class MultiHeadAttention(nn.Module):
 
 ### 对比速查
 
-| 变体 | Q 的头数 | K/V 的头数 | K/V 参数量 | 代表模型 |
-|------|----------|------------|------------|----------|
-| MHA | h | h | $3 \times d_{model}^2$ | GPT-2、BERT |
-| MQA | h | **1** | 大幅减少 | PaLM、StarCoder |
-| GQA | h | **g** (g < h) | 折中 | LLaMA 2/3、Mistral |
+| 变体 | Q 的头数 | K/V 的头数    | K/V 参数量             | 代表模型           |
+| ---- | -------- | ------------- | ---------------------- | ------------------ |
+| MHA  | h        | h             | $3 \times d_{model}^2$ | GPT-2、BERT        |
+| MQA  | h        | **1**         | 大幅减少               | PaLM、StarCoder    |
+| GQA  | h        | **g** (g < h) | 折中                   | LLaMA 2/3、Mistral |
 
 ### 一句话记忆
 
@@ -207,20 +208,20 @@ class GroupedQueryAttention(nn.Module):
 
 ## 面试追问：计算复杂度
 
-| | 复杂度 | 说明 |
-|---|---|---|
-| Self-Attention | $O(n^2 \cdot d)$ | $n$ 是序列长度，$d$ 是维度 |
-| 线性投影 | $O(n \cdot d^2)$ | 每个token 过线性层 |
-| 总计（MHA） | $O(n^2 d + nd^2)$ | 长序列时 $n^2$ 项主导 |
+|                | 复杂度            | 说明                       |
+| -------------- | ----------------- | -------------------------- |
+| Self-Attention | $O(n^2 \cdot d)$  | $n$ 是序列长度，$d$ 是维度 |
+| 线性投影       | $O(n \cdot d^2)$  | 每个token 过线性层         |
+| 总计（MHA）    | $O(n^2 d + nd^2)$ | 长序列时 $n^2$ 项主导      |
 
 ---
 
 ## 易错点
 
-| 易错 | 说明 |
-|------|------|
-| 除 $\sqrt{d_k}$ 不是 $\sqrt{d_{model}}$ | 是每个头的维度，不是总维度 |
-| causal mask 方向 | `tril` 生成下三角 = 保留，上三角 = 遮掩（未来） |
-| view 前 contiguous | transpose 后内存不连续，必须先 `.contiguous()` 再 view |
-| GQA 的 repeat_interleave | 不是 repeat，是 `repeat_interleave`，保证相邻 Q 头共享同一组 K/V |
-| MQA 是 GQA 的特例 | 当 `n_kv_heads=1` 时 GQA 退化为 MQA |
+| 易错                                    | 说明                                                             |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| 除 $\sqrt{d_k}$ 不是 $\sqrt{d_{model}}$ | 是每个头的维度，不是总维度                                       |
+| causal mask 方向                        | `tril` 生成下三角 = 保留，上三角 = 遮掩（未来）                  |
+| view 前 contiguous                      | transpose 后内存不连续，必须先 `.contiguous()` 再 view           |
+| GQA 的 repeat_interleave                | 不是 repeat，是 `repeat_interleave`，保证相邻 Q 头共享同一组 K/V |
+| MQA 是 GQA 的特例                       | 当 `n_kv_heads=1` 时 GQA 退化为 MQA                              |

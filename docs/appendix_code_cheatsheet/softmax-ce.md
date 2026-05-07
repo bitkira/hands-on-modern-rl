@@ -136,10 +136,10 @@ def manual_cross_entropy(logits, targets, ignore_index=-100):
 
 ## 易错点
 
-| 易错 | 说明 |
-|------|------|
-| softmax 忘了减 max | 面试手写第一步就扣分 |
-| 先 softmax 再 log | 数值不稳定，用 `log_softmax` 一步到位 |
+| 易错                       | 说明                                                                 |
+| -------------------------- | -------------------------------------------------------------------- |
+| softmax 忘了减 max         | 面试手写第一步就扣分                                                 |
+| 先 softmax 再 log          | 数值不稳定，用 `log_softmax` 一步到位                                |
 | Cross-Entropy 从 logits 算 | 不要先 softmax 再 log 再 CE，直接 `F.cross_entropy(logits, targets)` |
-| `ignore_index` | 面试追问 SFT loss 时会问，padding token 怎么处理 |
-| temperature | `logits / temperature` 再 softmax，T 越大分布越平 |
+| `ignore_index`             | 面试追问 SFT loss 时会问，padding token 怎么处理                     |
+| temperature                | `logits / temperature` 再 softmax，T 越大分布越平                    |
