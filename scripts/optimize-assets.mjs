@@ -37,7 +37,7 @@ const options = {
 }
 const mermaidFontFamily =
   '"Noto Sans CJK SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Arial Unicode MS", sans-serif'
-const mermaidRendererVersion = 'cjk-fixed-size-v1'
+const mermaidRendererVersion = 'cjk-measured-bounds-v3'
 const existingManifest = loadExistingManifest()
 
 function loadExistingManifest() {
@@ -74,7 +74,11 @@ function hashFile(filePath) {
   return sha256(fs.readFileSync(filePath))
 }
 
-function normalizeRenderedMermaidSvg(svg) {
+function formatSvgNumber(value) {
+  return Number.isInteger(value) ? String(value) : value.toFixed(3)
+}
+
+function normalizeRenderedMermaidSvg(svg, measuredBounds = null) {
   const viewBox = svg
     .match(/\bviewBox=["']([^"']+)["']/i)?.[1]
     ?.trim()
@@ -83,14 +87,114 @@ function normalizeRenderedMermaidSvg(svg) {
 
   if (!viewBox || viewBox.length !== 4) return svg
 
-  const [, , width, height] = viewBox
+  const [x, y, width, height] = viewBox
   if (!Number.isFinite(width) || !Number.isFinite(height)) return svg
 
+  const bounds =
+    measuredBounds &&
+    Number.isFinite(measuredBounds.x) &&
+    Number.isFinite(measuredBounds.y) &&
+    Number.isFinite(measuredBounds.width) &&
+    Number.isFinite(measuredBounds.height) &&
+    measuredBounds.width > 0 &&
+    measuredBounds.height > 0
+      ? measuredBounds
+      : { x, y, width, height }
+
+  const minX = Math.floor(bounds.x)
+  const minY = Math.floor(bounds.y)
+  const maxX = Math.ceil(bounds.x + bounds.width)
+  const maxY = Math.ceil(bounds.y + bounds.height)
+  const measuredWidth = maxX - minX
+  const measuredHeight = maxY - minY
+
   return svg
-    .replace(/\swidth=["'][^"']*["']/i, ` width="${Math.ceil(width)}"`)
+    .replace(
+      /\bviewBox=["'][^"']*["']/i,
+      `viewBox="${formatSvgNumber(minX)} ${formatSvgNumber(minY)} ${formatSvgNumber(measuredWidth)} ${formatSvgNumber(measuredHeight)}"`
+    )
+    .replace(/\swidth=["'][^"']*["']/i, ` width="${Math.ceil(measuredWidth)}"`)
     .replace(/\sheight=["'][^"']*["']/i, '')
-    .replace(/<svg\b/i, `<svg height="${Math.ceil(height)}"`)
+    .replace(/<svg\b/i, `<svg height="${Math.ceil(measuredHeight)}"`)
     .replace(/\sstyle=["']max-width:\s*[^"']*;?["']/i, '')
+    .replace(/<svg\b(?![^>]*\boverflow=)/i, '<svg overflow="visible"')
+    .replace(
+      /<foreignObject\b(?![^>]*\boverflow=)/gi,
+      '<foreignObject overflow="visible"'
+    )
+}
+
+async function measureMermaidSvgBounds(page, svg) {
+  return page.evaluate(async (source) => {
+    const host = document.createElement('div')
+    host.style.cssText =
+      'position:absolute;left:0;top:0;display:inline-block;background:#fff;'
+    host.innerHTML = source
+    document.body.appendChild(host)
+
+    try {
+      const svgElement = host.querySelector('svg')
+      if (!svgElement) return null
+
+      svgElement.setAttribute('overflow', 'visible')
+      svgElement.style.overflow = 'visible'
+      svgElement
+        .querySelectorAll('foreignObject')
+        .forEach((element) => element.setAttribute('overflow', 'visible'))
+
+      if (document.fonts?.ready) await document.fonts.ready
+
+      const viewBox = svgElement.viewBox.baseVal
+      const svgRect = svgElement.getBoundingClientRect()
+      if (!svgRect.width || !svgRect.height || !viewBox.width || !viewBox.height) {
+        return null
+      }
+
+      const ignored = new Set([
+        'defs',
+        'desc',
+        'filter',
+        'linearGradient',
+        'marker',
+        'metadata',
+        'radialGradient',
+        'script',
+        'style',
+        'title'
+      ])
+      const rects = []
+
+      for (const element of svgElement.querySelectorAll('*')) {
+        if (ignored.has(element.tagName)) continue
+
+        const style = window.getComputedStyle(element)
+        if (style.display === 'none' || style.visibility === 'hidden') continue
+
+        const rect = element.getBoundingClientRect()
+        if (rect.width > 0 && rect.height > 0) {
+          rects.push(rect)
+        }
+      }
+
+      if (!rects.length) return null
+
+      const left = Math.min(...rects.map((rect) => rect.left))
+      const top = Math.min(...rects.map((rect) => rect.top))
+      const right = Math.max(...rects.map((rect) => rect.right))
+      const bottom = Math.max(...rects.map((rect) => rect.bottom))
+      const scaleX = viewBox.width / svgRect.width
+      const scaleY = viewBox.height / svgRect.height
+
+      return {
+        x: viewBox.x + (left - svgRect.left) * scaleX,
+        y: viewBox.y + (top - svgRect.top) * scaleY,
+        width: (right - left) * scaleX,
+        height: (bottom - top) * scaleY
+      }
+    } finally {
+      host.remove()
+    }
+  }, svg)
 }
 
 function commandExists(command) {
@@ -853,11 +957,12 @@ async function renderMermaidBlocks(manifest) {
             graph: source
           }
         )
+        const measuredBounds = await measureMermaidSvgBounds(page, svg)
 
         ensureDir(outputPath)
         fs.writeFileSync(
           outputPath,
-          `${normalizeRenderedMermaidSvg(svg).trim()}\n`
+          `${normalizeRenderedMermaidSvg(svg, measuredBounds).trim()}\n`
         )
         Object.assign(block, {
           status: 'optimized',
