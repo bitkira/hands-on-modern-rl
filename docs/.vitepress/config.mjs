@@ -629,36 +629,32 @@ const zhSidebar = {
           ]
         },
         {
-          text: '4. Q-Learning 与 DQN',
+          text: '4. 深度 Q 网络',
           link: '/chapter04_dqn/intro',
           collapsed: false,
           items: [
             {
-              text: '4.1 GridWorld',
-              link: '/chapter04_dqn/q-learning'
-            },
-            {
-              text: '4.2 从 Q 到 DQN',
+              text: '4.1 为什么需要深度 Q 网络',
               link: '/chapter04_dqn/from-q-to-dqn'
             },
             {
-              text: '4.3 DQN 的三个组件',
+              text: '4.2 深度 Q 网络的三个组件',
               link: '/chapter04_dqn/dqn-components'
             },
             {
-              text: '4.4 训练过程',
+              text: '4.3 训练过程',
               link: '/chapter04_dqn/training-analysis'
             },
             {
-              text: '4.5 稀疏奖励',
+              text: '4.4 稀疏奖励',
               link: '/chapter04_dqn/mountain-car'
             },
             {
-              text: '4.6 DQN 家族',
+              text: '4.5 深度 Q 网络家族',
               link: '/chapter04_dqn/dqn-family'
             },
             {
-              text: '4.7 视觉游戏项目',
+              text: '4.6 视觉游戏项目',
               link: '/chapter04_dqn/visual-game-projects'
             }
           ]
