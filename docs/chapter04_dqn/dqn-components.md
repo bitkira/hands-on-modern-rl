@@ -33,7 +33,7 @@ $$
 
 ## 组件一：Q 网络——用神经网络近似 Q 函数
 
-Q 网络是深度 Q 网络的核心。它做的事情很简单：接收一个状态 $s$，输出每个动作的 Q 值。在 CartPole 中，输入是 4 维向量 $[x, \dot{x}, \theta, \dot{\theta}]$，输出是 2 个 Q 值（左推和右推）。
+Q 网络是深度 Q 网络的核心。它做的事情很简单：接收一个状态 $s$，输出每个动作的 Q 值。在 LunarLander 中，输入是 8 维向量，描述飞船的位置、速度、姿态和支架接触状态；输出是 4 个 Q 值，对应“不喷”“左侧喷口”“主发动机”“右侧喷口”四个离散动作。
 
 ```python
 import torch
@@ -56,11 +56,11 @@ class QNetwork(nn.Module):
         return self.net(x)  # 输出形状: (batch_size, action_dim)
 ```
 
-这段代码非常简洁：三层全连接网络，两个隐藏层各有 128 个神经元，用 ReLU 做激活函数。输入是状态向量，输出是每个动作的 Q 值。对于 CartPole（state_dim=4, action_dim=2），这个网络的参数量只有几万个——极其轻量。
+这段代码非常简洁：三层全连接网络，两个隐藏层各有 128 个神经元，用 ReLU 做激活函数。输入是状态向量，输出是每个动作的 Q 值。对于 LunarLander（`state_dim=8, action_dim=4`），这个网络的参数量仍然只有几万个——足够轻量，也足以表达低维控制任务中的非线性关系。
 
 为什么输出的是所有动作的 Q 值而不是单个？因为一次前向传播就能得到所有动作的评分，不需要为每个动作单独跑一遍网络。选择动作时只需要对输出取 `argmax`——哪个动作的 Q 值最大就选哪个。
 
-对于 Atari 游戏，输入是 84×84×4 的像素帧，全连接网络就不够用了——参数太多，且无法捕捉图像的空间结构。DeepMind 在原始论文中使用了卷积神经网络（CNN）：先用几层卷积提取图像特征，再用全连接层输出 Q 值。不过对于 CartPole 这样的低维输入，简单的 MLP 就足够了。我们在本章的动手环节中先用 MLP 在 CartPole 上跑通 DQN，Atari 的 CNN 架构留作拓展练习。
+对于 Atari 游戏，输入是 84×84×4 的像素帧，全连接网络就不够用了——参数太多，且无法捕捉图像的空间结构。DeepMind 在原始论文中使用了卷积神经网络（CNN）：先用几层卷积提取图像特征，再用全连接层输出 Q 值。不过对于 LunarLander 这样的低维向量输入，简单的 MLP 就足够了。我们在本章的动手环节中先用 MLP 在 LunarLander 上观察 DQN，再把 CNN 架构留给视觉游戏项目。
 
 Q 网络的训练目标是让网络输出的 Q 值尽可能接近"真实的" Q 值。但我们不知道真实的 Q 值是多少——如果能查表知道，就不需要神经网络了。所以我们用和 Q-Learning 一样的方式构造训练目标：
 
@@ -204,20 +204,28 @@ flowchart TD
 
 把三个组件拼在一起，深度 Q 网络的完整训练流程如下：
 
-1. 初始化 Q-Network $\theta$ 和目标网络 $\theta^-$（参数相同）
-2. 初始化经验回放池
-3. 对于每个 episode：
-   - 观察初始状态 $s$
-   - 对于每一步：
-     - 用 $\varepsilon$-贪婪策略选择动作 $a$（$\varepsilon$ 概率随机探索，$1-\varepsilon$ 概率选 Q 值最大的动作）
-     - 执行动作 $a$，观察奖励 $r$ 和下一状态 $s'$
-     - 将 $(s, a, r, s', \text{done})$ 存入经验回放池
-     - 从回放池随机采样一批经验
-     - 计算 TD Target：$y = r + \gamma (1-d) \max_{a'} Q(s', a'; \theta^-)$
-     - 计算 Loss：$\mathcal{L} = (y - Q(s, a; \theta))^2$
-     - 梯度下降更新 $\theta$
-     - 每隔 $C$ 步：$\theta^- \leftarrow \theta$
-     - $s \leftarrow s'$
+$$
+\begin{aligned}
+& \textbf{Algorithm: Deep Q-Network (DQN)} \\[6pt]
+& \textbf{1:}\ \text{初始化 Q 网络参数 } \theta\text{，目标网络 } \theta^- \leftarrow \theta\text{，回放池 } \mathcal{D} \\
+& \textbf{2:}\ \textbf{for}\ \mathrm{episode} = 1, 2, \ldots\ \textbf{do} \\
+& \textbf{3:}\ \quad \text{获取初始状态 } s \\
+& \textbf{4:}\ \quad \textbf{for}\ t = 1, 2, \ldots\ \textbf{do} \\
+& \textbf{5:}\ \qquad a \leftarrow \varepsilon\text{-greedy}(Q(s, \cdot\,; \theta)) \\
+& \textbf{6:}\ \qquad \text{执行 } a\text{，观察 } r, s', d \\
+& \textbf{7:}\ \qquad \mathcal{D}.\mathrm{push}(s, a, r, s', d) \\
+& \textbf{8:}\ \qquad \text{从 } \mathcal{D}\text{ 采样 batch } \{(s_i, a_i, r_i, s'_i, d_i)\}_{i=1}^{B} \\
+& \textbf{9:}\ \qquad y_i \leftarrow r_i + \gamma (1 - d_i) \max_{a'} Q(s'_i, a'; \theta^-) \\
+& \textbf{10:}\ \qquad \mathcal{L}(\theta) \leftarrow \frac{1}{B} \sum_{i=1}^{B} \bigl(y_i - Q(s_i, a_i; \theta)\bigr)^2 \\
+& \textbf{11:}\ \qquad \theta \leftarrow \theta - \alpha \nabla_\theta \mathcal{L} \\
+& \textbf{12:}\ \qquad \text{每隔 } C\text{ 步：} \theta^- \leftarrow \theta \\
+& \textbf{13:}\ \qquad s \leftarrow s' \\
+& \textbf{14:}\ \quad \textbf{end for} \\
+& \textbf{15:}\ \textbf{end for}
+\end{aligned}
+$$
+
+其中 $\varepsilon\text{-greedy}$ 表示以 $\varepsilon$ 概率随机探索，$1-\varepsilon$ 概率选 $a = \arg\max_{a'} Q(s, a'; \theta)$。
 
 对比第 3 章的 Q-Learning 表格方法，深度 Q 网络只做了三处改变：用神经网络代替表格（泛化能力）、加经验回放（打破相关性）、加目标网络（稳定目标）。核心的 TD Error 逻辑——"预测与现实的落差"——完全没变。
 
@@ -228,4 +236,4 @@ flowchart TD
 
 </details>
 
-现在我们已经拆解了深度 Q 网络的三个组件，接下来让我们亲手实现它——[用深度 Q 网络玩 CartPole](./cartpole-dqn)。
+现在我们已经拆解了深度 Q 网络的三个组件，接下来让我们在 LunarLander 上观察它们如何协同工作——[LunarLander 训练分析](./training-analysis)。
