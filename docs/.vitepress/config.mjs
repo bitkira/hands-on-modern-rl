@@ -646,8 +646,8 @@ const zhSidebar = {
               link: '/chapter04_dqn/training-analysis'
             },
             {
-              text: '4.4 稀疏奖励',
-              link: '/chapter04_dqn/mountain-car'
+              text: '4.4 LunarLander',
+              link: '/chapter04_dqn/lunar-lander'
             },
             {
               text: '4.5 深度 Q 网络家族',

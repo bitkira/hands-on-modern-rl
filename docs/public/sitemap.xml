@@ -410,13 +410,13 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter04_dqn/intro/</loc>
-    <lastmod>2026-05-08T09:34:45.029Z</lastmod>
+    <lastmod>2026-05-09T14:44:53.267Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter04_dqn/mountain-car/</loc>
-    <lastmod>2026-05-09T09:17:48.149Z</lastmod>
+    <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter04_dqn/lunar-lander/</loc>
+    <lastmod>2026-05-09T14:46:59.207Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
