@@ -542,11 +542,26 @@ tensorboard --logdir output/dqn_atari
 # 将本地 eval CSV 重新导出为讲义图片
 python code/chapter04_dqn/export_dqn_curves.py --run pong
 
-# 将训练好的模型渲染成讲义中的 Pong GIF
+# 渲染随机策略基线
+python code/chapter04_dqn/render_atari.py \
+  --policy random \
+  --output docs/chapter04_dqn/images/dqn-atari-pong-random.gif \
+  --seed 0
+
+# 将训练好的 5k smoke 模型渲染成讲义中的 Pong GIF
 python code/chapter04_dqn/render_atari.py \
   --model output/dqn_atari_runs/ALE_Pong-v5_dqn_seed0/final_model.zip \
   --output docs/chapter04_dqn/images/dqn-atari-pong-smoke.gif \
   --seed 0 \
+  --max-steps 1200 \
+  --render-every 4 \
+  --fps 20
+
+# 换一个 reset seed，再看同一个 5k smoke 模型是否稳定
+python code/chapter04_dqn/render_atari.py \
+  --model output/dqn_atari_runs/ALE_Pong-v5_dqn_seed0/final_model.zip \
+  --output docs/chapter04_dqn/images/dqn-atari-pong-smoke-seed42.gif \
+  --seed 42 \
   --max-steps 1200 \
   --render-every 4 \
   --fps 20
@@ -557,35 +572,34 @@ python code/chapter04_dqn/render_atari.py \
 `200k` 步足以确认实验链路是否完整；
 若希望看到 Pong 出现明显学习趋势，
 通常需要百万级环境步。
-本节也实际运行了一个 `ALE/Pong-v5` 的短实验：
+本节实际运行了一个 `ALE/Pong-v5` 的 smoke 实验：
 训练 `5000` 个环境步，
 每 `2500` 步评估 1 个 episode，
 并写入评估 CSV、曲线图和模型文件。
-两次评估回报都是 `-21.0`，
-这符合预期：
-这个规模只能证明真实 ALE 环境、Atari wrapper、CNN DQN、
-模型保存和评估链路已经打通，
-还不能说明策略学会了 Pong。
+两次评估回报都是 `-21.0`。
+如果把这两个点画成曲线，只会得到一条水平线；
+它能说明"分数没有改善"，
+但不适合单独当作主要图像。
+更有教学价值的做法，是把随机基线和训练后的模型放在一起看。
 
-![Atari Pong DQN 短实验曲线：5k 环境步内评估回报仍为 -21，说明这是训练链路验证，而不是策略收敛结果](./images/dqn-atari-pong-5k-eval-curve.png)
+**随机策略基线（回报 -19.0，992 步）** — 这是没有学习的策略。动作从动作空间中随机采样，球拍偶尔会碰巧接近球，但整体没有稳定跟随。它的作用是给后面的 DQN 回放提供参照：如果训练后的模型看起来和随机策略差不多，就不能说策略已经学会了 Pong。
 
-训练曲线只告诉我们"分数没有变好"，
-还不能告诉我们智能体具体错在哪里。
-因此，本节也把同一个 5k smoke 模型渲染成一局 Pong 回放：
-模型使用训练时相同的 wrapper 和 4 帧堆叠来选动作，
-讲义中的 GIF 则保存原始 RGB 游戏画面，
-便于直接观察球、球拍和得分变化。
+![Atari Pong 随机策略基线：动作随机采样，回报 -19.0](./images/dqn-atari-pong-random.gif)
 
-**Pong smoke run（回报 -21.0，757 步）** — 这是一局失败回放。球拍没有稳定跟随球的垂直位置，几乎没有形成有效防守，最后以 `-21` 结束。这个 GIF 的作用不是证明 DQN 已经学会 Pong，而是把短实验的结论可视化：环境能跑通，CNN DQN 能输出动作，评估和渲染链路能保存下来；但 5k 步远远不够让像素策略学到可用的击球规律。
+**5k DQN，seed=0（回报 -21.0，757 步）** — 这是训练 `5000` 步后的 smoke 模型。球拍没有稳定跟随球的垂直位置，几乎没有形成有效防守，最后以 `-21` 结束。这说明训练链路已经能产生模型和回放，但这么短的训练还没有带来可用策略。
 
 ![Atari Pong DQN smoke run：5k 训练步后的策略仍然输掉整局，回报 -21.0](./images/dqn-atari-pong-smoke.gif)
 
-把这段回放和 LunarLander 的成功着陆对比，会看到两个任务的差别。
+**5k DQN，seed=42（回报 -21.0，760 步）** — 换一个 reset seed 后，同一个模型仍然输掉整局。这比单个 GIF 更能说明问题：失败不是某一局偶然不好，而是策略还没有形成稳定的像素控制能力。此时应把实验结论写成"真实 Atari 训练链路跑通"，而不是"智能体学会 Pong"。
+
+![Atari Pong DQN smoke run：换一个 reset seed 后仍然失败，回报 -21.0](./images/dqn-atari-pong-smoke-seed42.gif)
+
+这三段回放共同说明了 Atari 和 LunarLander 的差别。
 LunarLander 的 8 维状态已经把位置、速度、角度和支架接触直接给了网络；
 Pong 的网络看到的是像素堆叠，必须先从画面中分辨球和球拍，
 再从连续帧里推断球的运动方向。
-所以，在 Atari 中，"能显示 GIF"只是实验链路完成，
-"GIF 里出现稳定策略"才说明训练开始真正有效。
+所以，在 Atari 中，"能显示 GIF"只是实验链路完成；
+"多个 seed 的 GIF 都出现稳定防守"才说明训练开始真正有效。
 
 RL-Zoo 的 Atari DQN 默认训练 `1e7` 步，
 使用 `CnnPolicy`、4 帧堆叠、

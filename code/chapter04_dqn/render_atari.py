@@ -4,10 +4,14 @@ The training script uses SB3's Atari wrapper stack plus 4-frame stacking. This
 renderer mirrors that observation pipeline for action selection, while saving
 the raw RGB game frames so the generated GIF is easy to read in the chapter.
 
-Example:
+Examples:
     python code/chapter04_dqn/render_atari.py \
       --model output/dqn_atari_runs/ALE_Pong-v5_dqn_seed0/final_model.zip \
       --output docs/chapter04_dqn/images/dqn-atari-pong-smoke.gif
+
+    python code/chapter04_dqn/render_atari.py \
+      --policy random \
+      --output docs/chapter04_dqn/images/dqn-atari-pong-random.gif
 """
 
 from __future__ import annotations
@@ -19,6 +23,7 @@ import ale_py
 import gymnasium as gym
 import imageio
 import numpy as np
+from PIL import Image
 from stable_baselines3 import DQN
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 
@@ -55,8 +60,24 @@ def model_observation(obs: np.ndarray) -> np.ndarray:
     return arr
 
 
+def scaled_frame(frame: np.ndarray, scale: int) -> np.ndarray:
+    if scale == 1:
+        return frame
+    image = Image.fromarray(frame)
+    width, height = image.size
+    return np.asarray(
+        image.resize((width * scale, height * scale), Image.Resampling.NEAREST)
+    )
+
+
 def render(args: argparse.Namespace) -> None:
-    model = DQN.load(args.model)
+    if args.policy == "model":
+        if args.model is None:
+            raise SystemExit("--model is required when --policy model is used.")
+        model = DQN.load(args.model)
+    else:
+        model = None
+
     env = make_render_env(args)
 
     obs, _ = env.reset(seed=args.seed)
@@ -65,9 +86,15 @@ def render(args: argparse.Namespace) -> None:
 
     for step in range(args.max_steps):
         if step % args.render_every == 0:
-            frames.append(env.render())
+            frames.append(scaled_frame(env.render(), args.scale))
 
-        action, _ = model.predict(model_observation(obs), deterministic=True)
+        if args.policy == "model":
+            action, _ = model.predict(model_observation(obs), deterministic=True)
+        elif args.policy == "random":
+            action = env.action_space.sample()
+        else:
+            action = 0
+
         obs, reward, terminated, truncated, _ = env.step(int(action))
         total_reward += float(reward)
 
@@ -83,20 +110,22 @@ def render(args: argparse.Namespace) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     imageio.mimsave(output, frames, duration=1000 / args.fps, loop=0)
     print(
-        f"Saved {output} | reward={total_reward:.1f}, "
+        f"Saved {output} | policy={args.policy}, reward={total_reward:.1f}, "
         f"env_steps={step + 1}, gif_frames={len(frames)}"
     )
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Render an Atari DQN model.")
-    parser.add_argument("--model", type=Path, required=True)
+    parser.add_argument("--model", type=Path, default=None)
+    parser.add_argument("--policy", choices=["model", "random", "noop"], default="model")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--env-id", type=str, default="ALE/Pong-v5")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--max-steps", type=int, default=1200)
     parser.add_argument("--fps", type=int, default=20)
     parser.add_argument("--render-every", type=int, default=4)
+    parser.add_argument("--scale", type=int, default=2)
 
     parser.add_argument("--frame-skip", type=int, default=4)
     parser.add_argument("--frame-stack", type=int, default=4)
