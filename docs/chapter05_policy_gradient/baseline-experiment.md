@@ -2,7 +2,7 @@
 
 > **本节目标**：用 `CartPole-v1` 对比原始 REINFORCE 和带 Value Baseline 的 REINFORCE，观察基线如何让策略梯度训练更快、更稳。
 
-> **本节代码**：[reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_with_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)
+> **本节代码**：[reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_with_baseline.py) · [render_cartpole_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/render_cartpole_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)
 
 前两节已经说明了 REINFORCE 的基本思想：
 如果一段轨迹得到高回报，
@@ -103,6 +103,19 @@ Baseline 版本先训练一个价值网络估计 $V(s_t)$，
 
 本节讲义中的图像就是由这个脚本导出的。
 
+如果希望同时导出回放 GIF，
+可以运行：
+
+```bash
+python code/chapter05_policy_gradient/render_cartpole_baseline.py \
+  --episodes 500 \
+  --seed 0
+```
+
+这个脚本会重新训练两个策略，
+然后用确定性动作渲染各自的 CartPole 回放，
+并把 GIF 写入 `docs/chapter05_policy_gradient/images/`。
+
 ## 5.3.3 看奖励曲线
 
 先看最直接的结果：小车能立住多久。
@@ -132,7 +145,38 @@ Baseline 不是一个装饰性的数学项。
 它能让策略更快进入“基本能立住杆子”的区域，
 并减少训练后期突然退步的概率。
 
-## 5.3.4 看方差曲线
+## 5.3.4 看回放
+
+曲线说明平均趋势，
+回放则说明策略到底在做什么。
+下面两段 GIF 使用同一个渲染脚本生成，
+展示训练 500 回合后两种策略的确定性表现。
+
+**Vanilla REINFORCE：能坚持一段时间，但仍然容易越调越偏。**
+这次渲染回报为 `166`。
+它已经不再是随机策略，
+但杆子偏离后修正不够稳定，
+小车会逐渐把局面推到不可恢复的位置。
+
+![Vanilla REINFORCE 训练后的 CartPole 回放：策略已经学到一部分平衡动作，但仍会逐渐失稳。](./images/cartpole-vanilla-reinforce.gif)
+
+**REINFORCE + Baseline：更稳定地把杆子拉回中心附近。**
+这次渲染回报为 `355`。
+它不是每次都达到 500 步上限，
+但动作修正明显更连贯，
+杆子偏离时更容易被拉回来。
+
+![REINFORCE + Baseline 训练后的 CartPole 回放：策略能更稳定地修正杆子角度。](./images/cartpole-reinforce-baseline.gif)
+
+这两段回放的意义不是证明某一个 seed 永远如此，
+而是帮助理解奖励曲线中的差别。
+原始 REINFORCE 的更新信号更吵，
+策略可能学到一些有用动作，
+但对不同状态的判断不够稳定。
+Baseline 版本通过 $G_t - V(s_t)$ 过滤掉一部分“这个状态本来就容易/本来就危险”的影响，
+更容易把学习集中在动作本身带来的增益上。
+
+## 5.3.5 看方差曲线
 
 奖励曲线回答“策略表现是否变好”。
 方差曲线回答另一个问题：
@@ -155,7 +199,7 @@ Baseline 把方差降到了原来的约 `27%`。
 更新信号更稳，
 策略就更容易持续朝着“让杆子站住”的方向移动。
 
-## 5.3.5 代码里到底改了什么
+## 5.3.6 代码里到底改了什么
 
 原始 REINFORCE 的核心更新是：
 
@@ -207,7 +251,7 @@ policy_loss = -(log_probs * advantages).mean()
 这也是为什么它叫“降方差”，
 而不是“改目标”。
 
-## 5.3.6 回到画面中理解
+## 5.3.7 回到画面中理解
 
 想象小车已经把杆子扶到接近竖直的位置。
 如果它本来就能从这个状态继续坚持很久，
@@ -231,7 +275,7 @@ policy_loss = -(log_probs * advantages).mean()
 和在容易状态下拿到 100 分，
 含义并不一样。
 
-## 5.3.7 常见误读
+## 5.3.8 常见误读
 
 **误读一：Baseline 会让奖励变大。**
 Baseline 不改环境奖励。
