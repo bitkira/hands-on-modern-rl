@@ -10,7 +10,7 @@
 - [REINFORCE 与基线实验](../chapter05_policy_gradient/baseline-experiment)——从 $G_t$ 到 $G_t - V(s)$ 的动机
   :::
 
-## 从 REINFORCE 到 Actor-Critic：关键的一步
+## 从 REINFORCE 到 Actor-Critic
 
 回顾第 5 章 REINFORCE 的梯度公式（回顾：[策略梯度定理](../chapter05_policy_gradient/policy-gradient)）：
 
@@ -30,7 +30,7 @@ $$\nabla_\theta J \approx \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot \delta$$
 | 偏差     | 无偏                      | 有偏（[自举](../chapter03_mdp/dp-mc-td)引入偏差）      |
 | 代价     | 无                        | 需要训练 Critic                                        |
 
-## Actor-Critic：两个网络，各司其职
+## Actor-Critic 架构
 
 把优势函数和 Critic 训练整合起来，就得到了强化学习中最经典的架构。Actor 负责选择动作，Critic 负责评估动作的好坏，两者通过优势函数 $A(s,a)$ 协作：
 
