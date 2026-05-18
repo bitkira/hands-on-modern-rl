@@ -66,9 +66,12 @@
 
 强化学习的交互过程是一个不断重复的循环：
 
-$$
-\text{智能体} \underset{\text{状态 } s_{t+1} + \text{奖励 } r_{t+1}}{\overset{\text{动作 } a_t}{\longleftrightarrow}} \text{环境}
-$$
+<div align="center" style="margin: 2.5rem 0;">
+  <img src="./images/rl-loop.svg" alt="强化学习核心循环：智能体与环境交互" style="max-width: 520px; width: 100%;">
+</div>
+<div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
+  <em>图：强化学习核心循环。智能体执行动作，环境返回新状态与奖励。</em>
+</div>
 
 1. 智能体观察到当前状态 $s_t$，选择动作 $a_t$
 2. 环境执行动作，转移到新状态 $s_{t+1}$，返回奖励 $r_{t+1}$
@@ -93,24 +96,24 @@ $$G_t = r_{t+1} + \gamma\, r_{t+2} + \gamma^2\, r_{t+3} + \cdots = \sum_{k=0}^{\
 - $r_{t+3}$ 是走三步才能拿到的奖励，打两次折，乘上 $\gamma^2$。
 - 依此类推，未来的第 $k+1$ 步奖励，就要乘上 $\gamma^k$。因为 $\gamma$ 是个小于 1 的小数（例如 0.9），所以 $\gamma^k$ 会随着步数的增加而越来越小（0.9, 0.81, 0.729...）。
 
-所以，$\gamma$ 的大小决定了智能体的“视野”。让我们用下面这只老鼠来算一笔账：
+所以，$\gamma$ 的大小决定了智能体的”视野”。让我们用一个简单的例子来算一笔账：
 
-$$
-\begin{aligned}
-\text{起点 🐭} &\xrightarrow{\text{1 步},\ r=+1} \text{小奶酪 🧀} \\
-\text{起点 🐭} &\xrightarrow{\text{4 步},\ r=+10} \text{大奶酪 🧀🧀🧀} \xrightarrow{\text{猫在旁边 🐱}} \text{危险}
-\end{aligned}
-$$
+<div align="center" style="margin: 2.5rem 0;">
+  <img src="./images/mouse-cheese.svg" alt="即时奖励与远期奖励的权衡" style="max-width: 580px; width: 100%;">
+</div>
+<div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
+  <em>图：折扣因子决定决策偏好。即时奖励与远期奖励（伴随风险）的权衡。</em>
+</div>
 
-老鼠面前有两条路：
+智能体面临两条路径：
 
-- **短视路线（走 1 步）**：马上吃到小奶酪，奖励是 +1。因为它就在眼前，不需要打折，实际价值就是 **1 分**。
-- **长远路线（走 4 步）**：跋涉 4 步才能吃到大奶酪，奖励是 +10。因为隔了步数，奖励要被打折，假设要乘上 $\gamma^3$（打了 3 次折）。
+- **即时奖励**：距离近，奖励是 +1。不需要打折，实际价值就是 **1 分**。
+- **远期奖励**：距离远，奖励是 +10，但伴随风险。因为隔了步数，奖励要被打折，假设要乘上 $\gamma^3$（打了 3 次折）。
 
 这个时候，$\gamma$ 的取值就成了决定性因素：
 
-- **如果 $\gamma = 0.1$（目光短浅）**：大奶酪在老鼠眼里的价值变成了 $10 \times 0.1^3 = 0.01$ 分。老鼠一看，0.01 分远不如眼前的 1 分，于是**直奔小奶酪**。
-- **如果 $\gamma = 0.9$（目光长远）**：大奶酪在老鼠眼里的价值变成了 $10 \times 0.9^3 = 7.29$ 分。老鼠一算，7.29 分远大于眼前的 1 分，于是它愿意抵御眼前的诱惑，**冒险绕路去拿大奶酪**。
+- **如果 $\gamma = 0.1$（目光短浅）**：远期奖励在智能体眼里的价值变成了 $10 \times 0.1^3 = 0.01$ 分。0.01 分远不如眼前的 1 分，于是智能体**选择即时奖励**。
+- **如果 $\gamma = 0.9$（目光长远）**：远期奖励在智能体眼里的价值变成了 $10 \times 0.9^3 = 7.29$ 分。7.29 分远大于眼前的 1 分，于是智能体愿意抵御眼前的诱惑，**选择远期奖励**。
 
 ![Maze Mouse Cheese](./images/maze_mouse_cheese.jpg)
 

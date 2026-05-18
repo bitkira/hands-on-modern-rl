@@ -64,9 +64,12 @@ $$
 
 Rollout 是一次完整的交互过程，而驱动其运行的引擎称为 **Agent Loop（智能体循环）**。它与第 1 章介绍的 RL 核心循环本质相同，只是动作空间从"左/右"扩展为"文本/工具调用/代码执行"：
 
-$$
-\text{智能体} \underset{\text{观测 } o_{t+1}}{\overset{\text{动作 } a_t}{\longleftrightarrow}} \text{环境（搜索引擎/代码沙箱/API）}
-$$
+<div align="center" style="margin: 2.5rem 0;">
+  <img src="./images/agentic-loop.svg" alt="Agent Loop：智能体与环境（含工具）交互" style="max-width: 560px; width: 100%;">
+</div>
+<div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
+  <em>图：Agent Loop。智能体执行动作（文本/工具调用/代码执行），环境返回观测（搜索结果/执行输出/API 响应）。</em>
+</div>
 
 1. **感知**：智能体接收到当前的环境观测 $o_t$（如搜索结果、代码报错、网页内容）
 2. **推理**：模型基于观测，生成下一步的思考（Chain-of-Thought）
