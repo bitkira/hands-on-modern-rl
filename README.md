@@ -175,6 +175,7 @@ Issues and pull requests are welcome for typo fixes, conceptual corrections, rep
 
 > **Note:** This course was created with AI assistance and has not yet been fully reviewed. It may contain factual mistakes or code that does not run as expected. Issues and pull requests are very welcome.
 
+- **[2026-05-15]** 📖 **Full English Translation & PDF Release**: Complete English translation of all chapters is now available. PDF builds for both Chinese and English editions are released automatically via CI.
 - **[2026-05-13]** 🚀 **Major Upgrade: LLM and Traditional RL Hands-on Labs**: Added reproducible training examples for **Agentic RL** (Deep Research / rLLM) and **Traditional RL** (Actor-Critic continuous control). Includes complete code and fine-tuning analysis for building an Agentic training system from scratch, along with new VLM RL (GeoQA geometry reasoning) hands-on experiments!
 - **[2026-05-02]** Initial browsable open-source release for testing and feedback.
 
@@ -183,8 +184,8 @@ Issues and pull requests are welcome for typo fixes, conceptual corrections, rep
 The course is under active development. Planned milestones:
 
 - [x] **2026-05-02:** Initial open-source browsable release for community testing and feedback.
-- [ ] **2026-05-10:** Publish a first stable minor version, fix early typos, and stabilize Part 1 and Part 2 content and code.
-- [ ] **Late May 2026:** Improve reproducible LLM RL experiments and add a full RLVR hands-on module with evaluation.
+- [x] **2026-05-10:** Publish a first stable minor version, fix early typos, and stabilize Part 1 and Part 2 content and code.
+- [x] **Late May 2026:** Improve reproducible LLM RL experiments and add a full RLVR hands-on module with evaluation.
 - [ ] **Early June 2026:** Deliver Agentic RL projects step by step, from single-tool use to complex Deep Research trajectory synthesis.
 - [ ] **Late June 2026:** Add Unity-based embodied RL environments and trainable project examples.
 - [ ] **July 2026 and later:** Expand multimodal frontier content with full VLM RL or Diffusion RL hands-on cases.
