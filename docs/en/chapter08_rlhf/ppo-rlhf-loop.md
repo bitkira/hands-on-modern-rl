@@ -126,7 +126,7 @@ $$
 \mathcal{L}_{clip}(\theta) = -\frac{1}{T}\sum_{t=1}^{T}\min(\rho_t A_t,\ \mathrm{clip}(\rho_t,1-\epsilon,1+\epsilon)A_t)
 $$
 
-A concrete example. The user asks "What is 3 + 3 \* 6?", and the model generates 9 tokens:
+A concrete example. The user asks "What is 3 + 3 \* 6?", and the model generates 5 tokens:
 
 ```text
 The  answer  is  2  1
